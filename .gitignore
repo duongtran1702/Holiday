@@ -59,3 +59,5 @@ share/python-wheels/
 
 # OS
 Thumbs.db
+update_docx.py
+*.py
