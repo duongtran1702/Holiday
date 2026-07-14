@@ -12,7 +12,8 @@ export type StaffMember = {
 
 export interface LoginRequest {
     email: string;
-    password: string;
+    password?: string;
+    portal?: string;
 }
 
 export interface RegisterRequest {
@@ -26,8 +27,11 @@ export interface UserInfo {
     id: string;
     email: string;
     fullName: string;
+    phone?: string;
+    address?: string;
     role: string;
     status: string;
+    authProvider?: string;
     permissions?: string[];
 }
 

@@ -40,6 +40,14 @@ import java.util.UUID;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import atmin.controller.auth.dto.Verify2FARequest;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
+import org.springframework.beans.factory.annotation.Value;
+import java.util.Collections;
+import atmin.controller.auth.dto.GoogleLoginRequest;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -55,6 +63,9 @@ public class AuthServiceImpl implements AuthService {
     private final JwtProperties jwtProperties;
     private final IEmailService emailService;
     private final StringRedisTemplate stringRedisTemplate;
+
+    @Value("${google.client.id}")
+    private String googleClientId;
 
     @Override
     @Transactional
@@ -86,15 +97,35 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse login(LoginRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
+        User existingUser = userRepository.findByEmailAndDeletedAtIsNull(request.getEmail()).orElse(null);
+        if (existingUser != null && "GOOGLE".equals(existingUser.getAuthProvider())) {
+            throw new UnauthorizedException("Vui lòng đăng nhập bằng Google.");
+        }
+
+        Authentication authentication;
+        try {
+            authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+            );
+        } catch (org.springframework.security.core.AuthenticationException e) {
+            log.error("Login failed for user {}: {}", request.getEmail(), e.getMessage());
+            throw new UnauthorizedException("Email hoặc mật khẩu không chính xác.");
+        }
         log.info("Người dùng {} đăng nhập thành công", request.getEmail());
 
         User user = (User) authentication.getPrincipal();
         
-        boolean require2fa = user.getRoles().stream()
+        boolean isAdminOrStaff = user.getRoles().stream()
                 .anyMatch(r -> r.getName().equalsIgnoreCase("ADMIN") || r.getName().equalsIgnoreCase("STAFF"));
+                
+        if ("customer".equalsIgnoreCase(request.getPortal()) && isAdminOrStaff) {
+            throw new UnauthorizedException("Tài khoản quản trị không được đăng nhập tại đây.");
+        }
+        if ("admin".equalsIgnoreCase(request.getPortal()) && !isAdminOrStaff) {
+            throw new UnauthorizedException("Bạn không có quyền truy cập trang quản trị.");
+        }
+
+        boolean require2fa = isAdminOrStaff;
                 
         if (require2fa) {
             String key = "OTP:" + user.getEmail();
@@ -200,6 +231,10 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmailAndDeletedAtIsNull(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
 
+        if ("GOOGLE".equals(user.getAuthProvider())) {
+            throw new IllegalArgumentException("Tài khoản Google không thể đổi mật khẩu.");
+        }
+
         if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
             throw new IllegalArgumentException("Mật khẩu cũ không chính xác!");
         }
@@ -225,6 +260,10 @@ public class AuthServiceImpl implements AuthService {
     public void forgotPassword(ForgotPasswordRequest request) {
         User user = userRepository.findByEmailAndDeletedAtIsNull(request.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("User", "email", request.getEmail()));
+
+        if ("GOOGLE".equals(user.getAuthProvider())) {
+            throw new IllegalArgumentException("Tài khoản Google không thể đổi mật khẩu.");
+        }
 
         String token = UUID.randomUUID().toString();
         user.setResetToken(token);
@@ -298,8 +337,12 @@ public class AuthServiceImpl implements AuthService {
                 .id(user.getId())
                 .email(user.getEmail())
                 .fullName(user.getFullName())
+                .avatarUrl(user.getAvatarUrl())
+                .phone(user.getPhoneNumber())
+                .address(user.getAddress())
                 .role(primaryRole)
                 .status(user.getStatus())
+                .authProvider(user.getAuthProvider())
                 .permissions(permissions)
                 .build();
 
@@ -315,6 +358,60 @@ public class AuthServiceImpl implements AuthService {
         if (activeTokens != null && !activeTokens.isEmpty()) {
             activeTokens.forEach(t -> t.setRevoked(true));
             refreshTokenRepository.saveAll(activeTokens);
+        }
+    }
+
+    @Override
+    @Transactional
+    public AuthResponse loginWithGoogle(GoogleLoginRequest request) {
+        try {
+            org.springframework.web.client.RestTemplate restTemplate = new org.springframework.web.client.RestTemplate();
+            org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+            headers.setBearerAuth(request.getAccessToken());
+            org.springframework.http.HttpEntity<String> entity = new org.springframework.http.HttpEntity<>("parameters", headers);
+            
+            org.springframework.http.ResponseEntity<java.util.Map> response = restTemplate.exchange(
+                    "https://www.googleapis.com/oauth2/v3/userinfo", 
+                    org.springframework.http.HttpMethod.GET, 
+                    entity, 
+                    java.util.Map.class);
+            
+            java.util.Map<String, Object> payload = response.getBody();
+            if (payload == null || !payload.containsKey("email")) {
+                throw new UnauthorizedException("Invalid Access Token");
+            }
+            
+            String email = (String) payload.get("email");
+            String name = (String) payload.get("name");
+
+            User user = userRepository.findByEmailAndDeletedAtIsNull(email).orElse(null);
+
+            if (user == null) {
+                // Register new user
+                Role customerRole = roleRepository.findByNameAndDeletedAtIsNull("CUSTOMER")
+                        .orElseGet(() -> roleRepository.save(Role.builder().name("CUSTOMER").build()));
+
+                user = User.builder()
+                        .email(email)
+                        .password(passwordEncoder.encode(UUID.randomUUID().toString())) // Random password
+                        .fullName(name)
+                        .status("active")
+                        .isEnabled(true)
+                        .authProvider("GOOGLE")
+                        .roles(Set.of(customerRole))
+                        .build();
+
+                user = userRepository.save(user);
+            } else {
+                if (!"GOOGLE".equals(user.getAuthProvider())) {
+                    throw new UnauthorizedException("Vui lòng đăng nhập bằng mật khẩu.");
+                }
+            }
+
+            return buildAuthResponse(user, true); // true = login immediately, issue token
+        } catch (Exception e) {
+            log.error("Google login failed", e);
+            throw new UnauthorizedException("Đăng nhập bằng Google thất bại: " + e.getMessage());
         }
     }
 }

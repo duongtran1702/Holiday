@@ -27,7 +27,15 @@ export function AdminUsers() {
   };
 
   const handleAddStaff = async () => {
-    if (!newStaff.name || !newStaff.email) return;
+    if (!newStaff.name.trim() || !newStaff.email.trim()) {
+      toast.error("Vui lòng điền đủ Tên và Email.");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newStaff.email.trim())) {
+      toast.error("Định dạng email không hợp lệ.");
+      return;
+    }
     try {
       await callApi("/admin/users/staff", "POST", {
         fullName: newStaff.name,

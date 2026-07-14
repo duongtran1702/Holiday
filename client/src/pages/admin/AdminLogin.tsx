@@ -29,12 +29,14 @@ export function AdminLoginPage() {
 
   const handleAdminCreds = async () => {
     setAdminError("");
-    if (!adminEmail || !adminPw) { setAdminError("Vui lòng nhập đầy đủ thông tin."); return; }
+    if (!adminEmail.trim() || !adminPw.trim()) { setAdminError("Vui lòng nhập đầy đủ thông tin."); return; }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(adminEmail.trim())) { setAdminError("Định dạng email không hợp lệ."); return; }
     if (failCount >= 5) { setAdminStep("locked"); setCountdown(1800); return; }
 
     try {
-      const response = await authApi.login({ email: adminEmail, password: adminPw });
-      const { user, require2fa, accessToken, refreshToken } = response.data;
+      const response = await authApi.login({ email: adminEmail, password: adminPw, portal: 'admin' });
+      const { user, require2fa, accessToken } = response.data;
       
       const roleStr = user.role?.toLowerCase() as AuthRole;
       if (roleStr !== "admin" && roleStr !== "staff") {

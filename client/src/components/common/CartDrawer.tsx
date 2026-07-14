@@ -1,64 +1,104 @@
-import React, { useState } from "react";
-import { ShoppingCart, X, Plus, Minus, ArrowRight } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { ShoppingCart, X, Plus, Minus, ArrowRight, Trash2 } from "lucide-react";
 import { fmt } from "../../util/format";
 
-export function CartDrawer({ cart, setCart, onClose }: Readonly<{ cart: CartItem[]; setCart: (c: CartItem[]) => void; onClose: () => void }>) {
+export function CartDrawer({ cart, setCart, onClose, onCheckout }: Readonly<{ cart: any[]; setCart: (c: any[]) => void; onClose: () => void; onCheckout?: () => void; }>) {
   const [voucher, setVoucher] = useState("");
   const [voucherOk, setVoucherOk] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const discount = voucherOk ? Math.floor(subtotal * 0.1) : 0;
+
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(onClose, 300);
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex">
-      <div className="flex-1 bg-black/30 backdrop-blur-[1px]" onClick={onClose} />
-      <div className="w-72 bg-card flex flex-col shadow-2xl border-l border-border">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-          <div className="flex items-center gap-2">
-            <ShoppingCart size={15} />
-            <span className="text-sm font-semibold">Giỏ hàng</span>
-            {cart.length > 0 && <span className="bg-accent text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">{cart.reduce((s,i)=>s+i.qty,0)}</span>}
-          </div>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground p-1 transition-colors"><X size={15} /></button>
+    <div className="fixed inset-0 z-[100] flex justify-end">
+      {/* Overlay */}
+      <div 
+        className={`fixed inset-0 bg-black/20 backdrop-blur-sm transition-opacity duration-300 ${!mounted || isClosing ? 'opacity-0' : 'opacity-100'}`} 
+        onClick={handleClose} 
+      />
+      
+      {/* Drawer */}
+      <div 
+        className={`relative w-[340px] max-w-[100vw] bg-background flex flex-col shadow-2xl transition-transform duration-300 ease-out ${!mounted || isClosing ? 'translate-x-full' : 'translate-x-0'}`}
+      >
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border/40">
+          <h2 className="text-sm font-semibold tracking-wide uppercase flex items-center gap-2">
+            Giỏ hàng 
+            <span className="bg-foreground text-background text-[10px] w-5 h-5 flex items-center justify-center rounded-full">{cart.reduce((s,i)=>s+i.qty,0)}</span>
+          </h2>
+          <button onClick={handleClose} className="text-muted-foreground hover:bg-muted p-1.5 rounded-full transition-colors"><X size={16} strokeWidth={2} /></button>
         </div>
-        <div className="flex-1 overflow-y-auto py-2">
+
+        <div className="flex-1 overflow-y-auto px-5 py-2 space-y-5">
           {cart.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center px-4">
-              <ShoppingCart size={32} className="text-muted-foreground/40 mb-2" />
-              <p className="text-sm text-muted-foreground">Giỏ hàng trống</p>
-              <button onClick={onClose} className="mt-3 text-xs text-accent hover:underline">Tiếp tục mua sắm</button>
+            <div className="flex flex-col items-center justify-center h-full text-center opacity-60">
+              <ShoppingCart size={40} strokeWidth={1.5} className="mb-4 text-muted-foreground" />
+              <p className="text-sm font-medium">Giỏ hàng của bạn đang trống</p>
+              <button onClick={handleClose} className="mt-4 text-xs font-semibold px-4 py-2 rounded-full border border-border hover:bg-muted transition-colors">Tiếp tục mua sắm</button>
             </div>
-          ) : cart.map((item, idx) => (
-            <div key={idx} className="flex items-center gap-2.5 px-4 py-2.5 hover:bg-muted/30 transition-colors border-b border-border/50 last:border-0">
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium leading-snug truncate">{item.name}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{item.size} · {item.color}</p>
-                <p className="text-xs font-semibold text-accent mt-0.5">{fmt(item.price * item.qty)}</p>
-              </div>
-              <div className="flex flex-col items-end gap-1.5 shrink-0">
-                <button onClick={() => setCart(cart.filter((_, i) => i !== idx))} className="text-muted-foreground hover:text-destructive transition-colors"><X size={11} /></button>
-                <div className="flex items-center border border-border rounded overflow-hidden">
-                  <button onClick={() => setCart(cart.map((i,n) => n===idx ? {...i,qty:Math.max(1,i.qty-1)} : i))} className="w-5 h-5 flex items-center justify-center hover:bg-muted text-muted-foreground"><Minus size={9} /></button>
-                  <span className="text-xs w-5 text-center">{item.qty}</span>
-                  <button onClick={() => setCart(cart.map((i,n) => n===idx ? {...i,qty:i.qty+1} : i))} className="w-5 h-5 flex items-center justify-center hover:bg-muted text-muted-foreground"><Plus size={9} /></button>
+          ) : (
+            <div className="space-y-5">
+              {cart.map((item, idx) => (
+                <div key={idx} className="flex gap-3">
+                  {/* Thumbnail Image */}
+                  <div className="w-20 h-24 bg-muted/40 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center border border-border/40 relative group">
+                    {item.image ? (
+                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <ShoppingCart className="text-muted-foreground/30" size={20} />
+                    )}
+                    <button onClick={() => setCart(cart.filter((_, i) => i !== idx))} className="absolute top-1 right-1 bg-white/80 backdrop-blur p-1 rounded-full text-destructive opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-white"><X size={12} strokeWidth={3} /></button>
+                  </div>
+                  
+                  <div className="flex-1 min-w-0 flex flex-col">
+                    <p className="text-sm font-medium leading-tight line-clamp-2 pr-4">{item.name}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{item.color} / {item.size}</p>
+                    
+                    <div className="mt-auto flex items-center justify-between pt-3">
+                      {/* Cuter Buttons */}
+                      <div className="flex items-center gap-1.5 bg-muted/50 rounded-full p-0.5 border border-border/40">
+                        <button onClick={() => setCart(cart.map((i,n) => n===idx ? {...i,qty:Math.max(1,i.qty-1)} : i))} className="w-6 h-6 flex items-center justify-center rounded-full bg-white text-muted-foreground hover:text-foreground shadow-sm transition-colors"><Minus size={12} strokeWidth={2.5} /></button>
+                        <span className="text-xs font-medium w-4 text-center">{item.qty}</span>
+                        <button onClick={() => setCart(cart.map((i,n) => n===idx ? {...i,qty:i.qty+1} : i))} className="w-6 h-6 flex items-center justify-center rounded-full bg-white text-muted-foreground hover:text-foreground shadow-sm transition-colors"><Plus size={12} strokeWidth={2.5} /></button>
+                      </div>
+                      <p className="text-sm font-bold text-accent">{fmt(item.price * item.qty)}</p>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
-          ))}
+          )}
         </div>
+
         {cart.length > 0 && (
-          <div className="border-t border-border px-4 py-3 space-y-2.5">
-            <div className="flex gap-1.5">
-              <input value={voucher} onChange={e => setVoucher(e.target.value)} placeholder="Mã giảm giá (ATMIN10)"
-                className="flex-1 text-xs px-2.5 py-1.5 bg-input-background border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-ring" />
+          <div className="p-5 bg-background border-t border-border/40 shadow-[0_-4px_20px_-15px_rgba(0,0,0,0.1)] z-10">
+            <div className="mb-4 flex gap-2">
+              <input value={voucher} onChange={e => setVoucher(e.target.value)} placeholder="Nhập mã giảm giá..."
+                className="flex-1 text-sm bg-muted/30 border border-border/60 rounded-full focus:border-foreground focus:outline-none py-2 px-4 transition-colors placeholder:text-muted-foreground/60" />
               <button onClick={() => { if (voucher.toUpperCase() === "ATMIN10") setVoucherOk(true); }}
-                className="text-xs px-2.5 py-1.5 bg-accent text-white rounded-lg hover:bg-accent/90 transition-colors whitespace-nowrap">Dùng</button>
+                className="text-xs font-semibold px-4 rounded-full bg-foreground text-background hover:bg-foreground/90 transition-colors whitespace-nowrap">Áp Dụng</button>
             </div>
-            {voucherOk && <p className="text-xs text-emerald-600 font-medium">✓ Giảm 10% — {fmt(discount)}</p>}
-            <div className="flex justify-between text-sm font-semibold pt-1 border-t border-border/60">
-              <span>Tổng</span>
-              <span style={{ fontFamily: "'Playfair Display', serif" }} className="text-accent">{fmt(subtotal - discount)}</span>
+            
+            {voucherOk && <div className="flex justify-between text-sm text-emerald-600 mb-3 font-medium px-1"><span>Giảm giá (ATMIN10)</span><span>-{fmt(discount)}</span></div>}
+            
+            <div className="flex justify-between items-end mb-4 px-1">
+              <span className="text-sm font-medium text-muted-foreground">Tổng cộng</span>
+              <span className="text-lg font-bold">{fmt(subtotal - discount)}</span>
             </div>
-            <button className="w-full bg-primary text-primary-foreground py-2.5 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-1.5">
-              Thanh toán <ArrowRight size={13} />
+            
+            <button onClick={onCheckout} className="w-full bg-accent text-white py-3.5 rounded-full text-sm font-bold hover:bg-accent/90 transition-all flex items-center justify-center gap-2 shadow-md shadow-accent/20">
+              Tiến Hành Thanh Toán <ArrowRight size={16} />
             </button>
           </div>
         )}

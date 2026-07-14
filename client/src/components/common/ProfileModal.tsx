@@ -1,18 +1,73 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { User, X, AlertTriangle, Camera, Lock } from "lucide-react";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store/store";
+import { useDispatch } from "react-redux";
+import { updateUser } from "../../redux/slice/authSlice";
+import { userApi } from "../../api/user.api";
+
+import { toast } from "sonner";
 
 export function ProfileModal({ onClose }: { onClose: () => void }) {
+  const dispatch = useDispatch();
+  const user = useSelector((state: RootState) => state.auth.user);
   const [tab, setTab] = useState<"info" | "password">("info");
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [form, setForm] = useState({ name: "Nguyễn Văn Minh", email: "minh@example.com", phone: "0901 234 567" });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [form, setForm] = useState({ 
+    name: user?.fullName || "", 
+    email: user?.email || "", 
+    phone: user?.phone || "",
+    address: user?.address || ""
+  });
   const [pwForm, setPwForm] = useState({ current: "", next: "", confirm: "" });
   const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
-  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) setAvatarPreview(URL.createObjectURL(file));
+    if (file) {
+      setAvatarPreview(URL.createObjectURL(file));
+      setSelectedFile(file);
+    }
   };
-  const handleSave = () => { setSaved(true); setTimeout(() => setSaved(false), 2000); };
+
+  const handleSaveInfo = async () => {
+    if (form.phone && !form.phone.match(/^(0|\+84)[0-9]{9}$/)) {
+      toast.error("Số điện thoại không hợp lệ (phải bắt đầu bằng 0 hoặc +84 và có 10 chữ số)");
+      return;
+    }
+    const toastId = toast.loading("Đang cập nhật thông tin...");
+    try {
+      setLoading(true);
+      let updatedUser = { ...user };
+      
+      // Upload avatar if changed
+      if (selectedFile) {
+        toast.loading("Đang tải ảnh lên...", { id: toastId });
+        const res = await userApi.uploadAvatar(selectedFile);
+        updatedUser = { ...updatedUser, ...res.data };
+      }
+      
+      // Update info
+      toast.loading("Đang lưu thông tin...", { id: toastId });
+      const profileRes = await userApi.updateProfile({ fullName: form.name, phone: form.phone, address: form.address });
+      updatedUser = { ...updatedUser, ...profileRes.data };
+      
+      dispatch(updateUser(updatedUser as any));
+      toast.success("Cập nhật thông tin thành công!", { id: toastId });
+      onClose();
+    } catch (err: any) {
+      console.error(err);
+      const errorMsg = err.response?.data?.message || "Cập nhật thất bại. Vui lòng thử lại sau.";
+      toast.error(errorMsg, { id: toastId });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSavePassword = () => { setSaved(true); setTimeout(() => setSaved(false), 2000); };
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
@@ -25,7 +80,9 @@ export function ProfileModal({ onClose }: { onClose: () => void }) {
           <button onClick={onClose} className="text-primary-foreground/50 hover:text-primary-foreground p-1"><X size={18} /></button>
         </div>
         <div className="flex border-b border-border">
-          {[{ key: "info", icon: User, label: "Thông tin" }, { key: "password", icon: Lock, label: "Đổi mật khẩu" }].map(t => (
+          {[{ key: "info", icon: User, label: "Thông tin" }, { key: "password", icon: Lock, label: "Đổi mật khẩu" }]
+            .filter(t => !(t.key === "password" && user?.authProvider === "GOOGLE"))
+            .map(t => (
             <button key={t.key} onClick={() => setTab(t.key as any)}
               className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium border-b-2 transition-colors ${tab === t.key ? "border-accent text-accent" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
               <t.icon size={14} />{t.label}
@@ -38,8 +95,10 @@ export function ProfileModal({ onClose }: { onClose: () => void }) {
               <div className="flex flex-col items-center gap-2">
                 <div className="relative">
                   <div className="w-20 h-20 rounded-full bg-muted overflow-hidden border-2 border-border">
-                    {avatarPreview ? <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" /> :
-                      <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-muted-foreground" style={{ fontFamily: "'Playfair Display', serif" }}>M</div>}
+                    {avatarPreview || user?.avatarUrl ? <img src={avatarPreview || user?.avatarUrl} alt="Avatar" className="w-full h-full object-cover" /> :
+                      <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-muted-foreground" style={{ fontFamily: "'Playfair Display', serif" }}>
+                        {form.name ? form.name.charAt(0).toUpperCase() : "U"}
+                      </div>}
                   </div>
                   <button onClick={() => fileRef.current?.click()} className="absolute -bottom-1 -right-1 w-7 h-7 bg-accent text-white rounded-full flex items-center justify-center shadow-md hover:bg-accent/90 transition-colors">
                     <Camera size={13} />
@@ -48,19 +107,23 @@ export function ProfileModal({ onClose }: { onClose: () => void }) {
                 </div>
                 <p className="text-xs text-muted-foreground">Nhấp camera để đổi ảnh đại diện</p>
               </div>
-              {[
-                { label: "Họ và tên", key: "name", type: "text" },
-                { label: "Email", key: "email", type: "email" },
-                { label: "Số điện thoại", key: "phone", type: "tel" },
-              ].map(f => (
-                <div key={f.key}>
-                  <label className="block text-xs font-medium mb-1.5">{f.label}</label>
-                  <input type={f.type} value={(form as any)[f.key]} onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
-                    className="w-full text-sm px-3 py-2.5 bg-input-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-all" />
-                </div>
-              ))}
-              <button onClick={handleSave} className={`w-full py-2.5 rounded-lg text-sm font-medium transition-all ${saved ? "bg-emerald-500 text-white" : "bg-primary text-primary-foreground hover:bg-primary/90"}`}>
-                {saved ? "✓ Đã lưu" : "Lưu thông tin"}
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: "Họ và tên", key: "name", type: "text" },
+                  { label: "Email", key: "email", type: "email" },
+                  { label: "Số điện thoại", key: "phone", type: "tel" },
+                  { label: "Địa chỉ nhận hàng", key: "address", type: "text" },
+                ].map(f => (
+                  <div key={f.key} className={f.key === "address" ? "col-span-2" : (f.key === "name" || f.key === "email" ? "col-span-2" : "col-span-2")}>
+                    <label className="block text-xs font-medium mb-1.5">{f.label}</label>
+                    <input type={f.type} value={(form as any)[f.key]} onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
+                      disabled={f.key === "email"}
+                      className={`w-full text-sm px-3 py-2.5 bg-input-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-all ${f.key === "email" ? "opacity-60 cursor-not-allowed" : ""}`} />
+                  </div>
+                ))}
+              </div>
+              <button onClick={handleSaveInfo} disabled={loading} className={`w-full py-2.5 rounded-lg text-sm font-medium transition-all ${saved ? "bg-emerald-500 text-white" : "bg-primary text-primary-foreground hover:bg-primary/90"}`}>
+                {saved ? "✓ Đã lưu" : (loading ? "Đang lưu..." : "Lưu thông tin")}
               </button>
             </div>
           )}
@@ -81,7 +144,7 @@ export function ProfileModal({ onClose }: { onClose: () => void }) {
                 </div>
               ))}
               {pwForm.next && pwForm.confirm && pwForm.next !== pwForm.confirm && <p className="text-xs text-destructive">Mật khẩu không khớp</p>}
-              <button onClick={handleSave} disabled={!pwForm.current || !pwForm.next || pwForm.next !== pwForm.confirm}
+              <button onClick={handleSavePassword} disabled={!pwForm.current || !pwForm.next || pwForm.next !== pwForm.confirm}
                 className={`w-full py-2.5 rounded-lg text-sm font-medium transition-all ${saved ? "bg-emerald-500 text-white" : "bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-40"}`}>
                 {saved ? "✓ Đã đổi mật khẩu" : "Đổi mật khẩu"}
               </button>

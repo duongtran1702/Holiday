@@ -44,6 +44,12 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "phone_number", length = 20, unique = true)
     private String phoneNumber;
 
+    @Column(name = "address")
+    private String address;
+
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
     @Column(length = 20)
     private String status;
 
@@ -59,6 +65,10 @@ public class User extends BaseEntity implements UserDetails {
 
     @Column(name = "password_changed_at")
     private LocalDateTime passwordChangedAt;
+
+    @Column(name = "auth_provider", length = 20)
+    @Builder.Default
+    private String authProvider = "LOCAL";
 
     @JoinTable(
             name = "user_role",

@@ -75,6 +75,7 @@ erDiagram
     products ||--o{ reviews : "1 SP có nhiều review"
 
     orders ||--o{ order_items : "1 đơn có nhiều dòng SP"
+    orders ||--o| invoices : "1 đơn có 1 hóa đơn thanh toán"
     orders ||--o{ order_status_history : "1 đơn có nhiều log trạng thái"
     product_variants ||--o{ order_items : "1 variant xuất hiện trong nhiều đơn"
 
@@ -91,9 +92,11 @@ erDiagram
         VARCHAR email
         VARCHAR password_hash
         VARCHAR full_name
-        VARCHAR phone
+        VARCHAR phone_number
+        TEXT address
         VARCHAR role
         VARCHAR status
+        VARCHAR auth_provider
     }
 
     agent_profiles {
@@ -138,11 +141,22 @@ erDiagram
 
     orders {
         CHAR_36 id PK
-        VARCHAR order_code
+        BIGINT order_code
         CHAR_36 user_id FK
         VARCHAR order_type
         VARCHAR status
+        VARCHAR payment_method
+        TEXT shipping_address
         BIGINT total_amount
+    }
+    
+    invoices {
+        CHAR_36 id PK
+        CHAR_36 order_id FK
+        VARCHAR invoice_number
+        BIGINT total_amount
+        VARCHAR payment_status
+        VARCHAR transaction_reference
     }
 
     order_items {
@@ -177,6 +191,7 @@ erDiagram
 ```
 
 ---
+
 
 ## 3. TỔNG QUAN CÁC BẢNG
 
@@ -238,11 +253,17 @@ CREATE TABLE users (
   email           VARCHAR(255) NOT NULL,
   password_hash   VARCHAR(255) NOT NULL,
   full_name       VARCHAR(255) NOT NULL,
-  phone           VARCHAR(20)  DEFAULT NULL,
+  phone_number    VARCHAR(20)  DEFAULT NULL,
+  address         TEXT         DEFAULT NULL,
   role            ENUM('customer','agent','admin','staff') NOT NULL,
   status          ENUM('active','pending','suspended','locked') NOT NULL DEFAULT 'active',
   avatar_url      TEXT         DEFAULT NULL,
   email_verified  TINYINT(1)   NOT NULL DEFAULT 0,
+  is_enabled      TINYINT(1)   NOT NULL DEFAULT 1,
+  reset_token     VARCHAR(255) DEFAULT NULL,
+  reset_token_expiry DATETIME  DEFAULT NULL,
+  password_changed_at DATETIME DEFAULT NULL,
+  auth_provider   ENUM('LOCAL','GOOGLE','FACEBOOK') NOT NULL DEFAULT 'LOCAL',
 
   -- Audit + Soft Delete
   created_at      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -254,6 +275,7 @@ CREATE TABLE users (
   PRIMARY KEY (id),
   -- Email unique chỉ khi chưa xóa (dùng trick: unique trên email + deleted_at placeholder)
   UNIQUE KEY uq_users_email (email, deleted_at),
+  UNIQUE KEY uq_users_phone (phone_number),
   INDEX idx_users_role_status (role, status, deleted_at),
   INDEX idx_users_deleted (deleted_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -593,13 +615,14 @@ CREATE TABLE promotions (
 
 CREATE TABLE orders (
   id              CHAR(36)    NOT NULL DEFAULT (UUID()),
-  order_code      VARCHAR(30) NOT NULL,
+  order_code      BIGINT      NOT NULL,
   user_id         CHAR(36)    NOT NULL,
-  order_type      ENUM('B2C','B2B') NOT NULL,
-  status          ENUM('pending','processing','shipping','delivered','completed','cancelled')
-                    NOT NULL DEFAULT 'pending',
-  payment_method  ENUM('cash','credit','vnpay','bank_transfer') DEFAULT NULL,
-  payment_status  ENUM('unpaid','partial','paid','refunded') DEFAULT 'unpaid',
+  order_type      ENUM('B2C','B2B') NOT NULL DEFAULT 'B2C',
+  status          ENUM('PENDING','PENDING_PAYMENT','PAID','PROCESSING','SHIPPING','DELIVERED','COMPLETED','CANCELLED')
+                    NOT NULL DEFAULT 'PENDING',
+  payment_method  ENUM('COD','PAYOS','CREDIT','VNPAY','BANK_TRANSFER') DEFAULT 'COD',
+  shipping_address TEXT       DEFAULT NULL,
+  phone_number    VARCHAR(20) DEFAULT NULL,
   total_qty       INT         NOT NULL DEFAULT 0,
   subtotal        BIGINT      NOT NULL DEFAULT 0,
   discount_amount BIGINT      DEFAULT 0,
@@ -636,6 +659,36 @@ CREATE TABLE orders (
 | Đã giao | `delivered` | Shipper giao thành công |
 | Hoàn thành | `completed` | Khách xác nhận nhận hàng |
 | Đã hủy | `cancelled` | Hủy bởi khách hoặc admin |
+
+---
+
+### 4.11b. `invoices` — Hóa đơn thanh toán (PayOS, v.v.)
+
+```sql
+-- ============================================================
+-- 9b. INVOICES — Hóa đơn thanh toán
+-- ============================================================
+
+CREATE TABLE invoices (
+  id                    CHAR(36)    NOT NULL DEFAULT (UUID()),
+  order_id              CHAR(36)    NOT NULL,
+  invoice_number        VARCHAR(50) NOT NULL,
+  issued_date           DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  total_amount          BIGINT      NOT NULL,
+  payment_status        VARCHAR(50) NOT NULL,
+  transaction_reference VARCHAR(255) DEFAULT NULL,
+
+  created_at            DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at            DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  deleted_at            DATETIME    DEFAULT NULL,
+
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_invoice_number (invoice_number, deleted_at),
+  UNIQUE KEY uq_invoice_order (order_id, deleted_at),
+  CONSTRAINT fk_invoice_order FOREIGN KEY (order_id) REFERENCES orders(id),
+  INDEX idx_invoices_deleted (deleted_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
 
 ---
 

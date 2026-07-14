@@ -30,7 +30,7 @@ export function ProductCard({ product, onAdd }: { product: typeof PRODUCTS[0]; o
             <span style={{ fontFamily: "'Playfair Display', serif" }} className="text-base font-bold text-accent">{fmt(product.price)}</span>
             <p className="text-xs text-muted-foreground">{inStock > 0 ? `Còn ${inStock}` : "Hết"}</p>
           </div>
-          <button disabled={inStock === 0} onClick={() => onAdd({ productId: product.id, size: sel.size, color: sel.color, qty: 1, price: product.price, name: product.name })}
+          <button disabled={inStock === 0} onClick={() => onAdd({ productId: product.id, size: sel.size, color: sel.color, qty: 1, price: product.price, name: product.name, image: product.image })}
             className="flex items-center gap-1 bg-primary text-primary-foreground text-xs px-3 py-2 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
             <ShoppingCart size={12} /> Thêm
           </button>

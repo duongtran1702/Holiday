@@ -10,15 +10,19 @@ import { UserMenu } from "../../components/common/UserMenu";
 
 import { useNavigate } from 'react-router-dom';
 import { atminDispatch } from '../../hook/reduxHook';
-import { logout } from '../../redux/slice/authSlice';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store/store';
+import { CheckoutModal } from '../../components/common/CheckoutModal';
 
 export function B2CPortal() {
   const navigate = useNavigate();
   const dispatch = atminDispatch();
+  const user = useSelector((state: RootState) => state.auth.user);
   const handleLogout = () => { dispatch(logout()); navigate('/login'); };
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("Tất cả");
   const [sortBy, setSortBy] = useState("Mới nhất");
@@ -41,6 +45,15 @@ export function B2CPortal() {
     setCartOpen(true);
   };
   const cartCount = cart.reduce((s,i)=>s+i.qty,0);
+
+  const handleCheckoutClick = () => {
+    setCartOpen(false);
+    if (!user) {
+      navigate('/login');
+    } else {
+      setCheckoutOpen(true);
+    }
+  };
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-40 bg-card/95 backdrop-blur border-b border-border">
@@ -111,8 +124,9 @@ export function B2CPortal() {
           </div>
         </div>
       </section>
-      {cartOpen && <CartDrawer cart={cart} setCart={setCart} onClose={()=>setCartOpen(false)} />}
+      {cartOpen && <CartDrawer cart={cart} setCart={setCart} onClose={()=>setCartOpen(false)} onCheckout={handleCheckoutClick} />}
       {profileOpen && <ProfileModal onClose={()=>setProfileOpen(false)} />}
+      {checkoutOpen && <CheckoutModal cart={cart} setCart={setCart} onClose={()=>setCheckoutOpen(false)} onSuccess={() => setCheckoutOpen(false)} />}
       <ChatWidget loggedInAs={{ name: "Nguyễn Văn Minh", role: "customer" }} />
     </div>
   );

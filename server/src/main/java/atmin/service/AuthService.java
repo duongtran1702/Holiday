@@ -14,4 +14,6 @@ public interface AuthService {
     void changePassword(String email, atmin.controller.auth.dto.ChangePasswordRequest request);
     void forgotPassword(atmin.controller.auth.dto.ForgotPasswordRequest request);
     void resetPassword(atmin.controller.auth.dto.ResetPasswordRequest request);
+    
+    AuthResponse loginWithGoogle(atmin.controller.auth.dto.GoogleLoginRequest request);
 }

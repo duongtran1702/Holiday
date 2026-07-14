@@ -41,6 +41,13 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success("Đăng nhập thành công", authResponse));
     }
 
+    @PostMapping("/google")
+    public ResponseEntity<ApiResponse<AuthResponse>> loginWithGoogle(@Valid @RequestBody atmin.controller.auth.dto.GoogleLoginRequest request, HttpServletResponse response) {
+        AuthResponse authResponse = authService.loginWithGoogle(request);
+        setRefreshTokenCookie(response, authResponse.getRefreshToken());
+        return ResponseEntity.ok(ApiResponse.success("Đăng nhập Google thành công", authResponse));
+    }
+
     @PostMapping("/verify-2fa")
     public ResponseEntity<ApiResponse<AuthResponse>> verify2fa(@Valid @RequestBody atmin.controller.auth.dto.Verify2FARequest request, HttpServletResponse response) {
         AuthResponse authResponse = authService.verify2fa(request);

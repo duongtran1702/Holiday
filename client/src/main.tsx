@@ -8,6 +8,8 @@ import { routers } from "./routes/index.tsx";
 import { Toaster } from "./components/ui/feedback/Sonner.tsx";
 import "./assets/styles/index.css";
 
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
 // 🧩 Ẩn lỗi "Extension context invalidated" khi reload (do Chrome extension)
 window.addEventListener('unhandledrejection', (event) => {
     if (event.reason?.message?.includes('Extension context invalidated')) {
@@ -15,13 +17,17 @@ window.addEventListener('unhandledrejection', (event) => {
     }
 });
 
+const GOOGLE_CLIENT_ID = "321259919923-e1p2b3v0v8idcsmqisofsv3pcu6mvbba.apps.googleusercontent.com";
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <Provider store={store}>
-      <AuthInit>
-        <RouterProvider router={routers} />
-      </AuthInit>
-      <Toaster position="top-right" richColors />
-    </Provider>
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <Provider store={store}>
+        <AuthInit>
+          <RouterProvider router={routers} />
+        </AuthInit>
+        <Toaster position="top-right" richColors />
+      </Provider>
+    </GoogleOAuthProvider>
   </StrictMode>
 );

@@ -26,14 +26,19 @@ export function RegisterPage() {
   const [b2bError, setB2bError] = useState("");
 
   const validateB2C = () => {
-    if (!b2c.name || !b2c.phone || !b2c.email || !b2c.pw) return "Vui lòng điền đầy đủ các trường bắt buộc.";
+    if (!b2c.name.trim() || !b2c.phone.trim() || !b2c.email.trim() || !b2c.pw.trim()) return "Vui lòng điền đầy đủ các trường bắt buộc.";
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(b2c.email.trim())) return "Định dạng email không hợp lệ.";
     if (b2c.pw !== b2c.confirm) return "Mật khẩu xác nhận không khớp.";
     if (b2c.pw.length < 8) return "Mật khẩu phải có ít nhất 8 ký tự.";
     return "";
   };
   const validateB2B = () => {
-    if (!b2b.name || !b2b.phone || !b2b.email || !b2b.pw || !b2b.business || !b2b.address) return "Vui lòng điền đầy đủ các trường bắt buộc.";
+    if (!b2b.name.trim() || !b2b.phone.trim() || !b2b.email.trim() || !b2b.pw.trim() || !b2b.business.trim() || !b2b.address.trim()) return "Vui lòng điền đầy đủ các trường bắt buộc.";
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(b2b.email.trim())) return "Định dạng email không hợp lệ.";
     if (b2b.pw !== b2b.confirm) return "Mật khẩu xác nhận không khớp.";
+    if (b2b.pw.length < 8) return "Mật khẩu phải có ít nhất 8 ký tự.";
     return "";
   };
 

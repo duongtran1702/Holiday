@@ -24,8 +24,12 @@ public class AuthResponse {
         private String id;
         private String email;
         private String fullName;
+        private String avatarUrl;
+        private String phone;
+        private String address;
         private String role;
         private String status;
+        private String authProvider;
         private java.util.List<String> permissions;
     }
 }

@@ -34,13 +34,11 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private void seedProducts() {
-        if (productRepository.count() > 0) return;
-
-        log.info("Khởi tạo danh sách Sản phẩm mẫu...");
-
-        java.util.List<atmin.entity.Product> products = java.util.List.of(
-            atmin.entity.Product.builder()
-                .name("Áo Polo ABC Classic")
+        if (!productRepository.existsById("p1")) {
+            log.info("Khởi tạo Sản phẩm mẫu p1...");
+            atmin.entity.Product p1 = atmin.entity.Product.builder()
+                .id("p1")
+                .name("Áo Polo Atmin Classic")
                 .category("Áo")
                 .price(280000.0)
                 .material("Cotton piqué 100%")
@@ -50,37 +48,46 @@ public class DataSeeder implements CommandLineRunner {
                 .sizes(java.util.Set.of("S", "M", "L", "XL", "XXL"))
                 .image("https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=600&h=700&fit=crop&auto=format")
                 .badge("Bán chạy")
-                .stock(java.util.Map.of("S-Trắng", 15, "M-Trắng", 22, "L-Trắng", 18, "XL-Trắng", 10, "XXL-Trắng", 5))
-                .build(),
+                .stock(java.util.Map.of("S-Trắng", 15, "M-Trắng", 22, "L-Trắng", 18, "XL-Trắng", 10,
+                        "XXL-Trắng", 5))
+                .build();
+            productRepository.save(p1);
+        }
 
-            atmin.entity.Product.builder()
-                .name("Đầm Floral Summer")
-                .category("Đầm/Váy")
-                .price(490000.0)
-                .material("Vải lụa viscose, họa tiết hoa")
-                .rating(4.9)
-                .reviews(87)
-                .colors(java.util.Set.of("Hồng Pastel", "Xanh Mint", "Vàng Chanh"))
-                .sizes(java.util.Set.of("XS", "S", "M", "L"))
-                .image("https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=600&h=700&fit=crop&auto=format")
-                .badge("Mới")
-                .stock(java.util.Map.of("XS-Hồng Pastel", 5, "S-Hồng Pastel", 12, "M-Hồng Pastel", 8))
-                .build(),
+        if (productRepository.count() > 1)
+            return;
 
-            atmin.entity.Product.builder()
-                .name("Quần Jeans Slim Fit")
-                .category("Quần")
-                .price(420000.0)
-                .material("Denim cotton stretch 98%")
-                .rating(4.5)
-                .reviews(203)
-                .colors(java.util.Set.of("Xanh Indigo", "Đen", "Xám nhạt"))
-                .sizes(java.util.Set.of("28", "29", "30", "31", "32", "34"))
-                .image("https://images.unsplash.com/photo-1542272604-787c3835535d?w=600&h=700&fit=crop&auto=format")
-                .badge(null)
-                .stock(java.util.Map.of("28-Xanh Indigo", 8, "29-Xanh Indigo", 15, "30-Xanh Indigo", 20))
-                .build()
-        );
+        log.info("Khởi tạo danh sách Sản phẩm mẫu khác...");
+
+        java.util.List<atmin.entity.Product> products = java.util.List.of(
+                atmin.entity.Product.builder()
+                        .id("p2")
+                        .name("Đầm Floral Summer")
+                        .category("Đầm/Váy")
+                        .price(490000.0)
+                        .material("Vải lụa viscose, họa tiết hoa")
+                        .rating(4.9)
+                        .reviews(87)
+                        .colors(java.util.Set.of("Hồng Pastel", "Xanh Mint", "Vàng Chanh"))
+                        .sizes(java.util.Set.of("XS", "S", "M", "L"))
+                        .image("https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=600&h=700&fit=crop&auto=format")
+                        .badge("Mới")
+                        .stock(java.util.Map.of("XS-Hồng Pastel", 5, "S-Hồng Pastel", 12, "M-Hồng Pastel", 8))
+                        .build(),
+
+                atmin.entity.Product.builder()
+                        .name("Quần Jeans Slim Fit")
+                        .category("Quần")
+                        .price(420000.0)
+                        .material("Denim cotton stretch 98%")
+                        .rating(4.5)
+                        .reviews(203)
+                        .colors(java.util.Set.of("Xanh Indigo", "Đen", "Xám nhạt"))
+                        .sizes(java.util.Set.of("28", "29", "30", "31", "32", "34"))
+                        .image("https://images.unsplash.com/photo-1542272604-787c3835535d?w=600&h=700&fit=crop&auto=format")
+                        .badge(null)
+                        .stock(java.util.Map.of("28-Xanh Indigo", 8, "29-Xanh Indigo", 15, "30-Xanh Indigo", 20))
+                        .build());
 
         productRepository.saveAll(products);
     }
@@ -88,14 +95,14 @@ public class DataSeeder implements CommandLineRunner {
     private void seedPermissionsAndRoles() {
         // Danh sách quyền dựa trên mockData
         String[] permissions = {
-            "VIEW_PRODUCTS", "CREATE_PRODUCTS", "UPDATE_PRODUCTS", "DELETE_PRODUCTS",
-            "VIEW_INVENTORY", "CREATE_INVENTORY", "UPDATE_INVENTORY",
-            "VIEW_ORDERS", "CREATE_ORDERS", "UPDATE_ORDERS", "DELETE_ORDERS",
-            "VIEW_AGENTS", "CREATE_AGENTS", "UPDATE_AGENTS", "DELETE_AGENTS",
-            "VIEW_DEBTS", "UPDATE_DEBTS",
-            "VIEW_PROMOTIONS", "CREATE_PROMOTIONS", "UPDATE_PROMOTIONS", "DELETE_PROMOTIONS",
-            "VIEW_REPORTS",
-            "VIEW_INBOX", "CREATE_INBOX"
+                "VIEW_PRODUCTS", "CREATE_PRODUCTS", "UPDATE_PRODUCTS", "DELETE_PRODUCTS",
+                "VIEW_INVENTORY", "CREATE_INVENTORY", "UPDATE_INVENTORY",
+                "VIEW_ORDERS", "CREATE_ORDERS", "UPDATE_ORDERS", "DELETE_ORDERS",
+                "VIEW_AGENTS", "CREATE_AGENTS", "UPDATE_AGENTS", "DELETE_AGENTS",
+                "VIEW_DEBTS", "UPDATE_DEBTS",
+                "VIEW_PROMOTIONS", "CREATE_PROMOTIONS", "UPDATE_PROMOTIONS", "DELETE_PROMOTIONS",
+                "VIEW_REPORTS",
+                "VIEW_INBOX", "CREATE_INBOX"
         };
 
         Set<atmin.entity.Permission> allPerms = new java.util.HashSet<>();
@@ -121,7 +128,7 @@ public class DataSeeder implements CommandLineRunner {
         roleRepository.save(adminRole);
 
         // Khởi tạo các Role cơ bản khác nếu chưa có
-        for (String roleName : new String[]{"STAFF", "CUSTOMER", "AGENT"}) {
+        for (String roleName : new String[] { "STAFF", "CUSTOMER", "AGENT" }) {
             roleRepository.findByNameAndDeletedAtIsNull(roleName)
                     .orElseGet(() -> roleRepository.save(Role.builder().name(roleName).build()));
         }
@@ -129,7 +136,7 @@ public class DataSeeder implements CommandLineRunner {
 
     private void seedAdminAccount() {
         Role adminRole = roleRepository.findByNameAndDeletedAtIsNull("ADMIN").orElseThrow();
-        
+
         String adminEmail = "duong170226@gmail.com";
         if (!userRepository.existsByEmailAndDeletedAtIsNull(adminEmail)) {
             log.info("Khởi tạo tài khoản Admin mặc định (duong170226@gmail.com / admin123)...");
