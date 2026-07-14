@@ -1,0 +1,59 @@
+package atmin.service.impl;
+
+import atmin.common.exception.DuplicateResourceException;
+import atmin.controller.admin.dto.CreateStaffRequest;
+import atmin.entity.Role;
+import atmin.entity.User;
+import atmin.repository.RoleRepository;
+import atmin.repository.UserRepository;
+import atmin.service.AdminUserService;
+import atmin.service.IEmailService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Set;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class AdminUserServiceImpl implements AdminUserService {
+
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final IEmailService emailService;
+
+    @Override
+    @Transactional
+    public void createStaff(CreateStaffRequest request) {
+        if (userRepository.existsByEmailAndDeletedAtIsNull(request.getEmail())) {
+            throw new DuplicateResourceException("Email đã tồn tại: " + request.getEmail());
+        }
+        if (request.getPhoneNumber() != null && userRepository.existsByPhoneNumberAndDeletedAtIsNull(request.getPhoneNumber())) {
+            throw new DuplicateResourceException("Số điện thoại đã được sử dụng: " + request.getPhoneNumber());
+        }
+
+        Role staffRole = roleRepository.findByNameAndDeletedAtIsNull("STAFF")
+                .orElseGet(() -> roleRepository.save(Role.builder().name("STAFF").build()));
+
+        // Sinh ngẫu nhiên mật khẩu 8 ký tự
+        String rawPassword = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+
+        User staffUser = User.builder()
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(rawPassword))
+                .fullName(request.getFullName())
+                .phoneNumber(request.getPhoneNumber())
+                .status("active")
+                .isEnabled(true)
+                .roles(Set.of(staffRole))
+                .build();
+
+        userRepository.save(staffUser);
+        
+        // Gửi email chứa mật khẩu
+        emailService.sendNewStaffEmail(staffUser.getEmail(), staffUser.getFullName(), rawPassword);
+    }
+}

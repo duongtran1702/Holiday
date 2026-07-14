@@ -1,0 +1,22 @@
+package atmin.controller.auth.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class ResetPasswordRequest {
+    @NotBlank(message = "Mã xác nhận (Token) không được để trống")
+    private String token;
+
+    @NotBlank(message = "Mật khẩu mới không được để trống")
+    private String newPassword;
+
+    @NotBlank(message = "Xác nhận mật khẩu không được để trống")
+    private String confirmPassword;
+}

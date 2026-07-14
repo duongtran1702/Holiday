@@ -1,0 +1,142 @@
+# ============================================================
+# ABC FASHION SERVER — .gitignore
+# Spring Boot 4.x + Java 21 + MySQL + Gradle
+# ============================================================
+
+# ====================
+# 🔐 BẢO MẬT — KHÔNG ĐƯỢC PUSH LÊN GIT
+# ====================
+# File chứa secrets (JWT, API keys, mật khẩu DB, mail...)
+.env
+.env.*
+!.env.example
+
+# Keystore / Certificate files
+*.jks
+*.keystore
+*.p12
+*.pem
+*.key
+*.crt
+
+# Application secrets (nếu đặt ngoài application.properties)
+secrets/
+config/secrets/
+
+# ====================
+# ☕ JAVA / SPRING BOOT
+# ====================
+# Compiled class files
+*.class
+*.jar
+*.war
+*.ear
+
+# Log files
+*.log
+logs/
+spring.log
+
+# Package/build output
+target/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# ====================
+# 🐘 GRADLE
+# ====================
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+
+# ====================
+# 💻 IDE — IntelliJ IDEA
+# ====================
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+# ====================
+# 💻 IDE — Eclipse / STS
+# ====================
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+# ====================
+# 💻 IDE — VS Code
+# ====================
+.vscode/
+
+# ====================
+# 💻 IDE — NetBeans
+# ====================
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# ====================
+# 🗄️ DATABASE
+# ====================
+# MySQL data directory (nếu chạy local embedded)
+data/
+mysql-data/
+
+# Database dumps / backups
+*.sql.gz
+*.sql.bak
+*.dump
+
+# H2 database files (dev/test)
+*.mv.db
+*.trace.db
+
+# ====================
+# 📦 UPLOAD & TEMP FILES
+# ====================
+uploads/
+temp/
+tmp/
+
+# ====================
+# 🖥️ OS FILES
+# ====================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.nfs*
+
+# ====================
+# 📄 MISC
+# ====================
+HELP.md
+*.swp
+*.swo
+*.bak
+*.tmp
+*.orig

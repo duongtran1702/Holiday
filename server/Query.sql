@@ -1,0 +1,1 @@
+drop database holiday_db;
