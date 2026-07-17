@@ -3,19 +3,23 @@ package atmin;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SpringBootApplication
 @EnableAsync
 @EnableJpaAuditing
 public class ServerApplication {
     static {
+        System.setProperty("java.net.preferIPv4Stack", "true");
         loadDotenv();
     }
 
@@ -23,10 +27,19 @@ public class ServerApplication {
         SpringApplication.run(ServerApplication.class, args);
     }
 
+    @Bean
+    public RestTemplate restTemplate() {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(5000);
+        factory.setReadTimeout(5000);
+        return new RestTemplate(factory);
+    }
+
     private static void loadDotenv() {
         try {
-            if (Files.exists(Paths.get(".env"))) {
-                List<String> lines = Files.readAllLines(Paths.get(".env"));
+            Path envPath = Paths.get(".env");
+            if (Files.exists(envPath)) {
+                List<String> lines = Files.readAllLines(envPath);
                 for (String line : lines) {
                     line = line.trim();
                     if (line.isEmpty() || line.startsWith("#")) {

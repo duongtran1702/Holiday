@@ -1,5 +1,5 @@
 import { Navigate } from "react-router-dom";
-import { atminSelector } from "./hook/reduxHook";
+import { atminSelector } from "./core/store/reduxHook";
 
 export default function App() {
   const { isAuthenticated, userRole } = atminSelector((state) => state.auth);

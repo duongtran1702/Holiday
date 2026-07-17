@@ -1,0 +1,49 @@
+{
+  "properties": [
+    {
+      "name": "jwt.secret-key",
+      "type": "java.lang.String",
+      "description": "JWT Secret Key"
+    },
+    {
+      "name": "jwt.access-expiration",
+      "type": "java.lang.Long",
+      "description": "JWT Access Token Expiration time in ms"
+    },
+    {
+      "name": "jwt.refresh-expiration",
+      "type": "java.lang.Long",
+      "description": "JWT Refresh Token Expiration time in ms"
+    },
+    {
+      "name": "cloudinary.cloud-name",
+      "type": "java.lang.String",
+      "description": "Cloudinary Cloud Name"
+    },
+    {
+      "name": "cloudinary.api-key",
+      "type": "java.lang.String",
+      "description": "Cloudinary API Key"
+    },
+    {
+      "name": "cloudinary.api-secret",
+      "type": "java.lang.String",
+      "description": "Cloudinary API Secret"
+    },
+    {
+      "name": "PAYOS_CLIENT_ID",
+      "type": "java.lang.String",
+      "description": "PayOS Client ID"
+    },
+    {
+      "name": "PAYOS_API_KEY",
+      "type": "java.lang.String",
+      "description": "PayOS API Key"
+    },
+    {
+      "name": "PAYOS_CHECKSUM_KEY",
+      "type": "java.lang.String",
+      "description": "PayOS Checksum Key"
+    }
+  ]
+}

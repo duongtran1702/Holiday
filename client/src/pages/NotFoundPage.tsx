@@ -2,19 +2,26 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'antd';
 import { motion } from "motion/react";
-import { Rocket } from "lucide-react";
+import { Home } from "lucide-react";
 
 export const NotFoundPage: React.FC = () => {
     const nvg = useNavigate();
     
+    // Trình tạo số ngẫu nhiên an toàn để tránh cảnh báo pseudorandom của SonarQube
+    const getSecureRandom = () => {
+        const array = new Uint32Array(1);
+        window.crypto.getRandomValues(array);
+        return array[0] / (0xffffffff + 1);
+    };
+
     // Tạo mảng các ngôi sao lấp lánh (particle effect)
     const stars = Array.from({ length: 40 }).map((_, i) => ({
         id: i,
-        top: Math.random() * 100 + '%',
-        left: Math.random() * 100 + '%',
-        size: Math.random() * 3 + 1,
-        duration: Math.random() * 3 + 2,
-        delay: Math.random() * 2
+        top: getSecureRandom() * 100 + '%',
+        left: getSecureRandom() * 100 + '%',
+        size: getSecureRandom() * 3 + 1,
+        duration: getSecureRandom() * 3 + 2,
+        delay: getSecureRandom() * 2
     }));
 
     return (
@@ -53,21 +60,21 @@ export const NotFoundPage: React.FC = () => {
                         </h1>
                     </motion.div>
                     
-                    <h2 className="text-3xl font-semibold text-white mb-4">Lost in Space!</h2>
+                    <h2 className="text-3xl font-semibold text-white mb-4">Lạc đường rồi!</h2>
                     
                     <p className="text-lg text-slate-300 mb-8 leading-relaxed">
-                        Oops! The page you're looking for has drifted into the cosmic void. Let's get you back to familiar territory.
+                        Trang bạn đang tìm kiếm không tồn tại hoặc đã bị di dời. Xin vui lòng quay lại trang chủ.
                     </p>
                     
                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                         <Button
                             type="primary"
                             size="large"
-                            icon={<Rocket className="w-5 h-5 mr-2" />}
+                            icon={<Home className="w-5 h-5 mr-2" />}
                             className="md:mx-0 shadow-lg !bg-gradient-to-r !from-blue-600 !to-indigo-500 hover:!from-blue-500 hover:!to-indigo-400 !border-none font-bold h-14 px-8 text-white text-lg rounded-xl flex items-center justify-center w-full md:w-auto"
                             onClick={() => nvg('/')}
                         >
-                            Return to Base
+                            Về trang chủ
                         </Button>
                     </motion.div>
                 </motion.div>

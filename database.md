@@ -197,29 +197,19 @@ erDiagram
 
 | # | Bảng | Mô tả | Soft Delete |
 |---|------|--------|:-----------:|
-| 1 | `users` | Tất cả user (customer, agent, admin, staff) | ✅ |
-| 2 | `agent_profiles` | Thông tin bổ sung đại lý B2B | ✅ |
-| 3 | `staff_permissions` | Phân quyền RBAC động cho staff | ✅ |
-| 4 | `categories` | Danh mục SP (Áo, Quần, Đầm/Váy) | ✅ |
-| 5 | `products` | Sản phẩm chính | ✅ |
-| 6 | `product_variants` | Biến thể Size × Màu + tồn kho | ✅ |
-| 7 | `product_images` | Ảnh sản phẩm | ✅ |
-| 8 | `pricing_tiers` | Giá sỉ bậc thang | ✅ |
-| 9 | `orders` | Đơn hàng (B2C + B2B) | ✅ |
-| 10 | `order_items` | Chi tiết dòng SP trong đơn | ❌ |
-| 11 | `order_status_history` | Nhật ký chuyển trạng thái đơn | ❌ |
-| 12 | `agent_debts` | Tổng hợp công nợ đại lý | ✅ |
-| 13 | `debt_transactions` | Lịch sử giao dịch nợ | ❌ |
-| 14 | `promotions` | Voucher / Mã khuyến mãi | ✅ |
-| 15 | `promotion_usages` | Lịch sử sử dụng voucher | ❌ |
-| 16 | `conversations` | Phiên chat hỗ trợ | ✅ |
-| 17 | `chat_messages` | Tin nhắn chat | ✅ |
-| 18 | `login_logs` | Nhật ký đăng nhập (Audit) | ❌ |
-| 19 | `login_attempts` | Chống dò mật khẩu (Rate Limit) | ❌ |
-| 20 | `reviews` | Đánh giá sản phẩm | ✅ |
+| 1 | `users` | Tất cả user (customer, admin, staff) | ✅ |
+| 2 | `roles` | Vai trò (Role) trong hệ thống | ✅ |
+| 3 | `user_role` | Bảng trung gian n-n (User - Role) | ❌ |
+| 4 | `permissions` | Quyền hạn (Permission) cụ thể | ✅ |
+| 5 | `role_permissions` | Bảng trung gian n-n (Role - Permission) | ❌ |
+| 6 | `products` | Sản phẩm chính | ✅ |
+| 7 | `orders` | Đơn hàng B2C | ✅ |
+| 8 | `order_items` | Chi tiết dòng SP trong đơn | ❌ |
+| 9 | `invoices` | Hóa đơn thanh toán (PayOS) | ✅ |
+| 10| `transactions` | Lịch sử giao dịch thanh toán chi tiết | ✅ |
 
-> **Tại sao `order_items`, `order_status_history`, `debt_transactions`, `promotion_usages`, `login_logs`, `login_attempts` không cần soft delete?**
-> → Vì chúng là bảng con hoặc bảng log. Khi bảng cha bị soft-delete, query JOIN đã tự loại trừ. Bảng log không bao giờ được xóa.
+> **Tại sao `user_role`, `role_permissions`, `order_items` không cần soft delete?**
+> → Vì chúng là bảng trung gian hoặc bảng con. Khi bảng cha bị soft-delete, query JOIN đã tự loại trừ. Bảng log/trung gian không bao giờ được xóa.
 
 ---
 
@@ -673,14 +663,16 @@ CREATE TABLE invoices (
   id                    CHAR(36)    NOT NULL DEFAULT (UUID()),
   order_id              CHAR(36)    NOT NULL,
   invoice_number        VARCHAR(50) NOT NULL,
-  issued_date           DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  total_amount          BIGINT      NOT NULL,
-  payment_status        VARCHAR(50) NOT NULL,
+  issued_date           DATETIME    NOT NULL,
+  total_amount          DOUBLE      NOT NULL,
+  payment_status        VARCHAR(50) DEFAULT NULL,
   transaction_reference VARCHAR(255) DEFAULT NULL,
 
   created_at            DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at            DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   deleted_at            DATETIME    DEFAULT NULL,
+  created_by            CHAR(36)    DEFAULT NULL,
+  updated_by            CHAR(36)    DEFAULT NULL,
 
   PRIMARY KEY (id),
   UNIQUE KEY uq_invoice_number (invoice_number, deleted_at),
@@ -1367,6 +1359,33 @@ ORDER BY TABLE_NAME;
 ```
 
 ---
+
+### 4.18. `transactions` - Lịch sử giao dịch thanh toán
+Lưu trữ toàn bộ thông tin chi tiết của mỗi lần thanh toán (đặc biệt là qua PayOS), dùng để đối soát và thống kê.
+
+```sql
+CREATE TABLE transactions (
+  id CHAR(36) PRIMARY KEY,
+  order_id CHAR(36),
+  order_code BIGINT,
+  amount DOUBLE,
+  reference VARCHAR(255),
+  payment_method VARCHAR(20),
+  status VARCHAR(20),
+  response_code VARCHAR(10),
+  transaction_date DATETIME,
+  description TEXT,
+  raw_payload TEXT,
+  
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  deleted_at DATETIME NULL,
+  created_by CHAR(36) DEFAULT NULL,
+  updated_by CHAR(36) DEFAULT NULL,
+  
+  FOREIGN KEY (order_id) REFERENCES orders(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
 
 ## 📋 TỔNG KẾT
 

@@ -2,10 +2,10 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
 import { Provider } from "react-redux";
-import { store } from "./redux/store/store.ts";
-import { AuthInit } from "./components/AuthInit.tsx";
-import { routers } from "./routes/index.tsx";
-import { Toaster } from "./components/ui/feedback/Sonner.tsx";
+import { store } from "./core/store/store/store.ts";
+import { AuthInit } from "./features/auth/components/AuthInit.tsx";
+import { routers } from "./core/routes/index.tsx";
+import { Toaster } from "./core/components/ui/feedback/Sonner.tsx";
 import "./assets/styles/index.css";
 
 import { GoogleOAuthProvider } from '@react-oauth/google';
