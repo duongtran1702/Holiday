@@ -18,8 +18,6 @@ export interface MessageDTO {
 }
 
 export interface ConversationDTO {
-    data: any;
-    success: any;
     id: string;
     type: ConversationType;
     name: string;

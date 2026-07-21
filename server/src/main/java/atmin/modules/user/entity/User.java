@@ -72,6 +72,9 @@ public class User extends BaseEntity implements UserDetails {
     @Builder.Default
     private String authProvider = "LOCAL";
 
+    @Column(name = "last_seen_notification_at")
+    private LocalDateTime lastSeenNotificationAt;
+
     @JoinTable(
             name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),

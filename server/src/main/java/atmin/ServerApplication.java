@@ -14,8 +14,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import org.springframework.scheduling.annotation.EnableScheduling;
+
 @SpringBootApplication
 @EnableAsync
+@EnableScheduling
 @EnableJpaAuditing
 public class ServerApplication {
     static {

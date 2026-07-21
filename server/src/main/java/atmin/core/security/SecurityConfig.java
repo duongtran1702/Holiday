@@ -77,7 +77,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .dispatcherTypeMatchers(ERROR).permitAll()
                         .requestMatchers("/api/v1/auth/change-password", "/api/v1/auth/logout").authenticated()
-                        .requestMatchers("/api/v1/auth/**", "/api/v1/payment/**", "/error").permitAll()
+                        .requestMatchers("/api/v1/auth/**", "/api/v1/payment/**", "/ws-chat/**", "/error").permitAll()
                         .requestMatchers("/api/v1/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/api/v1/staff/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
                         .requestMatchers("/api/v1/manager/**").hasAuthority("ROLE_MANAGER")

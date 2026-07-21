@@ -33,6 +33,7 @@ public class PaymentEventListener {
             log.info("Order {} status updated to PAID", event.orderCode());
             
             // Send email
+            org.hibernate.Hibernate.initialize(order.getOrderItems()); // Force Hibernate to initialize the collection
             orderEmailService.sendPaymentSuccessEmail(
                     order, 
                     event.invoiceNumber(), 

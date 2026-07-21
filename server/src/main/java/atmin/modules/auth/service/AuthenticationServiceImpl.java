@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import io.jsonwebtoken.JwtException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,7 +80,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
             authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
-        } catch (org.springframework.security.core.AuthenticationException e) {
+        } catch (AuthenticationException e) {
             log.error("Login failed for user {}: {}", request.getEmail(), e.getMessage());
             throw new UnauthorizedException("Email hoặc mật khẩu không chính xác.");
         }
@@ -109,7 +111,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     @Transactional
     public void logout(String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new io.jsonwebtoken.JwtException("Chưa xác thực quyền truy cập");
+            throw new JwtException("Chưa xác thực quyền truy cập");
         }
         String token = authHeader.substring(7);
         tokenManagementService.blacklistToken(token);

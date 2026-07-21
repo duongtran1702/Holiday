@@ -4,6 +4,7 @@ import { ShoppingCart, Search, LogOut } from "lucide-react";
 import { atminDispatch } from "../hook/reduxHook";
 import { logout } from "../redux/slice/authSlice";
 import { CartDrawer } from "../../components/common/CartDrawer";
+import { NotificationMenu } from "./NotificationMenu";
 
 export function LayoutB2C() {
   const navigate = useNavigate();
@@ -30,6 +31,9 @@ export function LayoutB2C() {
             <button onClick={() => setCartOpen(true)} className="relative w-8 h-8 flex items-center justify-center bg-muted rounded-full hover:bg-muted/80 transition-colors">
               <ShoppingCart size={14} className="text-foreground" />
             </button>
+            <div className="scale-75 origin-right">
+              <NotificationMenu />
+            </div>
             <div className="hidden sm:flex items-center gap-2 border-l border-border pl-3 ml-1">
               <button onClick={handleLogout} className="text-xs text-muted-foreground hover:text-destructive flex items-center gap-1 transition-colors">
                 <LogOut size={13} />

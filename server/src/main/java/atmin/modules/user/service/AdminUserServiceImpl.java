@@ -33,8 +33,13 @@ public class AdminUserServiceImpl implements AdminUserService {
         if (userRepository.existsByEmailAndDeletedAtIsNull(request.getEmail())) {
             throw new DuplicateResourceException("Email đã tồn tại: " + request.getEmail());
         }
-        if (request.getPhoneNumber() != null && userRepository.existsByPhoneNumberAndDeletedAtIsNull(request.getPhoneNumber())) {
-            throw new DuplicateResourceException("Số điện thoại đã được sử dụng: " + request.getPhoneNumber());
+        String phone = request.getPhoneNumber();
+        if (phone != null && phone.isBlank()) {
+            phone = null;
+        }
+
+        if (phone != null && userRepository.existsByPhoneNumberAndDeletedAtIsNull(phone)) {
+            throw new DuplicateResourceException("Số điện thoại đã được sử dụng: " + phone);
         }
 
         Role staffRole = roleRepository.findByNameAndDeletedAtIsNull("STAFF")
@@ -47,7 +52,7 @@ public class AdminUserServiceImpl implements AdminUserService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(rawPassword))
                 .fullName(request.getFullName())
-                .phoneNumber(request.getPhoneNumber())
+                .phoneNumber(phone)
                 .status("active")
                 .isEnabled(true)
                 .roles(Set.of(staffRole))

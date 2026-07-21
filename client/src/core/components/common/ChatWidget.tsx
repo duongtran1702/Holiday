@@ -15,41 +15,103 @@ export function ChatWidget({ loggedInAs }: Readonly<{ loggedInAs?: { name: strin
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [guestForm] = useState({ name: "", phone: "" });
-  const [guestReady] = useState(!!loggedInAs);
-  const [unread, setUnread] = useState(1);
+  const [unread, setUnread] = useState(0);
   const [faqSent, setFaqSent] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const scrollHeightRef = useRef<number>(0);
   const isAfterHours = new Date().getHours() >= 22 || new Date().getHours() < 7;
-  const [conversationId, setConversationId] = useState<string | null>(null);
+  const conversationIdRef = useRef<string | null>(null);
+  const [conversationId, setConversationIdState] = useState<string | null>(null);
+
+  const setConversationId = (id: string | null) => {
+    conversationIdRef.current = id;
+    setConversationIdState(id);
+  };
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    if (e.currentTarget.scrollTop === 0 && hasMore && !isLoadingMore) {
+      scrollHeightRef.current = e.currentTarget.scrollHeight;
+      loadMore();
+    }
+  };
+
+
 
   // Use any to bypass RootState import for now, or you can import RootState
   const token = useSelector((state: any) => state.auth.accessToken);
   const user = useSelector((state: any) => state.auth.user);
   
-  const { messages, sendMessage, isConnected, setMessages } = useChatWebSocket({ token, conversationId });
-
+  const isReady = !!loggedInAs || !!user;
+  
   const userName = loggedInAs?.name ?? guestForm.name ?? user?.fullName;
 
-  // Initialize conversation when chat opens
-  useEffect(() => {
-    if (open && guestReady && token && !conversationId) {
-      chatApi.startConversation().then(res => {
-        if (res && res.data) {
-          setConversationId(res.data.id);
-        }
-      }).catch(err => console.error("Could not start chat:", err));
+  const { messages, sendMessage, isConnected, setMessages, hasMore, isLoadingMore, loadMore, typingUsers, sendTyping } = useChatWebSocket({ 
+    token, 
+    conversationId, 
+    isViewing: open,
+    userId: user?.id,
+    userName: userName,
+    userAvatar: user?.avatarUrl,
+    onNewMessage: (msg) => {
+      if (!open && msg.senderId !== "user" && msg.senderId !== user?.id) {
+        setUnread(prev => prev + 1);
+      }
     }
-  }, [open, guestReady, token, conversationId]);
+  });
+
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (open && messages.length === 0 && guestReady && isConnected) {
+    if (!isLoadingMore && scrollHeightRef.current > 0 && messagesContainerRef.current) {
+       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight - scrollHeightRef.current;
+       scrollHeightRef.current = 0;
+    }
+  }, [messages, isLoadingMore]);
+
+  const handleInput = (val: string) => {
+    setInput(val);
+    if (!typingTimeoutRef.current) {
+      sendTyping();
+      typingTimeoutRef.current = setTimeout(() => {
+        typingTimeoutRef.current = null;
+      }, 2000);
+    }
+  };
+
+  // Initialize conversation when component mounts to get real unread count
+  useEffect(() => {
+    if (isReady && token && !conversationId) {
+      chatApi.getMyConversations().then(res => {
+        if (res?.data && res.data.length > 0) {
+          const conv = res.data[0];
+          setConversationId(conv.id);
+          if (!open) {
+            setUnread(conv.unreadCount);
+          }
+        } else if (open) {
+          // If no conversation exists, and user opens chat, start one
+          chatApi.startConversation().then(startRes => {
+            if (startRes && startRes.data) {
+              setConversationId(startRes.data.id);
+            }
+          }).catch(err => console.error("Could not start chat:", err));
+        }
+      }).catch(err => console.error("Could not fetch conversation:", err));
+    }
+  }, [open, isReady, token, conversationId]);
+
+  useEffect(() => {
+    if (open) {
       setUnread(0);
     }
-  }, [open, guestReady, isConnected, messages.length]);
+  }, [open]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (scrollHeightRef.current === 0) {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages]);
 
   const sendMsg = (text: string) => {
@@ -63,20 +125,12 @@ export function ChatWidget({ loggedInAs }: Readonly<{ loggedInAs?: { name: strin
     sendMessage(faq.label);
     setFaqSent(true);
     
-    // In a real system, the bot/server would reply. We can simulate bot reply by pushing directly or the server could have an auto-responder.
-    // For now we just push locally as a bot message
-    setTimeout(() => {
-      setMessages(prev => [...prev, {
-        id: "faq_" + Date.now(),
-        conversationId: conversationId || "",
-        senderId: "bot",
-        senderName: "Bot",
-        content: faq.answer,
-        contentType: "TEXT",
-        status: "SENT",
-        createdAt: new Date().toISOString()
-      } as MessageDTO]);
-    }, 500);
+    // Gửi yêu cầu lưu tin nhắn trả lời tự động của bot lên server
+    if (conversationId) {
+      setTimeout(() => {
+        chatApi.sendBotReply(conversationId, faq.answer).catch(err => console.error("Failed to send bot reply:", err));
+      }, 500);
+    }
   };
 
   return (
@@ -100,7 +154,7 @@ export function ChatWidget({ loggedInAs }: Readonly<{ loggedInAs?: { name: strin
           </div>
 
           {/* Guest form (if not logged in, though we need token so user should be logged in realistically) */}
-          {!guestReady ? (
+          {!isReady ? (
             <div className="flex-1 flex flex-col justify-center px-5 py-6 space-y-4">
               <div className="text-center">
                 <div className="w-14 h-14 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -113,7 +167,16 @@ export function ChatWidget({ loggedInAs }: Readonly<{ loggedInAs?: { name: strin
           ) : (
             <>
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3">
+              <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3" ref={messagesContainerRef} onScroll={handleScroll}>
+                {isLoadingMore && (
+                  <div className="flex justify-center py-2">
+                    <div className="animate-pulse flex gap-1">
+                      <div className="w-1.5 h-1.5 bg-accent/50 rounded-full animate-bounce"></div>
+                      <div className="w-1.5 h-1.5 bg-accent/50 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      <div className="w-1.5 h-1.5 bg-accent/50 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                    </div>
+                  </div>
+                )}
                 
                 {messages.length === 0 && isConnected && (
                   <div className="flex gap-2">
@@ -132,16 +195,33 @@ export function ChatWidget({ loggedInAs }: Readonly<{ loggedInAs?: { name: strin
                   const isUser = msg.senderId === user?.id || msg.senderId === "user";
                   return (
                     <div key={msg.id} className={`flex gap-2 ${isUser ? "flex-row-reverse" : ""}`}>
-                      {!isUser && (
-                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-auto ${msg.senderId === "bot" ? "bg-muted text-muted-foreground" : "bg-accent text-white"}`}>
-                          {msg.senderId === "bot" ? "🤖" : "A"}
-                        </div>
+                      {isUser ? (
+                        user?.avatarUrl ? (
+                          <img src={user.avatarUrl} alt="" className="w-6 h-6 rounded-full object-cover shrink-0 mt-auto bg-primary/10" />
+                        ) : (
+                          <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-auto bg-primary text-primary-foreground">
+                            {userName?.[0] || "U"}
+                          </div>
+                        )
+                      ) : (
+                        msg.senderAvatar ? (
+                          <img src={msg.senderAvatar} alt="" className="w-6 h-6 rounded-full object-cover shrink-0 mt-auto bg-accent/10" />
+                        ) : (
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-auto ${msg.senderId === "bot" ? "bg-muted text-muted-foreground" : "bg-accent text-white"}`}>
+                            {msg.senderId === "bot" ? "🤖" : "A"}
+                          </div>
+                        )
                       )}
                       <div className={`max-w-[75%] ${isUser ? "items-end" : "items-start"} flex flex-col gap-0.5`}>
                         <div className={`px-3 py-2 rounded-2xl text-xs leading-relaxed ${isUser ? "bg-primary text-primary-foreground rounded-tr-sm" : "bg-muted text-foreground rounded-tl-sm"}`}>
                           {msg.content}
                         </div>
-                        <span className="text-xs text-muted-foreground px-1">{new Date(msg.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                        <span className="text-[10px] text-muted-foreground px-1 flex items-center gap-1 justify-end">
+                          {new Date(msg.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                          {isUser && msg.status === "READ" && <span className="text-blue-500 font-bold">✓✓</span>}
+                          {isUser && msg.status === "DELIVERED" && <span className="text-muted-foreground font-bold">✓✓</span>}
+                          {isUser && msg.status === "SENT" && <span className="text-muted-foreground font-bold">✓</span>}
+                        </span>
                       </div>
                     </div>
                   );
@@ -162,13 +242,27 @@ export function ChatWidget({ loggedInAs }: Readonly<{ loggedInAs?: { name: strin
                 <div ref={bottomRef} />
               </div>
 
+              {/* Typing indicator */}
+              {typingUsers.length > 0 && (
+                <div className="px-4 pb-2 flex gap-2 items-center">
+                  <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold bg-accent/20 text-accent">
+                    A
+                  </div>
+                  <div className="px-3 py-2 rounded-2xl bg-muted text-foreground flex gap-1 items-center rounded-tl-sm h-8">
+                    <div className="w-1.5 h-1.5 bg-accent/50 rounded-full animate-bounce"></div>
+                    <div className="w-1.5 h-1.5 bg-accent/50 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    <div className="w-1.5 h-1.5 bg-accent/50 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                  </div>
+                </div>
+              )}
+
               {/* Input */}
               <div className="shrink-0 border-t border-border px-3 py-2.5 flex items-center gap-2">
                 <button onClick={() => fileRef.current?.click()} className="text-muted-foreground hover:text-foreground transition-colors p-1">
                   <Paperclip size={15} />
                 </button>
                 <input ref={fileRef} type="file" accept="image/*" className="hidden" />
-                <input value={input} onChange={e => setInput(e.target.value)}
+                <input value={input} onChange={e => handleInput(e.target.value)}
                   onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMsg(input); } }}
                   placeholder="Nhập tin nhắn..." className="flex-1 text-xs px-3 py-2 rounded-xl border border-border bg-input-background focus:outline-none focus:ring-1 focus:ring-accent/30" />
                 <button onClick={() => sendMsg(input)} disabled={!input.trim() || !isConnected}

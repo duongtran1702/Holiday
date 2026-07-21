@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 @Component
@@ -41,7 +42,7 @@ public class DataSeeder implements CommandLineRunner {
                 .id("p1")
                 .name("Áo Polo Atmin Classic")
                 .category("Áo")
-                .price(280000.0)
+                .price(BigDecimal.valueOf(280000.0))
                 .material("Cotton piqué 100%")
                 .rating(4.7)
                 .reviews(128)
@@ -65,7 +66,7 @@ public class DataSeeder implements CommandLineRunner {
                         .id("p2")
                         .name("Đầm Floral Summer")
                         .category("Đầm/Váy")
-                        .price(490000.0)
+                        .price(BigDecimal.valueOf(490000.0))
                         .material("Vải lụa viscose, họa tiết hoa")
                         .rating(4.9)
                         .reviews(87)
@@ -79,7 +80,7 @@ public class DataSeeder implements CommandLineRunner {
                 atmin.modules.product.entity.Product.builder()
                         .name("Quần Jeans Slim Fit")
                         .category("Quần")
-                        .price(420000.0)
+                        .price(BigDecimal.valueOf(420000.0))
                         .material("Denim cotton stretch 98%")
                         .rating(4.5)
                         .reviews(203)

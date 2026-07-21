@@ -12,7 +12,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.util.Random;
+import java.security.SecureRandom;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +33,7 @@ public class TwoFactorAuthServiceImpl implements ITwoFactorAuthService {
             throw new IllegalArgumentException("Vui lòng đợi 60 giây trước khi yêu cầu gửi lại mã OTP mới.");
         }
 
-        String otpCode = String.format("%06d", new Random().nextInt(999999));
+        String otpCode = String.format("%06d", new SecureRandom().nextInt(999999));
         stringRedisTemplate.opsForValue().set(key, otpCode, Duration.ofMinutes(3));
         
         log.info("========== DEV MODE ==========");

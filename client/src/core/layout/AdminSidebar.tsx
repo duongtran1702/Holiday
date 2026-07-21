@@ -1,8 +1,11 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Package, Users, FileText, Tag, BarChart3, Lock, Shield, ShieldCheck, MessageCircle } from "lucide-react";
+import { Package, Users, FileText, Tag, BarChart3, Lock, Shield, ShieldCheck, MessageCircle, Settings } from "lucide-react";
 import { AuthRole, PermSet } from "../types/index";
 import { countPerms } from "../utils/helpers";
-
+import { useState, useEffect } from "react";
+import { chatApi } from "../api/chat.api";
+import { useChatWebSocket } from "../store/useChatWebSocket";
+import { useSelector } from "react-redux";
 
 type AdminTab = "overview" | "orders" | "products" | "agents" | "promotions" | "inbox" | "users";
 
@@ -10,6 +13,31 @@ export function AdminSidebar({ userRole, staffPerms, user }: Readonly<{ userRole
   const isAdmin = userRole === "admin";
   const location = useLocation();
   const navigate = useNavigate();
+
+  const [unreadConvos, setUnreadConvos] = useState(0);
+  const token = useSelector((state: any) => state.auth.accessToken);
+
+  const fetchUnread = () => {
+    chatApi.getAllConversations().then(res => {
+      if (res?.data) {
+        const count = res.data.reduce((sum, c) => sum + c.unreadCount, 0);
+        setUnreadConvos(count);
+      }
+    });
+  };
+
+  useEffect(() => {
+    if (token && (isAdmin || staffPerms["inbox"]?.view)) {
+      fetchUnread();
+    }
+  }, [token, isAdmin, staffPerms]);
+
+  // Subscribe to updates globally in sidebar
+  useChatWebSocket({ 
+    token, 
+    conversationId: null,
+    onAdminUpdate: () => fetchUnread() 
+  });
 
   const ALL_NAV = [
     { key: "dashboard" as AdminTab, icon: BarChart3, label: "Tổng quan", permKey: "reports" },
@@ -64,8 +92,8 @@ export function AdminSidebar({ userRole, staffPerms, user }: Readonly<{ userRole
               className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-colors text-left ${isActive ? "bg-accent text-white" : "text-primary-foreground/60 hover:text-primary-foreground hover:bg-white/10"}`}>
               <item.icon size={15} />
               <span className="flex-1">{item.label}</span>
-              {item.key === "inbox" && (
-                <span className="bg-destructive text-white text-xs w-4 h-4 rounded-full flex items-center justify-center font-bold shrink-0">3</span>
+              {item.key === "inbox" && unreadConvos > 0 && (
+                <span className="bg-destructive text-white text-xs w-4 h-4 rounded-full flex items-center justify-center font-bold shrink-0">{unreadConvos}</span>
               )}
             </button>
           )
@@ -92,13 +120,16 @@ export function AdminSidebar({ userRole, staffPerms, user }: Readonly<{ userRole
       </nav>
 
       <div className="px-3 py-3 border-t border-primary-foreground/10">
-        <div className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-white/10 transition-colors cursor-pointer">
+        <div className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-white/10 transition-colors cursor-pointer group" onClick={() => navigate("/admin/settings")}>
           <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${isAdmin ? "bg-accent" : "bg-amber-500/70"}`}>
             {staffInfo.initials}
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-xs font-medium truncate">{staffInfo.name}</p>
             <p className="text-[10px] text-primary-foreground/50 truncate mt-0.5">{staffInfo.role}</p>
+          </div>
+          <div className="text-primary-foreground/40 group-hover:text-primary-foreground transition-colors">
+            <Settings size={16} />
           </div>
         </div>
       </div>

@@ -23,7 +23,7 @@
 
     /* Path mapping (if you use @/ to point to src/) */
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/core/*"]
     }
   },
   "include": ["src"],

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Map;
+import java.math.BigDecimal;
 import java.util.Set;
 
 @Data
@@ -16,7 +17,7 @@ public class ProductDto {
     private String id;
     private String name;
     private String category;
-    private Double price;
+    private BigDecimal price;
     private String material;
     private Double rating;
     private Integer reviews;

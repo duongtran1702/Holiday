@@ -9,6 +9,7 @@ import { Toaster } from "./core/components/ui/feedback/Sonner.tsx";
 import "./assets/styles/index.css";
 
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // 🧩 Ẩn lỗi "Extension context invalidated" khi reload (do Chrome extension)
 window.addEventListener('unhandledrejection', (event) => {
@@ -19,15 +20,26 @@ window.addEventListener('unhandledrejection', (event) => {
 
 const GOOGLE_CLIENT_ID = "321259919923-e1p2b3v0v8idcsmqisofsv3pcu6mvbba.apps.googleusercontent.com";
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: false
+    }
+  }
+});
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-      <Provider store={store}>
-        <AuthInit>
-          <RouterProvider router={routers} />
-        </AuthInit>
-        <Toaster position="top-right" richColors />
-      </Provider>
-    </GoogleOAuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+        <Provider store={store}>
+          <AuthInit>
+            <RouterProvider router={routers} />
+          </AuthInit>
+          <Toaster position="top-right" richColors />
+        </Provider>
+      </GoogleOAuthProvider>
+    </QueryClientProvider>
   </StrictMode>
 );

@@ -23,6 +23,30 @@ export const useOrderHistory = () => {
         }
     }, []);
 
+    const cancelOrder = useCallback(async (orderId: string) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const res = await orderApi.cancelOrder(orderId);
+            if (res.data) {
+                // Refetch orders after successful cancellation
+                await fetchOrders();
+                // Update selected order if it was the one cancelled
+                if (selectedOrder?.id === orderId) {
+                    setSelectedOrder(res.data);
+                }
+                return true;
+            }
+            return false;
+        } catch (err: any) {
+            console.error("Error cancelling order:", err);
+            setError(err);
+            return false;
+        } finally {
+            setLoading(false);
+        }
+    }, [fetchOrders, selectedOrder]);
+
     useEffect(() => {
         fetchOrders();
     }, [fetchOrders]);
@@ -33,6 +57,7 @@ export const useOrderHistory = () => {
         error, 
         selectedOrder, 
         setSelectedOrder, 
-        refetch: fetchOrders 
+        refetch: fetchOrders,
+        cancelOrder
     };
 };

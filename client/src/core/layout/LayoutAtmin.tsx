@@ -6,6 +6,7 @@ import { atminDispatch, atminSelector } from "../store/reduxHook";
 import { logout } from "../store/slice/authSlice";
 import { PERMISSION_MODULES } from "../utils/mockData";
 import { PermSet } from "../types/index";
+import { NotificationMenu } from "./NotificationMenu";
 
 export function LayoutAtmin() {
   const navigate = useNavigate();
@@ -47,9 +48,7 @@ export function LayoutAtmin() {
           </div>
           <div className="flex items-center gap-3">
             {isAdmin && (
-              <button className="relative p-1.5 hover:bg-muted rounded-lg transition-colors">
-                <Bell size={16} /><span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-destructive rounded-full" />
-              </button>
+              <NotificationMenu />
             )}
             {!isAdmin && (
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted px-3 py-1.5 rounded-lg">
@@ -58,15 +57,19 @@ export function LayoutAtmin() {
               </div>
             )}
             <div className="flex items-center gap-2 border-l border-border pl-3">
-              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white ${isAdmin ? "bg-accent" : "bg-amber-500"}`}>
-                {staffInfo.initials}
-              </div>
+              {user?.avatarUrl ? (
+                <img src={user.avatarUrl} alt="" className="w-6 h-6 rounded-full object-cover shrink-0" />
+              ) : (
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white ${isAdmin ? "bg-accent" : "bg-amber-500"}`}>
+                  {staffInfo.initials}
+                </div>
+              )}
               <div className="hidden sm:block">
                 <p className="text-xs font-medium leading-none">{staffInfo.name}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">{staffInfo.badge}</p>
               </div>
             </div>
-            <p className="text-xs text-muted-foreground hidden md:block">08/07/2026</p>
+            <p className="text-xs text-muted-foreground hidden md:block">{new Date().toLocaleDateString('vi-VN')}</p>
             <button onClick={handleLogout} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-destructive border-l border-border pl-3 transition-colors">
               <LogOut size={13} />Đăng xuất
             </button>

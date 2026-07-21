@@ -1,18 +1,29 @@
-import { Users, ChevronRight, Eye, ShoppingBag, AlertTriangle, DollarSign } from "lucide-react";
+import { Users, ChevronRight, Eye, ShoppingBag, AlertTriangle, DollarSign, Loader2 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { REVENUE_DATA, ORDERS_DATA } from "../../../core/utils/mockData";
 import { fmt } from "../../../core/utils/format";
 import { StatusBadge } from "../../../core/components/common/StatusBadge";
+import { useQuery } from "@tanstack/react-query";
+import { dashboardApi } from "../services/dashboard.api";
 
 export function AdminOverview() {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['dashboard_metrics'],
+    queryFn: dashboardApi.getMetrics
+  });
+
+  if (isLoading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-accent" /></div>;
+  if (error || !data?.data) return <div className="text-center text-red-500 py-10">Lỗi tải dữ liệu dashboard</div>;
+
+  const metrics = data.data;
+
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
         {[
-          { label: "Doanh thu hôm nay", value: fmt(14350000), delta: "+12%", icon: DollarSign, color: "text-emerald-600", bg: "bg-emerald-50" },
-          { label: "Đơn hàng mới", value: "28", delta: "+5 hôm nay", icon: ShoppingBag, color: "text-blue-600", bg: "bg-blue-50" },
-          { label: "SKU sắp hết hàng", value: "7 SKU", delta: "Cần nhập kho", icon: AlertTriangle, color: "text-amber-600", bg: "bg-amber-50" },
-          { label: "Đại lý hoạt động", value: "12", delta: "+1 mới duyệt", icon: Users, color: "text-purple-600", bg: "bg-purple-50" },
+          { label: "Doanh thu hôm nay", value: fmt(metrics.todayRevenue), delta: "Hôm nay", icon: DollarSign, color: "text-emerald-600", bg: "bg-emerald-50" },
+          { label: "Đơn hàng mới", value: metrics.newOrders.toString(), delta: "Hôm nay", icon: ShoppingBag, color: "text-blue-600", bg: "bg-blue-50" },
+          { label: "SKU sắp hết hàng", value: `${metrics.lowStockSkuCount} SKU`, delta: "Cần nhập kho", icon: AlertTriangle, color: "text-amber-600", bg: "bg-amber-50" },
+          { label: "Đại lý hoạt động", value: metrics.activeAgents.toString(), delta: "Hiện tại", icon: Users, color: "text-purple-600", bg: "bg-purple-50" },
         ].map((card) => (
           <div key={card.label} className="bg-card border border-border rounded-xl p-4">
             <div className="flex items-start justify-between mb-3">
@@ -34,11 +45,11 @@ export function AdminOverview() {
             </div>
           </div>
           <ResponsiveContainer width="100%" height={180}>
-            <BarChart data={REVENUE_DATA} barGap={3}>
+            <BarChart data={metrics.revenueChartData} barGap={3}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.05)" />
               <XAxis dataKey="month" tick={{ fontSize: 10 }} />
-              <YAxis tick={{ fontSize: 10 }} tickFormatter={v => `${v}tr`} />
-              <Tooltip formatter={(v: number) => [`${v} triệu`]} />
+              <YAxis tick={{ fontSize: 10 }} tickFormatter={v => `${v}M`} />
+              <Tooltip formatter={(v: number) => [`${v}M`]} />
               <Bar dataKey="b2c" fill="#C9973A" radius={[3, 3, 0, 0]} name="B2C" />
               <Bar dataKey="b2b" fill="#1C1917" radius={[3, 3, 0, 0]} name="B2B" />
             </BarChart>
@@ -47,7 +58,7 @@ export function AdminOverview() {
         <div className="bg-card border border-border rounded-xl p-5 space-y-4">
           <h3 className="font-semibold text-sm">Trạng thái đơn hàng</h3>
           <div className="space-y-2.5">
-            {[{label:"Chờ xử lý",count:8,color:"bg-amber-400",pct:28},{label:"Đang giao",count:12,color:"bg-blue-400",pct:43},{label:"Hoàn thành",count:6,color:"bg-emerald-400",pct:21},{label:"Đã hủy",count:2,color:"bg-red-400",pct:8}].map(item => (
+            {metrics.orderStatusData.map((item: any) => (
               <div key={item.label}>
                 <div className="flex justify-between text-xs mb-1"><span className="text-muted-foreground">{item.label}</span><span className="font-medium">{item.count}</span></div>
                 <div className="w-full bg-muted rounded-full h-1.5"><div className={`${item.color} h-1.5 rounded-full`} style={{ width: `${item.pct}%` }} /></div>
@@ -70,16 +81,25 @@ export function AdminOverview() {
       <div className="bg-card border border-border rounded-xl overflow-hidden">
         <div className="px-5 py-3.5 border-b border-border flex items-center justify-between"><h3 className="font-semibold text-sm">Đơn hàng gần đây</h3><button className="text-xs text-accent hover:underline flex items-center gap-1">Xem tất cả <ChevronRight size={12} /></button></div>
         <table className="w-full text-sm">
-          <thead className="bg-muted/60"><tr>{["Mã đơn","Khách hàng","Kênh","Số SP","Tổng tiền","Trạng thái",""].map(h=><th key={h} className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">{h}</th>)}</tr></thead>
+          <thead className="bg-muted/60"><tr>{["Mã đơn","Ngày tạo","Số SP","Tổng tiền","Trạng thái","Vận chuyển",""].map(h=><th key={h} className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">{h}</th>)}</tr></thead>
           <tbody className="divide-y divide-border">
-            {ORDERS_DATA.slice(0,5).map(o=>(
+            {metrics.recentOrders.map(o=>(
               <tr key={o.id} className="hover:bg-muted/30 transition-colors">
-                <td className="px-4 py-3 font-mono text-xs text-accent">{o.id}</td>
-                <td className="px-4 py-3 text-sm font-medium">{o.customer}</td>
-                <td className="px-4 py-3"><span className={`text-xs font-medium px-2 py-0.5 rounded-full ${o.type==="B2C"?"bg-blue-50 text-blue-700":"bg-purple-50 text-purple-700"}`}>{o.type}</span></td>
-                <td className="px-4 py-3 text-xs text-muted-foreground">{o.items} sp</td>
-                <td className="px-4 py-3 font-mono text-sm font-medium">{fmt(o.amount)}</td>
-                <td className="px-4 py-3"><StatusBadge status={o.status} /></td>
+                <td className="px-4 py-3 font-mono text-xs text-accent">#{o.orderCode}</td>
+                <td className="px-4 py-3 text-sm font-medium">{new Date(o.createdAt).toLocaleDateString()}</td>
+                <td className="px-4 py-3 text-xs text-muted-foreground">{o.items ? o.items.length : 0} sp</td>
+                <td className="px-4 py-3 font-mono text-sm font-medium">{fmt(o.totalAmount)}</td>
+                <td className="px-4 py-3"><StatusBadge status={o.status as any} /></td>
+                <td className="px-4 py-3">
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                    o.status === 'CANCELLED' ? 'bg-gray-100 text-gray-400' :
+                    o.shippingStatus === 'DELIVERED' ? 'bg-emerald-50 text-emerald-700' :
+                    o.shippingStatus === 'SHIPPING' ? 'bg-blue-50 text-blue-700' :
+                    'bg-gray-100 text-gray-600'
+                  }`}>
+                    {o.status === 'CANCELLED' ? 'Đã hủy' : o.shippingStatus === 'DELIVERED' ? 'Đã giao' : o.shippingStatus === 'SHIPPING' ? 'Đang giao' : 'Chưa giao'}
+                  </span>
+                </td>
                 <td className="px-4 py-3"><button className="text-muted-foreground hover:text-foreground p-1"><Eye size={14} /></button></td>
               </tr>
             ))}

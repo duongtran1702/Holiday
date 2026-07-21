@@ -7,6 +7,7 @@ import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.UUID;
 
@@ -27,7 +28,7 @@ public class Product extends BaseEntity {
 
     private String name;
     private String category;
-    private Double price;
+    private BigDecimal price;
     private String material;
     private Double rating;
     private Integer reviews;

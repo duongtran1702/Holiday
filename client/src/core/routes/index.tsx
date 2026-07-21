@@ -15,6 +15,7 @@ import { inboxAdminRoutes } from '../../features/inbox';
 import { dashboardAdminRoutes } from '../../features/dashboard';
 import { paymentRoutes } from '../../features/payment';
 import { TierProgress } from '../../features/orders/components/TierProgress';
+import { AdminProfile } from '../../features/profile/pages/AdminProfile';
 
 export const routers = createBrowserRouter([
     {
@@ -37,6 +38,7 @@ export const routers = createBrowserRouter([
             ...userAdminRoutes,
             ...promotionAdminRoutes,
             ...inboxAdminRoutes,
+            { path: 'settings', element: <AdminProfile /> },
         ]
     },
     {

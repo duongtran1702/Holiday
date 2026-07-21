@@ -16,5 +16,8 @@ export const authApi = {
     },
     logout: () => {
         return callApi<ApiResponse<void>>('/auth/logout', 'POST');
+    },
+    changePassword: (data: any) => {
+        return callApi<ApiResponse<void>>('/auth/change-password', 'POST', data);
     }
 };

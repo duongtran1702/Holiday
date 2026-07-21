@@ -21,20 +21,36 @@ export const useAdminUsers = () => {
   };
 
   const handleAddStaff = async () => {
-    if (!newStaff.name.trim() || !newStaff.email.trim()) {
-      toast.error("Vui lòng điền đủ Tên và Email.");
+    const name = newStaff.name.trim();
+    if (!name || name.length < 2) {
+      toast.error("Vui lòng nhập Họ và tên hợp lệ (ít nhất 2 ký tự).");
+      return;
+    }
+    const email = newStaff.email.trim();
+    if (!email) {
+      toast.error("Vui lòng điền Email.");
       return;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(newStaff.email.trim())) {
+    if (!emailRegex.test(email)) {
       toast.error("Định dạng email không hợp lệ.");
       return;
     }
+
+    const phone = newStaff.phone.trim();
+    if (phone) {
+      const phoneRegex = /^(0[3|5|7|8|9])[0-9]{8}$/;
+      if (!phoneRegex.test(phone)) {
+        toast.error("Số điện thoại không hợp lệ (phải bắt đầu bằng số 0 và có 10 chữ số).");
+        return;
+      }
+    }
+
     try {
       await callApi("/admin/users/staff", "POST", {
-        fullName: newStaff.name,
-        email: newStaff.email,
-        phoneNumber: newStaff.phone
+        fullName: name,
+        email: email,
+        ...(phone ? { phoneNumber: phone } : {})
       });
       toast.success("Tạo tài khoản và gửi email thành công!");
       

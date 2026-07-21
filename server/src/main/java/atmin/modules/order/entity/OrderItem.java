@@ -9,6 +9,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.util.UUID;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "order_items")
@@ -35,11 +36,14 @@ public class OrderItem extends BaseEntity {
     @Column(name = "product_name")
     private String productName;
 
+    @Column(name = "product_image_url")
+    private String productImageUrl;
+
     @Column(nullable = false)
     private Integer quantity;
 
     @Column(nullable = false)
-    private Double price;
+    private BigDecimal price;
 
     @Column(name = "selected_color")
     private String selectedColor;

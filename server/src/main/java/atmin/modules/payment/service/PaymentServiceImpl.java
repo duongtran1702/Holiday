@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 import vn.payos.PayOS;
 import vn.payos.model.v2.paymentRequests.CreatePaymentLinkRequest;
 import vn.payos.model.v2.paymentRequests.CreatePaymentLinkResponse;
@@ -29,15 +30,23 @@ public class PaymentServiceImpl implements PaymentService {
     private final InvoiceRepository invoiceRepository;
     private final ApplicationEventPublisher eventPublisher;
 
+    @Value("${app.frontend.url:http://localhost:5173}")
+    private String frontendUrl;
+
     @Override
     public String createPaymentLink(atmin.modules.order.entity.Order order) {
         try {
+            String desc = "Thanh toan don " + order.getOrderCode();
+            if (desc.length() > 25) {
+                desc = desc.substring(0, 25);
+            }
+            
             CreatePaymentLinkRequest paymentData = CreatePaymentLinkRequest.builder()
                     .orderCode(order.getOrderCode())
                     .amount(order.getTotalAmount().longValue())
-                    .description("Thanh toan don " + order.getOrderCode())
-                    .returnUrl("http://localhost:5173/payment/success")
-                    .cancelUrl("http://localhost:5173/payment/cancel")
+                    .description(desc)
+                    .returnUrl(frontendUrl + "/payment/success")
+                    .cancelUrl(frontendUrl + "/payment/cancel")
                     .build();
 
             CreatePaymentLinkResponse data = payOS.paymentRequests().create(paymentData);
@@ -58,6 +67,11 @@ public class PaymentServiceImpl implements PaymentService {
             if ("00".equals(data.getCode())) {
                 Long orderCode = data.getOrderCode();
                 OrderDto order = orderInternalApi.getOrderByCode(orderCode);
+
+                if (invoiceRepository.existsByOrderId(order.getId())) {
+                    log.warn("Invoice already exists for orderCode {} (Idempotency check)", orderCode);
+                    return;
+                }
 
                 Invoice invoice = Invoice.builder()
                         .orderId(order.getId())

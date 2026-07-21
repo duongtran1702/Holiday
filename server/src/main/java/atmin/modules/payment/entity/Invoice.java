@@ -10,6 +10,7 @@ import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "invoices")
@@ -36,7 +37,7 @@ public class Invoice extends BaseEntity {
     private LocalDateTime issuedDate;
 
     @Column(name = "total_amount", nullable = false)
-    private Double totalAmount;
+    private BigDecimal totalAmount;
 
     @Column(name = "payment_status")
     private String paymentStatus;

@@ -42,9 +42,11 @@ dependencies {
 
     implementation("com.cloudinary:cloudinary-http5:2.0.0")
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
     // Google API Client for Google Login
     implementation 'com.google.api-client:google-api-client:2.2.0'

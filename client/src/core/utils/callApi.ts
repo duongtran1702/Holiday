@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig, Method } from 'axios';
 import { store } from '../store/store/store';
 import { logout, setCredentials } from '../store/slice/authSlice';
 
-const API_BASE_URL = 'http://localhost:8080/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1';
 
 export const api = axios.create({
     baseURL: API_BASE_URL,
@@ -74,10 +74,12 @@ api.interceptors.response.use(
 
                 originalRequest.headers['Authorization'] = 'Bearer ' + newAccess;
                 return api(originalRequest);
-            } catch (err) {
+            } catch (err: any) {
                 processQueue(err, null);
-                store.dispatch(logout());
-                window.location.href = '/login';
+                if (err.response?.status === 401 || err.response?.status === 403) {
+                    store.dispatch(logout());
+                    window.location.href = '/login';
+                }
                 return Promise.reject(err);
             } finally {
                 isRefreshing = false;

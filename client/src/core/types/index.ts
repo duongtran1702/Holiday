@@ -28,6 +28,7 @@ export interface UserInfo {
     id: string;
     email: string;
     fullName: string;
+    avatarUrl?: string;
     phone?: string;
     address?: string;
     role: string;

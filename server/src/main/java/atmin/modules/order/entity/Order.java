@@ -10,6 +10,7 @@ import org.hibernate.annotations.SQLRestriction;
 
 import java.util.List;
 import java.util.UUID;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "orders")
@@ -34,7 +35,7 @@ public class Order extends BaseEntity {
     private String userId;
 
     @Column(name = "total_amount", nullable = false)
-    private Double totalAmount;
+    private BigDecimal totalAmount;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
@@ -52,6 +53,23 @@ public class Order extends BaseEntity {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<OrderItem> orderItems;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "shipping_status", nullable = false)
+    @Builder.Default
+    private ShippingStatus shippingStatus = ShippingStatus.NOT_SHIPPED;
+
+    @Column(name = "estimated_delivery_date")
+    private java.time.LocalDate estimatedDeliveryDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "email_status")
+    @Builder.Default
+    private EmailStatus emailStatus = EmailStatus.PENDING;
+
+    @Column(name = "email_retry_count", nullable = false)
+    @Builder.Default
+    private int emailRetryCount = 0;
 
     @PrePersist
     public void ensureId() {

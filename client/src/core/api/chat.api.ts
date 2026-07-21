@@ -17,5 +17,8 @@ export const chatApi = {
     },
     markAsRead: (conversationId: string) => {
         return callApi<ApiResponse<void>>(`/chat/${conversationId}/read`, 'POST');
+    },
+    sendBotReply: (conversationId: string, content: string) => {
+        return callApi<ApiResponse<MessageDTO>>(`/chat/${conversationId}/bot-reply`, 'POST', { content, contentType: 'TEXT' });
     }
 };
