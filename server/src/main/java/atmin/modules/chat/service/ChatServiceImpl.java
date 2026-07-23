@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -89,7 +91,7 @@ public class ChatServiceImpl implements ChatService {
     public void markAsRead(String conversationId, String userId) {
         chatMessageRepository.markAsReadForUser(conversationId, userId);
         messagingTemplate.convertAndSend("/topic/admin/conversations", "update");
-        messagingTemplate.convertAndSend("/topic/conversation/" + conversationId + "/read", java.util.Map.of("readerId", userId));
+        messagingTemplate.convertAndSend("/topic/conversation/" + conversationId + "/read", (Object) Map.of("readerId", userId));
     }
 
     @Override
@@ -150,7 +152,7 @@ public class ChatServiceImpl implements ChatService {
         String avatarUrl = conversation.getAvatarUrl();
 
         if ("DIRECT".equals(conversation.getType()) && conversation.getCustomer() != null) {
-            name = "Chat với " + conversation.getCustomer().getFullName();
+            name = conversation.getCustomer().getFullName();
             avatarUrl = conversation.getCustomer().getAvatarUrl();
         }
         
@@ -159,6 +161,7 @@ public class ChatServiceImpl implements ChatService {
                 .type(conversation.getType())
                 .name(name != null ? name : (conversation.getCustomer() != null ? conversation.getCustomer().getFullName() : ""))
                 .avatarUrl(avatarUrl != null ? avatarUrl : (conversation.getCustomer() != null ? conversation.getCustomer().getAvatarUrl() : ""))
+                .participantId(conversation.getCustomer() != null ? conversation.getCustomer().getId() : null)
                 .unreadCount(unreadCount)
                 .lastMessage(lastMessageDTO)
                 .createdAt(conversation.getCreatedAt())

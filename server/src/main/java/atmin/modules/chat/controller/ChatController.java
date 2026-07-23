@@ -75,4 +75,9 @@ public class ChatController {
         MessageDTO messageDTO = chatService.processMessage(request, "bot");
         return ResponseEntity.ok(ApiResponse.success("Thành công", messageDTO));
     }
+
+    @GetMapping("/presence")
+    public ResponseEntity<ApiResponse<java.util.Set<String>>> getOnlineUsers(@org.springframework.beans.factory.annotation.Autowired atmin.modules.chat.service.PresenceManager presenceManager) {
+        return ResponseEntity.ok(ApiResponse.success("Thành công", presenceManager.getOnlineUsers()));
+    }
 }

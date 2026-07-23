@@ -5,6 +5,8 @@ import { setCredentials } from '../../../core/store/slice/authSlice';
 
 import { Loader2 } from 'lucide-react';
 
+let refreshPromise: Promise<any> | null = null;
+
 export function AuthInit({ children }: Readonly<{ children: React.ReactNode }>) {
     const [isLoading, setIsLoading] = useState(true);
     const dispatch = useDispatch();
@@ -13,7 +15,10 @@ export function AuthInit({ children }: Readonly<{ children: React.ReactNode }>) 
         const verifyToken = async () => {
             try {
                 // Try to refresh token silently using HTTP-Only cookie
-                const response = await api.post<any>('/auth/refresh');
+                if (!refreshPromise) {
+                    refreshPromise = api.post<any>('/auth/refresh');
+                }
+                const response = await refreshPromise;
                 // Since interceptor returns response.data, response is the ApiResponse object
                 // If it's the ApiResponse object, it has a 'data' field.
                 const authResponse = response.data; // or response if the server directly returns the object
@@ -33,6 +38,7 @@ export function AuthInit({ children }: Readonly<{ children: React.ReactNode }>) 
                 // Ignore error, user is simply not logged in
             } finally {
                 setIsLoading(false);
+                refreshPromise = null;
             }
         };
 

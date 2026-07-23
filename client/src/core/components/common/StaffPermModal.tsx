@@ -6,6 +6,24 @@ import { countPerms } from "../../utils/helpers";
 import { InputField } from "./InputField";
 import { PermissionMatrix } from "./PermissionMatrix";
 
+const LOCAL_PRESETS: Record<string, PermSet> = {
+  "Kế toán": { ...defaultPerms(), debts: { view: true, update: true }, reports: { view: true } },
+  "Nhân viên Kho": { ...defaultPerms(), inventory: { view: true, create: true, update: true }, orders: { view: true, create: false, update: true, delete: false } },
+  "Sales": { ...defaultPerms(), orders: { view: true, create: true, update: true, delete: false }, agents: { view: true, create: false, update: true, delete: false }, promotions: { view: true, create: true, update: true, delete: false }, inbox: { view: true, create: true } },
+  "CSKH": { ...defaultPerms(), inbox: { view: true, create: true }, orders: { view: true, create: false, update: false, delete: false }, promotions: { view: true, create: false, update: false, delete: false } },
+  "Quản lý (Full)": { 
+    ...defaultPerms(), 
+    products: { view: true, create: true, update: true, delete: true },
+    inventory: { view: true, create: true, update: true },
+    orders: { view: true, create: true, update: true, delete: true },
+    agents: { view: true, create: true, update: true, delete: true },
+    debts: { view: true, update: true },
+    promotions: { view: true, create: true, update: true, delete: true },
+    reports: { view: true },
+    inbox: { view: true, create: true }
+  }
+};
+
 export function StaffPermModal({ staff, onSave, onClose }: {
   staff: StaffMember; onSave: (id: string, perms: PermSet, meta: Partial<StaffMember>) => void; onClose: () => void;
 }) {
@@ -20,8 +38,8 @@ export function StaffPermModal({ staff, onSave, onClose }: {
     setTimeout(() => { setSaved(false); onClose(); }, 1200);
   };
 
-  const applyPreset = (preset: keyof typeof STAFF_PRESETS) => {
-    setPerms(JSON.parse(JSON.stringify(STAFF_PRESETS[preset])));
+  const applyPreset = (preset: keyof typeof LOCAL_PRESETS) => {
+    setPerms(JSON.parse(JSON.stringify(LOCAL_PRESETS[preset])));
   };
 
   const totalPerms = countPerms(perms);
@@ -65,12 +83,19 @@ export function StaffPermModal({ staff, onSave, onClose }: {
               {/* Preset toolbar */}
               <div className="px-5 py-3 border-b border-border bg-muted/30 flex items-center gap-3 flex-wrap">
                 <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Áp dụng mẫu nhanh:</span>
-                {Object.keys(STAFF_PRESETS).map(preset => (
-                  <button key={preset} onClick={() => applyPreset(preset as any)}
-                    className="text-xs px-3 py-1.5 border border-border bg-card rounded-lg hover:border-accent hover:text-accent transition-colors font-medium">
-                    {preset}
-                  </button>
-                ))}
+                {Object.keys(LOCAL_PRESETS).map(preset => {
+                  const isActive = JSON.stringify(perms) === JSON.stringify(LOCAL_PRESETS[preset]);
+                  return (
+                    <button key={preset} onClick={() => applyPreset(preset as any)}
+                      className={`text-xs px-3 py-1.5 border rounded-lg transition-colors font-medium ${
+                        isActive 
+                          ? "border-accent bg-accent/10 text-accent" 
+                          : "border-border bg-card hover:border-accent hover:text-accent"
+                      }`}>
+                      {preset}
+                    </button>
+                  );
+                })}
                 <button onClick={() => setPerms(defaultPerms())}
                   className="text-xs px-3 py-1.5 border border-destructive/30 text-destructive rounded-lg hover:bg-red-50 transition-colors ml-auto">
                   Xóa tất cả quyền
@@ -82,10 +107,13 @@ export function StaffPermModal({ staff, onSave, onClose }: {
               </div>
 
               {/* Legend */}
-              <div className="px-5 py-3 border-t border-border bg-muted/20 flex items-center gap-4 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1.5"><span className="w-4 h-4 bg-accent rounded flex items-center justify-center"><CheckCircle size={10} className="text-white" /></span>Đã cấp</span>
-                <span className="flex items-center gap-1.5"><span className="w-4 h-4 border-2 border-muted-foreground/30 rounded" />Chưa cấp</span>
-                <span className="flex items-center gap-1.5"><span className="text-muted-foreground/30">—</span>Không áp dụng</span>
+              <div className="px-5 py-3 border-t border-border bg-muted/20 flex flex-col gap-2 text-xs text-muted-foreground">
+                <div className="font-semibold text-foreground mb-1">Hướng dẫn:</div>
+                <div className="flex items-center gap-6">
+                  <span className="flex items-center gap-1.5"><span className="w-4 h-4 bg-accent rounded flex items-center justify-center"><CheckCircle size={10} className="text-white" /></span>Được phép thao tác</span>
+                  <span className="flex items-center gap-1.5"><span className="w-4 h-4 border-2 border-muted-foreground/30 rounded" />Bị chặn (Không có quyền)</span>
+                  <span className="flex items-center gap-1.5"><span className="text-muted-foreground/30">—</span>Quyền này không áp dụng cho module tương ứng</span>
+                </div>
               </div>
             </div>
           )}

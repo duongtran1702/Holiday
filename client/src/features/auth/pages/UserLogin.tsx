@@ -33,6 +33,9 @@ export function UserLoginPage() {
         <div className="space-y-4">
           <InputField label="Email" icon={Mail} type="email" placeholder="example@email.com" value={email} onChange={setEmail} required />
           <InputField label="Mật khẩu" icon={Lock} type="password" placeholder="••••••••" value={password} onChange={setPassword} required />
+          <div className="flex justify-end mt-[-8px]">
+            <button type="button" onClick={() => navigate("/forgot-password")} className="text-xs font-semibold text-accent hover:underline">Quên mật khẩu?</button>
+          </div>
 
           {userError && (
             <div className={`flex items-start gap-2.5 p-3 rounded-lg text-sm border ${userError.includes("chờ") ? "bg-amber-50 border-amber-200 text-amber-700" : "bg-red-50 border-red-200 text-red-700"}`}>

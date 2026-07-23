@@ -1,6 +1,17 @@
-# Nháº­t kÃ½ cáº­p nháº­t há»‡ thá»‘ng (Changelog)
+﻿## [22/07/2026] - Phát triển chức năng Quản lý Voucher & Ví Voucher
+- Thêm module backend `promotion` với các entity `Promotion` và `UserVoucherWallet`.
+- Phát triển `PromotionService` với logic cấp voucher theo 4 loại giới hạn và đối tượng cụ thể (Khách hàng, Đại lý, Email cụ thể).
+- Tích hợp `NotificationRepository` để bắn thông báo tự động khi có voucher mới.
+- Xây dựng giao diện Client (chia theo micro client & service):
+  - `promotionService.ts`: Xử lý call API.
+  - `PromotionFormModal.tsx`: Giao diện form Admin để tạo Voucher.
+  - `AdminPromotions.tsx`: Giao diện hiển thị danh sách voucher của Admin.
+  - `MyPromotions.tsx`: Giao diện Ví Voucher cho B2C và B2B với hiệu ứng UI hiện trạng thái (dùng ngay, đã dùng, hết hạn/xám, xoá).
+- Áp dụng chuẩn SOLID và OCD Zero-warning.
 
-File nÃ y ghi láº¡i toÃ n bá»™ cÃ¡c thay Ä‘á»•i, tÃ­nh nÄƒng má»›i vÃ  cáº­p nháº­t trong quÃ¡ trÃ¬nh phÃ¡t triá»ƒn dá»± Ã¡n.
+# NhÃ¡ÂºÂ­t kÃƒÂ½ cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t hÃ¡Â»â€¡ thÃ¡Â»â€˜ng (Changelog)
+
+File nÃƒÂ y ghi lÃ¡ÂºÂ¡i toÃƒÂ n bÃ¡Â»â„¢ cÃƒÂ¡c thay Ã„â€˜Ã¡Â»â€¢i, tÃƒÂ­nh nÃ„Æ’ng mÃ¡Â»â€ºi vÃƒÂ  cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t trong quÃƒÂ¡ trÃƒÂ¬nh phÃƒÂ¡t triÃ¡Â»Æ’n dÃ¡Â»Â± ÃƒÂ¡n.
 
 ## [22/07/2026] - Dong bo ten va avatar trong lich su chat
 
@@ -16,247 +27,247 @@ File nÃ y ghi láº¡i toÃ n bá»™ cÃ¡c thay Ä‘á»•i, tÃ­nh nÄ
 - Cap nhat ChatController.java: Xu ly loi NullPointerException khi Guest goi API read.
 - Cap nhat ChatServiceImpl.java: Gui Map JSON cho STOMP message.
 
-## [22/07/2026] - ThÃªm tÃ­nh nÄƒng cáº­p nháº­t tráº¡ng thÃ¡i Ä‘Ã£ Ä‘á»c Realtime
+## [22/07/2026] - ThÃƒÂªm tÃƒÂ­nh nÃ„Æ’ng cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t trÃ¡ÂºÂ¡ng thÃƒÂ¡i Ã„â€˜ÃƒÂ£ Ã„â€˜Ã¡Â» c Realtime
 
-**1. Sá»­a lá»—i frontend (Client)**
+**1. SÃ¡Â»Â­a lÃ¡Â»â€”i frontend (Client)**
 
-- Cáº­p nháº­t useChatWebSocket.ts: ThÃªm readSubRef Ä‘Äƒng kÃ½ theo dÃµi topic /topic/conversation/{convId}/read Ä‘á»ƒ cáº­p nháº­t tráº¡ng thÃ¡i tin nháº¯n thÃ nh READ ngay khi nháº­n Ä‘Æ°á»£c tÃ­n hiá»‡u ngÆ°á»i dÃ¹ng khÃ¡c Ä‘Ã£ Ä‘á»c.
+- CÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t useChatWebSocket.ts: ThÃƒÂªm readSubRef Ã„â€˜Ã„Æ’ng kÃƒÂ½ theo dÃƒÂµi topic /topic/conversation/{convId}/read Ã„â€˜Ã¡Â»Æ’ cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t trÃ¡ÂºÂ¡ng thÃƒÂ¡i tin nhÃ¡ÂºÂ¯n thÃƒÂ nh READ ngay khi nhÃ¡ÂºÂ­n Ã„â€˜Ã†Â°Ã¡Â»Â£c tÃƒÂ­n hiÃ¡Â»â€¡u ngÃ†Â°Ã¡Â» i dÃƒÂ¹ng khÃƒÂ¡c Ã„â€˜ÃƒÂ£ Ã„â€˜Ã¡Â» c.
 
-**2. Sá»­a lá»—i backend (Server)**
+**2. SÃ¡Â»Â­a lÃ¡Â»â€”i backend (Server)**
 
-- Cáº­p nháº­t ChatServiceImpl.java: ThÃªm hÃ m gá»­i thÃ´ng bÃ¡o qua STOMP tá»›i topic /topic/conversation/{conversationId}/read sau khi gá»i markAsReadForUser.
+- CÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t ChatServiceImpl.java: ThÃƒÂªm hÃƒÂ m gÃ¡Â»Â­i thÃƒÂ´ng bÃƒÂ¡o qua STOMP tÃ¡Â»â€ºi topic /topic/conversation/{conversationId}/read sau khi gÃ¡Â» i markAsReadForUser.
 
-## [22/07/2026] - Sá»­a lá»—i sá»‘ lÆ°á»£ng tin nháº¯n chÆ°a Ä‘á»c
+## [22/07/2026] - SÃ¡Â»Â­a lÃ¡Â»â€”i sÃ¡Â»â€˜ lÃ†Â°Ã¡Â»Â£ng tin nhÃ¡ÂºÂ¯n chÃ†Â°a Ã„â€˜Ã¡Â» c
 
-**1. Sá»­a lá»—i frontend (Client)**
+**1. SÃ¡Â»Â­a lÃ¡Â»â€”i frontend (Client)**
 
-- Cáº­p nháº­t useChatWebSocket.ts: ThÃªm onNewMessage callback Ä‘á»ƒ xá»­ lÃ½ tin nháº¯n má»›i nháº­n tá»« WebSocket thay vÃ¬ dá»±a vÃ o messages.length.
-- Cáº­p nháº­t ChatWidget.tsx: XÃ³a logic lá»—i tÃ­nh sá»‘ lÆ°á»£ng tin nháº¯n chÆ°a Ä‘á»c dá»±a trÃªn lá»‹ch sá»­ tin nháº¯n. Sá»­ dá»¥ng onNewMessage Ä‘á»ƒ chá»‰ tÄƒng unreadCount khi cÃ³ tin nháº¯n thá»±c sá»± má»›i vÃ  khung chat Ä‘ang Ä‘Ã³ng.
+- CÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t useChatWebSocket.ts: ThÃƒÂªm onNewMessage callback Ã„â€˜Ã¡Â»Æ’ xÃ¡Â»Â­ lÃƒÂ½ tin nhÃ¡ÂºÂ¯n mÃ¡Â»â€ºi nhÃ¡ÂºÂ­n tÃ¡Â»Â« WebSocket thay vÃƒÂ¬ dÃ¡Â»Â±a vÃƒÂ o messages.length.
+- CÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t ChatWidget.tsx: XÃƒÂ³a logic lÃ¡Â»â€”i tÃƒÂ­nh sÃ¡Â»â€˜ lÃ†Â°Ã¡Â»Â£ng tin nhÃ¡ÂºÂ¯n chÃ†Â°a Ã„â€˜Ã¡Â» c dÃ¡Â»Â±a trÃƒÂªn lÃ¡Â»â€¹ch sÃ¡Â»Â­ tin nhÃ¡ÂºÂ¯n. SÃ¡Â»Â­ dÃ¡Â»Â¥ng onNewMessage Ã„â€˜Ã¡Â»Æ’ chÃ¡Â»â€° tÃ„Æ’ng unreadCount khi cÃƒÂ³ tin nhÃ¡ÂºÂ¯n thÃ¡Â»Â±c sÃ¡Â»Â± mÃ¡Â»â€ºi vÃƒÂ  khung chat Ã„â€˜ang Ã„â€˜ÃƒÂ³ng.
 
-## [14/07/2026] - TÃ­nh nÄƒng ÄÄƒng nháº­p báº±ng Google
+## [14/07/2026] - TÃƒÂ­nh nÃ„Æ’ng Ã„ Ã„Æ’ng nhÃ¡ÂºÂ­p bÃ¡ÂºÂ±ng Google
 
-**1. Cáº­p nháº­t thÆ° viá»‡n & Cáº¥u hÃ¬nh**
+**1. CÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t thÃ†Â° viÃ¡Â»â€¡n & CÃ¡ÂºÂ¥u hÃƒÂ¬nh**
 
-- ThÃªm thÆ° viá»‡n `com.google.api-client:google-api-client:2.2.0` vÃ o `build.gradle` Ä‘á»ƒ phá»¥c vá»¥ viá»‡c xÃ¡c minh chá»¯ kÃ½ ID Token tá»« Google.
-- Khai bÃ¡o biáº¿n mÃ´i trÆ°á»ng `google.client.id` trong file `application.properties`.
+- ThÃƒÂªm thÃ†Â° viÃ¡Â»â€¡n `com.google.api-client:google-api-client:2.2.0` vÃƒÂ o `build.gradle` Ã„â€˜Ã¡Â»Æ’ phÃ¡Â»Â¥c vÃ¡Â»Â¥ viÃ¡Â»â€¡c xÃƒÂ¡c minh chÃ¡Â»Â¯ kÃƒÂ½ ID Token tÃ¡Â»Â« Google.
+- Khai bÃƒÂ¡o biÃ¡ÂºÂ¿n mÃƒÂ´i trÃ†Â°Ã¡Â» ng `google.client.id` trong file `application.properties`.
 
-**2. Táº§ng Controller & DTO**
+**2. TÃ¡ÂºÂ§ng Controller & DTO**
 
-- Táº¡o má»›i class `GoogleLoginRequest.java` táº¡i `atmin.controller.auth.dto` Ä‘á»ƒ nháº­n yÃªu cáº§u tá»« Frontend chá»©a `idToken`.
-- ThÃªm API endpoint má»›i `POST /api/v1/auth/google` vÃ o `AuthController.java`.
+- TÃ¡ÂºÂ¡o mÃ¡Â»â€ºi class `GoogleLoginRequest.java` tÃ¡ÂºÂ¡i `atmin.controller.auth.dto` Ã„â€˜Ã¡Â»Æ’ nhÃ¡ÂºÂ­n yÃƒÂªu cÃ¡ÂºÂ§u tÃ¡Â»Â« Frontend chÃ¡Â»Â©a `idToken`.
+- ThÃƒÂªm API endpoint mÃ¡Â»â€ºi `POST /api/v1/auth/google` vÃƒÂ o `AuthController.java`.
 
-**3. Táº§ng Service (Xá»­ lÃ½ nghiá»‡p vá»¥)**
+**3. TÃ¡ÂºÂ§ng Service (XÃ¡Â»Â­ lÃƒÂ½ nghiÃ¡Â»â€¡p vÃ¡Â»Â¥)**
 
-- Cáº­p nháº­t interface `AuthService.java` vÃ  class `AuthServiceImpl.java` vá»›i phÆ°Æ¡ng thá»©c `loginWithGoogle`.
-- XÃ¢y dá»±ng luá»“ng tá»± Ä‘á»™ng kiá»ƒm chá»©ng token báº±ng `GoogleIdTokenVerifier`.
-- XÃ¢y dá»±ng luá»“ng tá»± Ä‘á»™ng táº¡o ngÆ°á»i dÃ¹ng má»›i xuá»‘ng Database (vá»›i Role lÃ  `CUSTOMER` vÃ  sinh máº­t kháº©u ngáº«u nhiÃªn) náº¿u email Ä‘Äƒng nháº­p láº§n Ä‘áº§u tiÃªn.
-- TÃ­ch há»£p hÃ m táº¡o Access Token vÃ  Refresh Token giá»‘ng nhÆ° luá»“ng Ä‘Äƒng nháº­p thÆ°á»ng.
-- Cáº­p nháº­t (15/07): Äá»•i phÆ°Æ¡ng thá»©c xÃ¡c thá»±c tá»« `GoogleIdTokenVerifier` sang sá»­ dá»¥ng `RestTemplate` gá»i API `userinfo` cá»§a Google báº±ng `access_token` Ä‘á»ƒ cho phÃ©p tÃ¹y chá»‰nh giao diá»‡n Frontend.
+- CÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t interface `AuthService.java` vÃƒÂ  class `AuthServiceImpl.java` vÃ¡Â»â€ºi phÃ†Â°Ã†Â¡ng thÃ¡Â»Â©c `loginWithGoogle`.
+- XÃƒÂ¢y dÃ¡Â»Â±ng luÃ¡Â»â€œng tÃ¡Â»Â± Ã„â€˜Ã¡Â»â„¢ng kiÃ¡Â»Æ’m chÃ¡Â»Â©ng token bÃ¡ÂºÂ±ng `GoogleIdTokenVerifier`.
+- XÃƒÂ¢y dÃ¡Â»Â±ng luÃ¡Â»â€œng tÃ¡Â»Â± Ã„â€˜Ã¡Â»â„¢ng tÃ¡ÂºÂ¡o ngÃ†Â°Ã¡Â» i dÃƒÂ¹ng mÃ¡Â»â€ºi xuÃ¡Â»â€˜ng Database (vÃ¡Â»â€ºi Role lÃƒÂ  `CUSTOMER` vÃƒÂ  sinh mÃ¡ÂºÂ­t khÃ¡ÂºÂ©u ngÃ¡ÂºÂ«u nhiÃƒÂªn) nÃ¡ÂºÂ¿u email Ã„â€˜Ã„Æ’ng nhÃ¡ÂºÂ­p lÃ¡ÂºÂ§n Ã„â€˜Ã¡ÂºÂ§u tiÃƒÂªn.
+- TÃƒÂ­ch hÃ¡Â»Â£p hÃƒÂ m tÃ¡ÂºÂ¡o Access Token vÃƒÂ  Refresh Token giÃ¡Â»â€˜ng nhÃ†Â° luÃ¡Â»â€œng Ã„â€˜Ã„Æ’ng nhÃ¡ÂºÂ­p thÃ†Â°Ã¡Â» ng.
+- CÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t (15/07): Ã„ Ã¡Â»â€¢i phÃ†Â°Ã†Â¡ng thÃ¡Â»Â©c xÃƒÂ¡c thÃ¡Â»Â±c tÃ¡Â»Â« `GoogleIdTokenVerifier` sang sÃ¡Â»Â­ dÃ¡Â»Â¥ng `RestTemplate` gÃ¡Â» i API `userinfo` cÃ¡Â»Â§a Google bÃ¡ÂºÂ±ng `access_token` Ã„â€˜Ã¡Â»Æ’ cho phÃƒÂ©p tÃƒÂ¹y chÃ¡Â»â€°nh giao diÃ¡Â»â€¡n Frontend.
 
-**4. Táº§ng Frontend (Client)**
+**4. TÃ¡ÂºÂ§ng Frontend (Client)**
 
-- ThÆ° viá»‡n: CÃ i Ä‘áº·t `@react-oauth/google`.
-- Cáº¥u hÃ¬nh: Bá»c `main.tsx` vá»›i `<GoogleOAuthProvider>`.
-- API: ThÃªm hÃ m `loginWithGoogle` trong `auth.api.ts` (gá»­i `accessToken`).
-- Giao diá»‡n: Sá»­ dá»¥ng Hook `useGoogleLogin` trong `UserLogin.tsx` thay vÃ¬ nÃºt chuáº©n cá»§a Google, giÃºp giá»¯ nguyÃªn 100% giao diá»‡n nÃºt thiáº¿t káº¿ (UI custom) ban Ä‘áº§u.
+- ThÃ†Â° viÃ¡Â»â€¡n: CÃƒÂ i Ã„â€˜Ã¡ÂºÂ·t `@react-oauth/google`.
+- CÃ¡ÂºÂ¥u hÃƒÂ¬nh: BÃ¡Â» c `main.tsx` vÃ¡Â»â€ºi `<GoogleOAuthProvider>`.
+- API: ThÃƒÂªm hÃƒÂ m `loginWithGoogle` trong `auth.api.ts` (gÃ¡Â»Â­i `accessToken`).
+- Giao diÃ¡Â»â€¡n: SÃ¡Â»Â­ dÃ¡Â»Â¥ng Hook `useGoogleLogin` trong `UserLogin.tsx` thay vÃƒÂ¬ nÃƒÂºt chuÃ¡ÂºÂ©n cÃ¡Â»Â§a Google, giÃƒÂºp giÃ¡Â»Â¯ nguyÃƒÂªn 100% giao diÃ¡Â»â€¡n nÃƒÂºt thiÃ¡ÂºÂ¿t kÃ¡ÂºÂ¿ (UI custom) ban Ã„â€˜Ã¡ÂºÂ§u.
 
-## [14/07/2026] - TÃ­nh nÄƒng Äáº·t hÃ ng vÃ  Thanh toÃ¡n trá»±c tuyáº¿n (PayOS)
+## [14/07/2026] - TÃƒÂ­nh nÃ„Æ’ng Ã„ Ã¡ÂºÂ·t hÃƒÂ ng vÃƒÂ  Thanh toÃƒÂ¡n trÃ¡Â»Â±c tuyÃ¡ÂºÂ¿n (PayOS)
 
-**1. Cáº­p nháº­t thÆ° viá»‡n & Cáº¥u hÃ¬nh**
+**1. CÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t thÃ†Â° viÃ¡Â»â€¡n & CÃ¡ÂºÂ¥u hÃƒÂ¬nh**
 
-- ThÃªm thÆ° viá»‡n `vn.payos:payos-java:2.0.1` vÃ o `build.gradle` Ä‘á»ƒ sá»­ dá»¥ng SDK má»›i nháº¥t cá»§a PayOS.
-- Khai bÃ¡o cÃ¡c biáº¿n mÃ´i trÆ°á»ng `PAYOS_CLIENT_ID`, `PAYOS_API_KEY`, `PAYOS_CHECKSUM_KEY` trong file `application.properties`.
-- Táº¡o class cáº¥u hÃ¬nh `PayOSConfig.java` Ä‘á»ƒ náº¡p thÃ´ng tin káº¿t ná»‘i PayOS.
+- ThÃƒÂªm thÃ†Â° viÃ¡Â»â€¡n `vn.payos:payos-java:2.0.1` vÃƒÂ o `build.gradle` Ã„â€˜Ã¡Â»Æ’ sÃ¡Â»Â­ dÃ¡Â»Â¥ng SDK mÃ¡Â»â€ºi nhÃ¡ÂºÂ¥t cÃ¡Â»Â§a PayOS.
+- Khai bÃƒÂ¡o cÃƒÂ¡c biÃ¡ÂºÂ¿n mÃƒÂ´i trÃ†Â°Ã¡Â» ng `PAYOS_CLIENT_ID`, `PAYOS_API_KEY`, `PAYOS_CHECKSUM_KEY` trong file `application.properties`.
+- TÃ¡ÂºÂ¡o class cÃ¡ÂºÂ¥u hÃƒÂ¬nh `PayOSConfig.java` Ã„â€˜Ã¡Â»Æ’ nÃ¡ÂºÂ¡p thÃƒÂ´ng tin kÃ¡ÂºÂ¿t nÃ¡Â»â€˜i PayOS.
 
-**2. Táº§ng Entity & Enum**
+**2. TÃ¡ÂºÂ§ng Entity & Enum**
 
-- ThÃªm báº£ng dá»¯ liá»‡u `Order`, `OrderItem`, `Invoice` cÃ³ liÃªn káº¿t khoÃ¡ ngoáº¡i phÃ¹ há»£p cho viá»‡c thanh toÃ¡n.
-- Äá»‹nh nghÄ©a enum `OrderStatus` (PENDING, PENDING_PAYMENT, PAID, v.v.) vÃ  `PaymentMethod` (COD, PAYOS).
+- ThÃƒÂªm bÃ¡ÂºÂ£ng dÃ¡Â»Â¯ liÃ¡Â»â€¡u `Order`, `OrderItem`, `Invoice` cÃƒÂ³ liÃƒÂªn kÃ¡ÂºÂ¿t khoÃƒÂ¡ ngoÃ¡ÂºÂ¡i phÃƒÂ¹ hÃ¡Â»Â£p cho viÃ¡Â»â€¡c thanh toÃƒÂ¡n.
+- Ã„ Ã¡Â»â€¹nh nghÃ„Â©a enum `OrderStatus` (PENDING, PENDING_PAYMENT, PAID, v.v.) vÃƒÂ  `PaymentMethod` (COD, PAYOS).
 
-**3. Táº§ng Controller & DTO**
+**3. TÃ¡ÂºÂ§ng Controller & DTO**
 
-- Äá»‹nh nghÄ©a cÃ¡c DTO `OrderRequest` vÃ  `OrderResponse`.
-- Táº¡o `OrderController.java` Ä‘á»ƒ nháº­n yÃªu cáº§u Ä‘áº·t hÃ ng cá»§a khÃ¡ch hÃ ng qua API.
-- Táº¡o `PaymentController.java` má»Ÿ cá»•ng Webhook nháº­n tráº¡ng thÃ¡i thanh toÃ¡n tá»« há»‡ thá»‘ng PayOS.
+- Ã„ Ã¡Â»â€¹nh nghÃ„Â©a cÃƒÂ¡c DTO `OrderRequest` vÃƒÂ  `OrderResponse`.
+- TÃ¡ÂºÂ¡o `OrderController.java` Ã„â€˜Ã¡Â»Æ’ nhÃ¡ÂºÂ­n yÃƒÂªu cÃ¡ÂºÂ§u Ã„â€˜Ã¡ÂºÂ·t hÃƒÂ ng cÃ¡Â»Â§a khÃƒÂ¡ch hÃƒÂ ng qua API.
+- TÃ¡ÂºÂ¡o `PaymentController.java` mÃ¡Â»Å¸ cÃ¡Â»â€¢ng Webhook nhÃ¡ÂºÂ­n trÃ¡ÂºÂ¡ng thÃƒÂ¡i thanh toÃƒÂ¡n tÃ¡Â»Â« hÃ¡Â»â€¡ thÃ¡Â»â€˜ng PayOS.
 
-**4. Táº§ng Service**
+**4. TÃ¡ÂºÂ§ng Service**
 
-- Táº¡o `OrderService` xá»­ lÃ½ lÆ°u dá»¯ liá»‡u Ä‘Æ¡n hÃ ng vÃ  kiá»ƒm tra lá»±a chá»n (náº¿u chá»n PAYOS thÃ¬ gá»i tá»›i `PaymentService`).
-- Táº¡o `PaymentService` Ä‘Ã³ng vai trÃ² gá»i PayOS SDK Ä‘á»ƒ táº¡o Payment Link vÃ  xá»­ lÃ½ Webhook. Tá»± Ä‘á»™ng chuyá»ƒn tráº¡ng thÃ¡i Ä‘Æ¡n hÃ ng sang `PAID` vÃ  sinh `Invoice` khi ngÆ°á»i dÃ¹ng thanh toÃ¡n thÃ nh cÃ´ng.
+- TÃ¡ÂºÂ¡o `OrderService` xÃ¡Â»Â­ lÃƒÂ½ lÃ†Â°u dÃ¡Â»Â¯ liÃ¡Â»â€¡u Ã„â€˜Ã†Â¡n hÃƒÂ ng vÃƒÂ  kiÃ¡Â»Æ’m tra lÃ¡Â»Â±a chÃ¡Â» n (nÃ¡ÂºÂ¿u chÃ¡Â» n PAYOS thÃƒÂ¬ gÃ¡Â» i tÃ¡Â»â€ºi `PaymentService`).
+- TÃ¡ÂºÂ¡o `PaymentService` Ã„â€˜ÃƒÂ³ng vai trÃƒÂ² gÃ¡Â» i PayOS SDK Ã„â€˜Ã¡Â»Æ’ tÃ¡ÂºÂ¡o Payment Link vÃƒÂ  xÃ¡Â»Â­ lÃƒÂ½ Webhook. TÃ¡Â»Â± Ã„â€˜Ã¡Â»â„¢ng chuyÃ¡Â»Æ’ trÃ¡ÂºÂ¡ng thÃƒÂ¡i Ã„â€˜Ã†Â¡n hÃƒÂ ng sang `PAID` vÃƒÂ  sinh `Invoice` khi ngÃ†Â°Ã¡Â» i dÃƒÂ¹ng thanh toÃƒÂ¡n thÃƒÂ nh cÃƒÂ´ng.
 
-## [15/07/2026] - Kiáº¿n trÃºc TÃ¡ch báº¡ch ÄÄƒng nháº­p & PhÃ¢n quyá»n Cá»•ng (Portal)
+## [15/07/2026] - KiÃ¡ÂºÂ¿n trÃƒÂºc TÃƒÂ¡ch bÃ¡ÂºÂ¡ch Ã„ Ã„Æ’ng nhÃ¡ÂºÂ­p & PhÃƒÂ¢n quyÃ¡Â» n CÃ¡Â»â€¢ng (Portal)
 
-**1. Táº§ng Database & Entity**
+**1. TÃ¡ÂºÂ§ng Database & Entity**
 
-- Bá»• sung cá»™t `auth_provider` vÃ o entity `User.java` (máº·c Ä‘á»‹nh `LOCAL`, náº¿u táº¡o qua Google thÃ¬ gÃ¡n `GOOGLE`).
+- BÃ¡Â»â€¢ sung cÃ¡Â»â„¢t `auth_provider` vÃƒÂ o entity `User.java` (mÃ¡ÂºÂ·c Ã„â€˜Ã¡Â»â€¹nh `LOCAL`, nÃ¡ÂºÂ¿u tÃ¡ÂºÂ¡o qua Google thÃƒÂ¬ gÃƒÂ¡n `GOOGLE`).
 
-**2. Táº§ng Controller & DTO**
+**2. TÃ¡ÂºÂ§ng Controller & DTO**
 
-- Bá»• sung biáº¿n `portal` (nháº­n giÃ¡ trá»‹ `admin` hoáº·c `customer`) vÃ o `LoginRequest.java` Ä‘á»ƒ xÃ¡c Ä‘á»‹nh luá»“ng Ä‘Äƒng nháº­p.
+- BÃ¡Â»â€¢ sung biÃ¡ÂºÂ¿n `portal` (nhÃ¡ÂºÂ­n giÃƒÂ¡ trÃ¡Â»â€¹ `admin` hoÃ¡ÂºÂ·c `customer`) vÃƒÂ o `LoginRequest.java` Ã„â€˜Ã¡Â»Æ’ xÃƒÂ¡c Ã„â€˜Ã¡Â»â€¹nh luÃ¡Â»â€œng Ã„â€˜Ã„Æ’ng nhÃ¡ÂºÂ­p.
 
-**3. Táº§ng Service (`AuthServiceImpl.java`)**
+**3. TÃ¡ÂºÂ§ng Service (`AuthServiceImpl.java`)**
 
-- Ãp dá»¥ng cÆ¡ cháº¿ **Strict Separation** (TÃ¡ch báº¡ch hoÃ n toÃ n):
-  - Cháº·n tÃ i khoáº£n táº¡o báº±ng Máº­t kháº©u khÃ´ng Ä‘Æ°á»£c dÃ¹ng nÃºt ÄÄƒng nháº­p Google.
-  - Cháº·n tÃ i khoáº£n táº¡o báº±ng Google khÃ´ng Ä‘Æ°á»£c dÃ¹ng form ÄÄƒng nháº­p Máº­t kháº©u.
-  - Cháº·n tÃ i khoáº£n Google sá»­ dá»¥ng tÃ­nh nÄƒng "QuÃªn máº­t kháº©u" vÃ  "Äá»•i máº­t kháº©u" Ä‘á»ƒ báº£o vá»‡ luá»“ng xÃ¡c thá»±c.
-- PhÃ¢n quyá»n Cá»•ng Ä‘Äƒng nháº­p (Portal):
-  - Cháº·n tÃ i khoáº£n `ADMIN` vÃ  `STAFF` Ä‘Äƒng nháº­p qua cá»•ng Customer (`portal="customer"`).
-  - Cháº·n ngÆ°á»i dÃ¹ng thÆ°á»ng (Customer) Ä‘Äƒng nháº­p qua cá»•ng Admin (`portal="admin"`).
-- Cáº£i thiá»‡n UX: RÃºt ngáº¯n toÃ n bá»™ cÃ¡c thÃ´ng bÃ¡o lá»—i (Exception messages) Ä‘á»ƒ trÃ¡nh hiá»‡n tÆ°á»£ng vá»¡ layout trÃªn Frontend.
+- Ãƒ p dÃ¡Â»Â¥ng cÃ†Â¡ chÃ¡ÂºÂ¿ **Strict Separation** (TÃƒÂ¡ch bÃ¡ÂºÂ¡ch hoÃƒÂ n toÃƒÂ n):
+  - ChÃ¡ÂºÂ·n tÃƒÂ i khoÃ¡ÂºÂ£n tÃ¡ÂºÂ¡o bÃ¡ÂºÂ±ng MÃ¡ÂºÂ­t khÃ¡ÂºÂ©u khÃƒÂ´ng Ã„â€˜Ã†Â°Ã¡Â»Â£c dÃƒÂ¹ng nÃƒÂºt Ã„ Ã„Æ’ng nhÃ¡ÂºÂ­p Google.
+  - ChÃ¡ÂºÂ·n tÃƒÂ i khoÃ¡ÂºÂ£n tÃ¡ÂºÂ¡o bÃ¡ÂºÂ±ng Google khÃƒÂ´ng Ã„â€˜Ã†Â°Ã¡Â»Â£c dÃƒÂ¹ng form Ã„ Ã„Æ’ng nhÃ¡ÂºÂ­p MÃ¡ÂºÂ­t khÃ¡ÂºÂ©u.
+  - ChÃ¡ÂºÂ·n tÃƒÂ i khoÃ¡ÂºÂ£n Google sÃ¡Â»Â­ dÃ¡Â»Â¥ng tÃƒÂ­nh nÃ„Æ’ng "QuÃƒÂªn mÃ¡ÂºÂ­t khÃ¡ÂºÂ©u" vÃƒÂ  "Ã„ Ã¡Â»â€¢i mÃ¡ÂºÂ­t khÃ¡ÂºÂ©u" Ã„â€˜Ã¡Â»Æ’ bÃ¡ÂºÂ£o vÃ¡Â»â€¡ luÃ¡Â»â€œng xÃƒÂ¡c thÃ¡Â»Â±c.
+- PhÃƒÂ¢n quyÃ¡Â» n CÃ¡Â»â€¢ng Ã„â€˜Ã„Æ’ng nhÃ¡ÂºÂ­p (Portal):
+  - ChÃ¡ÂºÂ·n tÃƒÂ i khoÃ¡ÂºÂ£n `ADMIN` vÃƒÂ  `STAFF` Ã„â€˜Ã„Æ’ng nhÃ¡ÂºÂ­p qua cÃ¡Â»â€¢ng Customer (`portal="customer"`).
+  - ChÃ¡ÂºÂ·n ngÃ†Â°Ã¡Â» i dÃƒÂ¹ng thÃ†Â°Ã¡Â» ng (Customer) Ã„â€˜Ã„Æ’ng nhÃ¡ÂºÂ­p qua cÃ¡Â»â€¢ng Admin (`portal="admin"`).
+- CÃ¡ÂºÂ£i thiÃ¡Â»â€¡n UX: RÃƒÂºt ngÃ¡ÂºÂ¯n toÃƒÂ n bÃ¡Â»â„¢ cÃƒÂ¡c thÃƒÂ´ng bÃƒÂ¡o lÃ¡Â»â€”i (Exception messages) Ã„â€˜Ã¡Â»Æ’ trÃƒÂ¡nh hiÃ¡Â»â€¡n tÃ†Â°Ã¡Â»Â£ng vÃ¡Â»Â¡ layout trÃƒÂªn Frontend.
 
-**4. Táº§ng Frontend**
+**4. TÃ¡ÂºÂ§ng Frontend**
 
-- Bá»• sung cáº¥u hÃ¬nh truyá»n tham sá»‘ `portal: 'customer'` trong `UserLogin.tsx`.
-- Bá»• sung cáº¥u hÃ¬nh truyá»n tham sá»‘ `portal: 'admin'` trong `AdminLogin.tsx`.
+- BÃ¡Â»â€¢ sung cÃ¡ÂºÂ¥u hÃƒÂ¬nh truyÃ¡Â» n tham sÃ¡Â»â€˜ `portal: 'customer'` trong `UserLogin.tsx`.
+- BÃ¡Â»â€¢ sung cÃ¡ÂºÂ¥u hÃƒÂ¬nh truyÃ¡Â» n tham sÃ¡Â»â€˜ `portal: 'admin'` trong `AdminLogin.tsx`.
 
-## [15/07/2026] - HoÃ n thiá»‡n UI & Káº¿t ná»‘i dá»¯ liá»‡u ngÆ°á»i dÃ¹ng (Profile)
+## [15/07/2026] - HoÃƒÂ n thiÃ¡Â»â€¡n UI & KÃ¡ÂºÂ¿t nÃ¡Â»â€˜i dÃ¡Â»Â¯ liÃ¡Â»â€¡u ngÃ†Â°Ã¡Â» i dÃƒÂ¹ng (Profile)
 
-**1. Táº§ng Backend**
+**1. TÃ¡ÂºÂ§ng Backend**
 
-- Bá»• sung trÆ°á»ng dá»¯ liá»‡u `authProvider` vÃ  `phone` vÃ o trong DTO tráº£ vá» `AuthResponse.UserInfo`.
-- Cáº­p nháº­t hÃ m `buildAuthResponse` trong `AuthServiceImpl` Ä‘á»ƒ truyá»n `authProvider` vÃ  `phone` xuá»‘ng Frontend sau khi ngÆ°á»i dÃ¹ng Ä‘Äƒng nháº­p thÃ nh cÃ´ng.
+- BÃ¡Â»â€¢ sung trÃ†Â°Ã¡Â» ng dÃ¡Â»Â¯ liÃ¡Â»â€¡u `authProvider` vÃƒÂ  `phone` vÃƒÂ o trong DTO trÃ¡ÂºÂ£ vÃ¡Â»  `AuthResponse.UserInfo`.
+- CÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t hÃƒÂ m `buildAuthResponse` trong `AuthServiceImpl` Ã„â€˜Ã¡Â»Æ’ truyÃ¡Â» n `authProvider` vÃƒÂ  `phone` xuÃ¡Â»â€˜ng Frontend sau khi ngÃ†Â°Ã¡Â» i dÃƒÂ¹ng Ã„â€˜Ã„Æ’ng nhÃ¡ÂºÂ­p thÃƒÂ nh cÃƒÂ´ng.
 
-**2. Táº§ng Frontend**
+**2. TÃ¡ÂºÂ§ng Frontend**
 
-- Cáº­p nháº­t Interface `User` vÃ  `UserInfo` trong `types/index.ts` Ä‘á»ƒ Ä‘á»“ng bá»™ cáº¥u trÃºc dá»¯ liá»‡u tráº£ vá» tá»« Backend (thÃªm `phone` vÃ  `authProvider`).
-- **ProfileModal.tsx (TÃ i khoáº£n cá»§a tÃ´i) & UserMenu.tsx (Menu gÃ³c trÃªn)**:
-  - Loáº¡i bá» hoÃ n toÃ n dá»¯ liá»‡u giáº£ (Mock Data) vÃ  káº¿t ná»‘i trá»±c tiáº¿p vá»›i tráº¡ng thÃ¡i ngÆ°á»i dÃ¹ng lÆ°u trong Redux (`state.auth.user`).
-  - Giao diá»‡n: Tá»± Ä‘á»™ng trÃ­ch xuáº¥t chá»¯ cÃ¡i Ä‘áº§u tiÃªn trong tÃªn tháº­t cá»§a khÃ¡ch hÃ ng Ä‘á»ƒ lÃ m áº£nh Ä‘áº¡i diá»‡n (Avatar initial).
-  - Tráº£i nghiá»‡m (UX): KhÃ³a cá»©ng trÆ°á»ng `Email` (chá»‰ cho phÃ©p xem) Ä‘á»ƒ báº£o vá»‡ tÃ­nh váº¹n toÃ n dá»¯ liá»‡u Ä‘á»‹nh danh.
-  - Báº£o vá»‡ luá»“ng Ä‘Äƒng nháº­p (Strict Separation): Tá»± Ä‘á»™ng áº©n hoÃ n toÃ n nÃºt/tab "Äá»•i máº­t kháº©u" á»Ÿ má»i nÆ¡i náº¿u há»‡ thá»‘ng phÃ¡t hiá»‡n ngÆ°á»i dÃ¹ng Ä‘ang Ä‘Äƒng nháº­p báº±ng Google (`authProvider === "GOOGLE"`).
-  - TÃ­ch há»£p logic upload file áº£nh lÃªn Cloudinary thÃ´ng qua API.
-  - Cáº­p nháº­t Redux Store ngay sau khi gá»i API thÃ nh cÃ´ng Ä‘á»ƒ thay tháº¿ hÃ¬nh Avatar chá»¯ cÃ¡i báº±ng áº¢nh tháº­t cá»§a User mÃ  khÃ´ng cáº§n reload trang.
-  - Tá»± Ä‘á»™ng gá»i API cáº­p nháº­t Há» TÃªn vÃ  Sá»‘ Ä‘iá»‡n thoáº¡i khi báº¥m "LÆ°u thÃ´ng tin".
+- CÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t Interface `User` vÃƒÂ  `UserInfo` trong `types/index.ts` Ã„â€˜Ã¡Â»Æ’ Ã„â€˜Ã¡Â»â€œng bÃ¡Â»â„¢ cÃ¡ÂºÂ¥u trÃƒÂºc dÃ¡Â»Â¯ liÃ¡Â»â€¡u trÃ¡ÂºÂ£ vÃ¡Â»  tÃ¡Â»Â« Backend (thÃƒÂªm `phone` vÃƒÂ  `authProvider`).
+- **ProfileModal.tsx (TÃƒÂ i khoÃ¡ÂºÂ£n cÃ¡Â»Â§a tÃƒÂ´i) & UserMenu.tsx (Menu gÃƒÂ³c trÃƒÂªn)**:
+  - LoÃ¡ÂºÂ¡i bÃ¡Â»  hoÃƒÂ n toÃƒÂ n dÃ¡Â»Â¯ liÃ¡Â»â€¡u giÃ¡ÂºÂ£ (Mock Data) vÃƒÂ  kÃ¡ÂºÂ¿t nÃ¡Â»â€˜i trÃ¡Â»Â±c tiÃ¡ÂºÂ¿p vÃ¡Â»â€ºi trÃ¡ÂºÂ¡ng thÃƒÂ¡i ngÃ†Â°Ã¡Â» i dÃƒÂ¹ng lÃ†Â°u trong Redux (`state.auth.user`).
+  - Giao diÃ¡Â»â€¡n: TÃ¡Â»Â± Ã„â€˜Ã¡Â»â„¢ng trÃƒÂ­ch xuÃ¡ÂºÂ¥t chÃ¡Â»Â¯ cÃƒÂ¡i Ã„â€˜Ã¡ÂºÂ§u tiÃƒÂªn trong tÃƒÂªn thÃ¡ÂºÂ­t cÃ¡Â»Â§a khÃƒÂ¡ch hÃƒÂ ng Ã„â€˜Ã¡Â»Æ’ lÃƒÂ m Ã¡ÂºÂ£nh Ã„â€˜Ã¡ÂºÂ¡i diÃ¡Â»â€¡n (Avatar initial).
+  - TrÃ¡ÂºÂ£i nghiÃ¡Â»â€¡m (UX): KhÃƒÂ³a cÃ¡Â»Â©ng trÃ†Â°Ã¡Â» ng `Email` (chÃ¡Â»â€° cho phÃƒÂ©p xem) Ã„â€˜Ã¡Â»Æ’ bÃ¡ÂºÂ£o vÃ¡Â»â€¡ tÃƒÂ­nh vÃ¡ÂºÂ¹n toÃƒÂ n dÃ¡Â»Â¯ liÃ¡Â»â€¡u Ã„â€˜Ã¡Â»â€¹nh danh.
+  - BÃ¡ÂºÂ£o vÃ¡Â»â€¡ luÃ¡Â»â€œng Ã„â€˜Ã„Æ’ng nhÃ¡ÂºÂ­p (Strict Separation): TÃ¡Â»Â± Ã„â€˜Ã¡Â»â„¢ng Ã¡ÂºÂ©n hoÃƒÂ n toÃƒÂ n nÃƒÂºt/tab "Ã„ Ã¡Â»â€¢i mÃ¡ÂºÂ­t khÃ¡ÂºÂ©u" Ã¡Â»Å¸ mÃ¡Â» i nÃ†Â¡i nÃ¡ÂºÂ¿u hÃ¡Â»â€¡ thÃ¡Â»â€˜ng phÃƒÂ¡t hiÃ¡Â»â€¡n ngÃ†Â°Ã¡Â» i dÃƒÂ¹ng Ã„â€˜ang Ã„â€˜Ã„Æ’ng nhÃ¡ÂºÂ­p bÃ¡ÂºÂ±ng Google (`authProvider === "GOOGLE"`).
+  - TÃƒÂ­ch hÃ¡Â»Â£p logic upload file Ã¡ÂºÂ£nh lÃƒÂªn Cloudinary thÃƒÂ´ng qua API.
+  - CÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t Redux Store ngay sau khi gÃ¡Â» i API thÃƒÂ nh cÃƒÂ´ng Ã„â€˜Ã¡Â»Æ’ thay thÃ¡ÂºÂ¿ hÃƒÂ¬nh Avatar chÃ¡Â»Â¯ cÃƒÂ¡i bÃ¡ÂºÂ±ng Ã¡ÂºÂ¢nh thÃ¡ÂºÂ­t cÃ¡Â»Â§a User mÃƒÂ  khÃƒÂ´ng cÃ¡ÂºÂ§n reload trang.
+  - TÃ¡Â»Â± Ã„â€˜Ã¡Â»â„¢ng gÃ¡Â» i API cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t HÃ¡Â»  TÃƒÂªn vÃƒÂ  SÃ¡Â»â€˜ Ã„â€˜iÃ¡Â»â€¡n thoÃ¡ÂºÂ¡i khi bÃ¡ÂºÂ¥m "LÃ†Â°u thÃƒÂ´ng tin".
 
-## [15/07/2026] - Triá»ƒn khai luá»“ng Äáº·t HÃ ng (Checkout Flow) & TÃ­nh nÄƒng Tá»± Ä‘á»™ng lÆ°u thÃ´ng tin
+## [15/07/2026] - TriÃ¡Â»Æ’n khai luÃ¡Â»â€œng Ã„ Ã¡ÂºÂ·t HÃƒÂ ng (Checkout Flow) & TÃƒÂ­nh nÃ„Æ’ng TÃ¡Â»Â± Ã„â€˜Ã¡Â»â„¢ng lÃ†Â°u thÃƒÂ´ng tin
 
-**1. Táº§ng Database & Backend**
+**1. TÃ¡ÂºÂ§ng Database & Backend**
 
-- Bá»• sung trÆ°á»ng `address` (Äá»‹a chá»‰ giao hÃ ng) vÃ o Entity `User.java` vÃ  cáº­p nháº­t cÃ¡c luá»“ng DTO liÃªn quan (`UpdateProfileRequest`, `AuthResponse.UserInfo`).
-- TÃ­ch há»£p logic **Auto-save** trong `OrderServiceImpl.java`: Khi ngÆ°á»i dÃ¹ng táº¡o má»™t Ä‘Æ¡n hÃ ng má»›i, náº¿u há» cung cáº¥p sá»‘ Ä‘iá»‡n thoáº¡i hoáº·c Ä‘á»‹a chá»‰ khÃ¡c vá»›i thÃ´ng tin cÃ³ sáºµn trong tÃ i khoáº£n, há»‡ thá»‘ng sáº½ tá»± Ä‘á»™ng cáº­p nháº­t Ä‘Ã¨ nhá»¯ng thÃ´ng tin nÃ y vÃ o Profile cá»§a há» Ä‘á»ƒ tiáº¿t kiá»‡m thá»i gian cho láº§n mua hÃ ng sau.
+- BÃ¡Â»â€¢ sung trÃ†Â°Ã¡Â» ng `address` (Ã„ Ã¡Â»â€¹a chÃ¡Â»â€° giao hÃƒÂ ng) vÃƒÂ o Entity `User.java` vÃƒÂ  cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t cÃƒÂ¡c luÃ¡Â»â€œng DTO liÃƒÂªn quan (`UpdateProfileRequest`, `AuthResponse.UserInfo`).
+- TÃƒÂ­ch hÃ¡Â»Â£p logic **Auto-save** trong `OrderServiceImpl.java`: Khi ngÃ†Â°Ã¡Â» i dÃƒÂ¹ng tÃ¡ÂºÂ¡o mÃ¡Â»â„¢t Ã„â€˜Ã†Â¡n hÃƒÂ ng mÃ¡Â»â€ºi, nÃ¡ÂºÂ¿u hÃ¡Â»  cung cÃ¡ÂºÂ¥p sÃ¡Â»â€˜ Ã„â€˜iÃ¡Â»â€¡n thoÃ¡ÂºÂ¡i hoÃ¡ÂºÂ·c Ã„â€˜Ã¡Â»â€¹a chÃ¡Â»â€° khÃƒÂ¡c vÃ¡Â»â€ºi thÃƒÂ´ng tin cÃƒÂ³ sÃ¡ÂºÂµn trong tÃƒÂ i khoÃ¡ÂºÂ£n, hÃ¡Â»â€¡ thÃ¡Â»â€˜ng sÃ¡ÂºÂ½ tÃ¡Â»Â± Ã„â€˜Ã¡Â»â„¢ng cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t Ã„â€˜ÃƒÂ¨ nhÃ¡Â»Â¯ng thÃƒÂ´ng tin nÃƒÂ y vÃƒÂ o Profile cÃ¡Â»Â§a hÃ¡Â»  Ã„â€˜Ã¡Â»Æ’ tiÃ¡ÂºÂ¿t kiÃ¡Â»â€¡m thÃ¡Â» i gian cho lÃ¡ÂºÂ§n mua hÃƒÂ ng sau.
 
-**2. Táº§ng Frontend (Giao diá»‡n & Logic)**
+**2. TÃ¡ÂºÂ§ng Frontend (Giao diÃ¡Â»â€¡n & Logic)**
 
-- Bá»• sung Ã´ nháº­p "Äá»‹a chá»‰ nháº­n hÃ ng" vÃ o form cá»§a `ProfileModal.tsx`.
-- Táº¡o má»›i file `order.api.ts` Ä‘á»ƒ tÆ°Æ¡ng tÃ¡c vá»›i cÃ¡c endpoint Äáº·t hÃ ng cá»§a Backend.
-- XÃ¢y dá»±ng **CheckoutModal.tsx** (Giao diá»‡n Thanh toÃ¡n Pop-up):
-  - **Auto-fill**: Tá»± Ä‘á»™ng Ä‘iá»n sáºµn Há» tÃªn, SÄT vÃ  Äá»‹a chá»‰ tá»« `user` state trong Redux.
-  - TÃ­ch há»£p hai hÃ¬nh thá»©c thanh toÃ¡n: COD (Thanh toÃ¡n khi nháº­n hÃ ng) vÃ  PAYOS (Thanh toÃ¡n online quÃ©t mÃ£ QR).
-  - TÃ­ch há»£p **Validate cháº·t cháº½** (Strict Validation) theo chÃ¢m ngÃ´n "Thá»«a hÆ¡n thiáº¿u": Sá»‘ Ä‘iá»‡n thoáº¡i pháº£i Ä‘Ãºng regex Viá»‡t Nam (10 sá»‘, Ä‘áº§u 0 hoáº·c +84), Äá»‹a chá»‰ giao hÃ ng báº¯t buá»™c dÃ i hÆ¡n 10 kÃ½ tá»± Ä‘á»ƒ háº¡n cháº¿ sai sÃ³t.
-- NÃ¢ng cáº¥p `CartDrawer.tsx` & `B2CPortal.tsx`:
-  - **Báº£o vá»‡ luá»“ng thanh toÃ¡n**: Cháº·n ngÆ°á»i dÃ¹ng vÃ£ng lai (Guest), yÃªu cáº§u pháº£i ÄÄƒng nháº­p má»›i Ä‘Æ°á»£c áº¥n "Tiáº¿n hÃ nh thanh toÃ¡n" (Tá»± Ä‘á»™ng redirect vá» `/login`).
-  - Xá»­ lÃ½ mÆ°á»£t mÃ  quÃ¡ trÃ¬nh Ä‘iá»u hÆ°á»›ng URL (Ä‘á»‘i vá»›i PayOS) vÃ  lÃ m trá»‘ng giá» hÃ ng (Ä‘á»‘i vá»›i COD).
+- BÃ¡Â»â€¢ sung ÃƒÂ´ nhÃ¡ÂºÂ­p "Ã„ Ã¡Â»â€¹a chÃ¡Â»â€° nhÃ¡ÂºÂ­n hÃƒÂ ng" vÃƒÂ o form cÃ¡Â»Â§a `ProfileModal.tsx`.
+- TÃ¡ÂºÂ¡o mÃ¡Â»â€ºi file `order.api.ts` Ã„â€˜Ã¡Â»Æ’ tÃ†Â°Ã†Â¡ng tÃƒÂ¡c vÃ¡Â»â€ºi cÃƒÂ¡c endpoint Ã„ Ã¡ÂºÂ·t hÃƒÂ ng cÃ¡Â»Â§a Backend.
+- XÃƒÂ¢y dÃ¡Â»Â±ng **CheckoutModal.tsx** (Giao diÃ¡Â»â€¡n Thanh toÃƒÂ¡n Pop-up):
+  - **Auto-fill**: TÃ¡Â»Â± Ã„â€˜Ã¡Â»â„¢ng Ã„â€˜iÃ¡Â» n sÃ¡ÂºÂµn HÃ¡Â»  tÃƒÂªn, SÃ„ T vÃƒÂ  Ã„ Ã¡Â»â€¹a chÃ¡Â»â€° tÃ¡Â»Â« `user` state trong Redux.
+  - TÃƒÂ­ch hÃ¡Â»Â£p hai hÃƒÂ¬nh thÃ¡Â»Â©c thanh toÃƒÂ¡n: COD (Thanh toÃƒÂ¡n khi nhÃ¡ÂºÂ­n hÃƒÂ ng) vÃƒÂ  PAYOS (Thanh toÃƒÂ¡n online quÃƒÂ©t mÃƒÂ£ QR).
+  - TÃƒÂ­ch hÃ¡Â»Â£p **Validate chÃ¡ÂºÂ·t chÃ¡ÂºÂ½** (Strict Validation) theo chÃƒÂ¢m ngÃƒÂ´n "ThÃ¡Â»Â«a hÃ†Â¡n thiÃ¡ÂºÂ¿u": SÃ¡Â»â€˜ Ã„â€˜iÃ¡Â»â€¡n thoÃ¡ÂºÂ¡i phÃ¡ÂºÂ£i Ã„â€˜ÃƒÂºng regex ViÃ¡Â»â€¡t Nam (10 sÃ¡Â»â€˜, Ã„â€˜Ã¡ÂºÂ§u 0 hoÃ¡ÂºÂ·c +84), Ã„ Ã¡Â»â€¹a chÃ¡Â»â€° giao hÃƒÂ ng bÃ¡ÂºÂ¯t buÃ¡Â»â„¢c dÃƒÂ i hÃ†Â¡n 10 kÃƒÂ½ tÃ¡Â»Â± Ã„â€˜Ã¡Â»Æ’ hÃ¡ÂºÂ¡n chÃ¡ÂºÂ¿ sai sÃƒÂ³t.
+- NÃƒÂ¢ng cÃ¡ÂºÂ¥p `CartDrawer.tsx` & `B2CPortal.tsx`:
+  - **BÃ¡ÂºÂ£o vÃ¡Â»â€¡ luÃ¡Â»â€œng thanh toÃƒÂ¡n**: ChÃ¡ÂºÂ·n ngÃ†Â°Ã¡Â» i dÃƒÂ¹ng vÃƒÂ£ng lai (Guest), yÃƒÂªu cÃ¡ÂºÂ§u phÃ¡ÂºÂ£i Ã„ Ã„Æ’ng nhÃ¡ÂºÂ­p mÃ¡Â»â€ºi Ã„â€˜Ã†Â°Ã¡Â»Â£c Ã¡ÂºÂ¥n "TiÃ¡ÂºÂ¿n hÃƒÂ nh thanh toÃƒÂ¡n" (TÃ¡Â»Â± Ã„â€˜Ã¡Â»â„¢ng redirect vÃ¡Â»  `/login`).
+  - XÃ¡Â»Â­ lÃƒÂ½ mÃ†Â°Ã¡Â»Â£t mÃƒÂ  quÃƒÂ¡ trÃƒÂ¬nh Ã„â€˜iÃ¡Â» u hÃ†Â°Ã¡Â»â€ºng URL (Ã„â€˜Ã¡Â»â€˜i vÃ¡Â»â€ºi PayOS) vÃƒÂ  lÃƒÂ m trÃ¡Â»â€˜ng giÃ¡Â»  hÃƒÂ ng (Ã„â€˜Ã¡Â»â€˜i vÃ¡Â»â€ºi COD).
 
-**3. Cáº­p nháº­t AI Custom Rules**
+**3. CÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t AI Custom Rules**
 
-- ThÃªm nguyÃªn táº¯c `Strict Validation Rule` vÃ o cáº¥u hÃ¬nh `.agents/AGENTS.md` nháº±m luÃ´n Æ°u tiÃªn xá»­ lÃ½ dá»¯ liá»‡u ngÆ°á»i dÃ¹ng cáº©n tháº­n, an toÃ n vÃ  cháº·t cháº½ trong cÃ¡c tÃ¡c vá»¥ tÆ°Æ¡ng lai.
+- ThÃƒÂªm nguyÃƒÂªn tÃ¡ÂºÂ¯c `Strict Validation Rule` vÃƒÂ o cÃ¡ÂºÂ¥u hÃƒÂ¬nh `.agents/AGENTS.md` nhÃ¡ÂºÂ±m luÃƒÂ´n Ã†Â°u tiÃƒÂªn xÃ¡Â»Â­ lÃƒÂ½ dÃ¡Â»Â¯ liÃ¡Â»â€¡u ngÃ†Â°Ã¡Â» i dÃƒÂ¹ng cÃ¡ÂºÂ©n thÃ¡ÂºÂ­n, an toÃƒÂ n vÃƒÂ  chÃ¡ÂºÂ·t chÃ¡ÂºÂ½ trong cÃƒÂ¡c tÃƒÂ¡c vÃ¡Â»Â¥ tÃ†Â°Ã†Â¡ng lai.
 
-## [15/07/2026] - Kháº¯c phá»¥c sá»± cá»‘ (Bug Fixes) TÃ­ch há»£p Há»‡ thá»‘ng Äáº·t hÃ ng & Thanh toÃ¡n
+## [15/07/2026] - KhÃ¡ÂºÂ¯c phÃ¡Â»Â¥c sÃ¡Â»Â± cÃ¡Â»â€˜ (Bug Fixes) TÃƒÂ­ch hÃ¡Â»Â£p HÃ¡Â»â€¡ thÃ¡Â»â€˜ng Ã„ Ã¡ÂºÂ·t hÃƒÂ ng & Thanh toÃƒÂ¡n
 
-**1. Lá»—i Xung Ä‘á»™t Cáº¥u hÃ¬nh Khá»Ÿi Ä‘á»™ng Spring Boot**
+**1. LÃ¡Â»â€”i Xung Ã„â€˜Ã¡Â»â„¢t CÃ¡ÂºÂ¥u hÃƒÂ¬nh KhÃ¡Â»Å¸i Ã„â€˜Ã¡Â»â„¢ng Spring Boot**
 
-- **Sá»± cá»‘:** á»¨ng dá»¥ng Spring Boot bá»‹ crash liÃªn tá»¥c vá»›i lá»—i `Failed to configure a DataSource: 'url' attribute is not specified`.
-- **NguyÃªn nhÃ¢n:** PhiÃªn báº£n má»›i cá»§a thÆ° viá»‡n dÃ¹ng chung `atmin-library:1.0.4.Beta` vÃ´ tÃ¬nh Ä‘Ã³ng gÃ³i kÃ¨m má»™t file `application.properties` rÃ¡c, Ä‘Ã¨ lÃªn cáº¥u hÃ¬nh database cá»¥c bá»™.
-- **Kháº¯c phá»¥c:** Äá»•i tÃªn file cáº¥u hÃ¬nh ná»™i bá»™ tá»« `application.properties` sang `application-default.properties` Ä‘á»ƒ nÃ¢ng Ä‘á»™ Æ°u tiÃªn náº¡p cáº¥u hÃ¬nh (Ã¡p dá»¥ng cho Profile máº·c Ä‘á»‹nh `default`), qua Ä‘Ã³ ghi Ä‘Ã¨ triá»‡t Ä‘á»ƒ file rÃ¡c cá»§a thÆ° viá»‡n.
+- **SÃ¡Â»Â± cÃ¡Â»â€˜:** Ã¡Â»Â¨ng dÃ¡Â»Â¥ng Spring Boot bÃ¡Â»â€¹ crash liÃƒÂªn tÃ¡Â»Â¥c vÃ¡Â»â€ºi lÃ¡Â»â€”i `Failed to configure a DataSource: 'url' attribute is not specified`.
+- **NguyÃƒÂªn nhÃƒÂ¢n:** PhiÃƒÂªn bÃ¡ÂºÂ£n mÃ¡Â»â€ºi cÃ¡Â»Â§a thÃ†Â° viÃ¡Â»â€¡n dÃƒÂ¹ng chung `atmin-library:1.0.4.Beta` vÃƒÂ´ tÃƒÂ¬nh Ã„â€˜ÃƒÂ³ng gÃƒÂ³i kÃƒÂ¨m mÃ¡Â»â„¢t file `application.properties` rÃƒÂ¡c, Ã„â€˜ÃƒÂ¨ lÃƒÂªn cÃ¡ÂºÂ¥u hÃƒÂ¬nh database cÃ¡Â»Â¥c bÃ¡Â»â„¢.
+- **KhÃ¡ÂºÂ¯c phÃ¡Â»Â¥c:** Ã„ Ã¡Â»â€¢i tÃƒÂªn file cÃ¡ÂºÂ¥u hÃƒÂ¬nh nÃ¡Â»â„¢i bÃ¡Â»â„¢ tÃ¡Â»Â« `application.properties` sang `application-default.properties` Ã„â€˜Ã¡Â»Æ’ nÃƒÂ¢ng Ã„â€˜Ã¡Â»â„¢ Ã†Â°u tiÃƒÂªn nÃ¡ÂºÂ¡p cÃ¡ÂºÂ¥u hÃƒÂ¬nh (ÃƒÂ¡p dÃ¡Â»Â¥ng cho Profile mÃ¡ÂºÂ·c Ã„â€˜Ã¡Â»â€¹nh `default`), qua Ã„â€˜ÃƒÂ³ ghi Ã„â€˜ÃƒÂ¨ triÃ¡Â»â€¡t Ã„â€˜Ã¡Â»Æ’ file rÃƒÂ¡c cÃ¡Â»Â§a thÃ†Â° viÃ¡Â»â€¡n.
 
-**2. Lá»—i TÃ­nh tá»•ng tiá»n ra `NaN` vÃ  `An unexpected error occurred` khi Checkout**
+**2. LÃ¡Â»â€”i TÃƒÂ­nh tÃ¡Â»â€¢ng tiÃ¡Â» n ra `NaN` vÃƒÂ  `An unexpected error occurred` khi Checkout**
 
-- **Sá»± cá»‘:** Giá» hÃ ng tÃ­nh ra tá»•ng tiá»n `NaN Ä‘`, API Ä‘áº·t hÃ ng tráº£ vá» 500.
-- **NguyÃªn nhÃ¢n:** Báº¥t Ä‘á»“ng bá»™ Ä‘á»‹nh dáº¡ng dá»¯ liá»‡u (Data Type Mismatch). Frontend trong máº£ng `cart` lÆ°u sá»‘ lÆ°á»£ng lÃ  `qty`, mÃ u lÃ  `color`, kÃ­ch cá»¡ lÃ  `size`. NhÆ°ng khi map vÃ o Ä‘á»‘i tÆ°á»£ng gá»­i Ä‘i (`CreateOrderRequest`) láº¡i dÃ¹ng nháº§m `item.quantity`, `item.selectedColor`, dáº«n Ä‘áº¿n gá»­i dá»¯ liá»‡u `null/undefined` xuá»‘ng Backend.
-- **Kháº¯c phá»¥c:** Chuáº©n hÃ³a láº¡i viá»‡c khá»Ÿi táº¡o payload á»Ÿ Frontend: sá»­ dá»¥ng Ä‘Ãºng `item.qty || 1`, fallback Ä‘áº§y Ä‘á»§ cho `item.color`, `item.size` á»Ÿ trong file `CheckoutModal.tsx`.
+- **SÃ¡Â»Â± cÃ¡Â»â€˜:** GiÃ¡Â»  hÃƒÂ ng tÃƒÂ­nh ra tÃ¡Â»â€¢ng tiÃ¡Â» n `NaN Ã„â€˜`, API Ã„â€˜Ã¡ÂºÂ·t hÃƒÂ ng trÃ¡ÂºÂ£ vÃ¡Â»  500.
+- **NguyÃƒÂªn nhÃƒÂ¢n:** BÃ¡ÂºÂ¥t Ã„â€˜Ã¡Â»â€œng bÃ¡Â»â„¢ Ã„â€˜Ã¡Â»â€¹nh dÃ¡ÂºÂ¡ng dÃ¡Â»Â¯ liÃ¡Â»â€¡u (Data Type Mismatch). Frontend trong mÃ¡ÂºÂ£ng `cart` lÃ†Â°u sÃ¡Â»â€˜ lÃ†Â°Ã¡Â»Â£ng lÃƒÂ  `qty`, mÃƒÂ u lÃƒÂ  `color`, kÃƒÂ­ch cÃ¡Â»Â¡ lÃƒÂ  `size`. NhÃ†Â°ng khi map vÃƒÂ o Ã„â€˜Ã¡Â»â€˜i tÃ†Â°Ã¡Â»Â£ng gÃ¡Â»Â­i Ã„â€˜i (`CreateOrderRequest`) lÃ¡ÂºÂ¡i dÃƒÂ¹ng nhÃ¡ÂºÂ§m `item.quantity`, `item.selectedColor`, dÃ¡ÂºÂ«n Ã„â€˜Ã¡ÂºÂ¿n gÃ¡Â»Â­i dÃ¡Â»Â¯ liÃ¡Â»â€¡u `null/undefined` xuÃ¡Â»â€˜ng Backend.
+- **KhÃ¡ÂºÂ¯c phÃ¡Â»Â¥c:** ChuÃ¡ÂºÂ©n hÃƒÂ³a lÃ¡ÂºÂ¡i viÃ¡Â»â€¡c khÃ¡Â»Å¸i tÃ¡ÂºÂ¡o payload Ã¡Â»Å¸ Frontend: sÃ¡Â»Â­ dÃ¡Â»Â¥ng Ã„â€˜ÃƒÂºng `item.qty || 1`, fallback Ã„â€˜Ã¡ÂºÂ§y Ã„â€˜Ã¡Â»Â§ cho `item.color`, `item.size` Ã¡Â»Å¸ trong file `CheckoutModal.tsx`.
 
-**3. Lá»—i `User not found` khi táº¡o ÄÆ¡n HÃ ng (OrderServiceImpl)**
+**3. LÃ¡Â»â€”i `User not found` khi tÃ¡ÂºÂ¡o Ã„ Ã†Â¡n HÃƒÂ ng (OrderServiceImpl)**
 
-- **Sá»± cá»‘:** `java.lang.RuntimeException: User not found` vÄƒng ra á»Ÿ bÆ°á»›c lÆ°u Database dÃ¹ ngÆ°á»i dÃ¹ng Ä‘Ã£ Ä‘Äƒng nháº­p.
-- **NguyÃªn nhÃ¢n:** HÃ m `createOrder` sá»­ dá»¥ng tham sá»‘ lÃ  `userId` vÃ  tÃ¬m kiáº¿m báº±ng `userRepository.findById()`. Tuy nhiÃªn, biáº¿n nÃ y láº¥y giÃ¡ trá»‹ tá»« `authentication.getName()` cá»§a JWT (thá»±c cháº¥t lÃ  chuá»—i Email cá»§a ngÆ°á»i dÃ¹ng, khÃ´ng pháº£i mÃ£ UUID).
-- **Kháº¯c phá»¥c:** Cáº­p nháº­t láº¡i logic tÃ¬m kiáº¿m trong `OrderServiceImpl.java` thÃ nh `userRepository.findByEmailAndDeletedAtIsNull(username)` Ä‘á»ƒ truy xuáº¥t dá»¯ liá»‡u chÃ­nh xÃ¡c theo Email.
+- **SÃ¡Â»Â± cÃ¡Â»â€˜:** `java.lang.RuntimeException: User not found` vÃ„Æ’ng ra Ã¡Â»Å¸ bÃ†Â°Ã¡Â»â€ºc lÃ†Â°u Database dÃƒÂ¹ ngÃ†Â°Ã¡Â» i dÃƒÂ¹ng Ã„â€˜ÃƒÂ£ Ã„â€˜Ã„Æ’ng nhÃ¡ÂºÂ­p.
+- **NguyÃƒÂªn nhÃƒÂ¢n:** HÃƒÂ m `createOrder` sÃ¡Â»Â­ dÃ¡Â»Â¥ng tham sÃ¡Â»â€˜ lÃƒÂ  `userId` vÃƒÂ  tÃƒÂ¬m kiÃ¡ÂºÂ¿m bÃ¡ÂºÂ±ng `userRepository.findById()`. Tuy nhiÃƒÂªn, biÃ¡ÂºÂ¿n nÃƒÂ y lÃ¡ÂºÂ¥y giÃƒÂ¡ trÃ¡Â»â€¹ tÃ¡Â»Â« `authentication.getName()` cÃ¡Â»Â§a JWT (thÃ¡Â»Â±c chÃ¡ÂºÂ¥t lÃƒÂ  chuÃ¡Â»â€”i Email cÃ¡Â»Â§a ngÃ†Â°Ã¡Â» i dÃƒÂ¹ng, khÃƒÂ´ng phÃ¡ÂºÂ£i mÃƒÂ£ UUID).
+- **KhÃ¡ÂºÂ¯c phÃ¡Â»Â¥c:** CÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t lÃ¡ÂºÂ¡i logic tÃƒÂ¬m kiÃ¡ÂºÂ¿m trong `OrderServiceImpl.java` thÃƒÂ nh `userRepository.findByEmailAndDeletedAtIsNull(username)` Ã„â€˜Ã¡Â»Æ’ truy xuÃ¡ÂºÂ¥t dÃ¡Â»Â¯ liÃ¡Â»â€¡u chÃƒÂ­nh xÃƒÂ¡c theo Email.
 
-**4. Lá»—i `Product not found` vá»›i dá»¯ liá»‡u Mock**
+**4. LÃ¡Â»â€”i `Product not found` vÃ¡Â»â€ºi dÃ¡Â»Â¯ liÃ¡Â»â€¡u Mock**
 
-- **Sá»± cá»‘:** BÃ¡o lá»—i `Product not found: p1` á»Ÿ Backend do ngÆ°á»i dÃ¹ng mua sáº£n pháº©m `p1` tá»« giao diá»‡n hiá»ƒn thá»‹ máº«u.
-- **NguyÃªn nhÃ¢n:** Frontend sá»­ dá»¥ng ID giáº£ (`"p1"`) tá»« file `mockData.ts`, nhÆ°ng Backend táº¡o Database rá»—ng vá»›i cÃ¡c ID sáº£n pháº©m Ä‘Æ°á»£c sinh tá»± Ä‘á»™ng báº±ng mÃ£ UUID (random 36 kÃ½ tá»±).
-- **Kháº¯c phá»¥c:** Viáº¿t thÃªm lá»‡nh can thiá»‡p vÃ o `DataSeeder.java`. Ã‰p Spring Boot khá»Ÿi táº¡o cá»‘ Ä‘á»‹nh (hardcode) má»™t báº£n ghi Sáº£n pháº©m máº«u vá»›i tham sá»‘ `id = "p1"` ngay khi khá»Ÿi Ä‘á»™ng Ä‘á»ƒ Ä‘Ã¡p á»©ng chÃ­nh xÃ¡c mÃ£ ID gá»i tá»« Frontend.
+- **SÃ¡Â»Â± cÃ¡Â»â€˜:** BÃƒÂ¡o lÃ¡Â»â€”i `Product not found: p1` Ã¡Â»Å¸ Backend do ngÃ†Â°Ã¡Â» i dÃƒÂ¹ng mua sÃ¡ÂºÂ£n phÃ¡ÂºÂ©m `p1` tÃ¡Â»Â« giao diÃ¡Â»â€¡n hiÃ¡Â»Æ’n thÃ¡Â»â€¹ mÃ¡ÂºÂ«u.
+- **NguyÃƒÂªn nhÃƒÂ¢n:** Frontend sÃ¡Â»Â­ dÃ¡Â»Â¥ng ID giÃ¡ÂºÂ£ (`"p1"`) tÃ¡Â»Â« file `mockData.ts`, nhÃ†Â°ng Backend tÃ¡ÂºÂ¡o Database rÃ¡Â»â€”ng vÃ¡Â»â€ºi cÃƒÂ¡c ID sÃ¡ÂºÂ£n phÃ¡ÂºÂ©m Ã„â€˜Ã†Â°Ã¡Â»Â£c sinh tÃ¡Â»Â± Ã„â€˜Ã¡Â»â„¢ng bÃ¡ÂºÂ±ng mÃƒÂ£ UUID (random 36 kÃƒÂ½ tÃ¡Â»Â±).
+- **KhÃ¡ÂºÂ¯c phÃ¡Â»Â¥c:** ViÃ¡ÂºÂ¿t thÃƒÂªm lÃ¡Â»â€¡nh can thiÃ¡Â»â€¡p vÃƒÂ o `DataSeeder.java`. Ãƒâ€°p Spring Boot khÃ¡Â»Å¸i tÃ¡ÂºÂ¡o cÃ¡Â»â€˜ Ã„â€˜Ã¡Â»â€¹nh (hardcode) mÃ¡Â»â„¢t bÃ¡ÂºÂ£n ghi SÃ¡ÂºÂ£n phÃ¡ÂºÂ©m mÃ¡ÂºÂ«u vÃ¡Â»â€ºi tham sÃ¡Â»â€˜ `id = "p1"` ngay khi khÃ¡Â»Å¸i Ã„â€˜Ã¡Â»â„¢ng Ã„â€˜Ã¡Â»Æ’ Ã„â€˜ÃƒÂ¡p Ã¡Â»Â©ng chÃƒÂ­nh xÃƒÂ¡c mÃƒÂ£ ID gÃ¡Â» i tÃ¡Â»Â« Frontend.
 
-**5. Lá»—i `KhÃ´ng thá»ƒ táº¡o link thanh toÃ¡n` qua PayOS**
+**5. LÃ¡Â»â€”i `KhÃƒÂ´ng thÃ¡Â»Æ’ tÃ¡ÂºÂ¡o link thanh toÃƒÂ¡n` qua PayOS**
 
-- **Sá»± cá»‘:** PhÆ°Æ¡ng thá»©c Payment bÃ¡o lá»—i do PayOS SDK tá»« chá»‘i yÃªu cáº§u (401 Unauthorized).
-- **NguyÃªn nhÃ¢n:** á»¨ng dá»¥ng cháº¡y trá»±c tiáº¿p báº±ng IDE khÃ´ng tá»± Ä‘á»™ng Ä‘á»c ná»™i dung file `.env`. Do file `application-default.properties` trÆ°á»›c Ä‘Ã¢y thiáº¿t láº­p máº·c Ä‘á»‹nh (fallback) báº±ng giÃ¡ trá»‹ giáº£ (`YOUR_CLIENT_ID`), PayOS SDK Ä‘Ã£ láº¥y giÃ¡ trá»‹ giáº£ nÃ y Ä‘á»ƒ gá»­i Ä‘i.
-- **Kháº¯c phá»¥c:**
-  - Hardcode trá»±c tiáº¿p cÃ¡c cáº·p Key cá»§a PayOS lÃ m giÃ¡ trá»‹ máº·c Ä‘á»‹nh tháº³ng vÃ o file properties (`${PAYOS_CLIENT_ID:37ef7825...}`).
-  - Bá»• sung log báº¯t ngoáº¡i lá»‡ chi tiáº¿t (`e.getMessage()`) trong `PaymentServiceImpl` Ä‘á»ƒ hiá»ƒn thá»‹ táº­n gá»‘c lÃ½ do PayOS tá»« chá»‘i lá»‡nh táº¡o Payment Link sau nÃ y.
+- **SÃ¡Â»Â± cÃ¡Â»â€˜:** PhÃ†Â°Ã†Â¡ng thÃ¡Â»Â©c Payment bÃƒÂ¡o lÃ¡Â»â€”i do PayOS SDK tÃ¡Â»Â« chÃ¡Â»â€˜i yÃƒÂªu cÃ¡ÂºÂ§u (401 Unauthorized).
+- **NguyÃƒÂªn nhÃƒÂ¢n:** Ã¡Â»Â¨ng dÃ¡Â»Â¥ng chÃ¡ÂºÂ¡y trÃ¡Â»Â±c tiÃ¡ÂºÂ¿p bÃ¡ÂºÂ±ng IDE khÃƒÂ´ng tÃ¡Â»Â± Ã„â€˜Ã¡Â»â„¢ng Ã„â€˜Ã¡Â» c nÃ¡Â»â„¢i dung file `.env`. Do file `application-default.properties` trÃ†Â°Ã¡Â»â€ºc Ã„â€˜ÃƒÂ¢y thiÃ¡ÂºÂ¿t lÃ¡ÂºÂ­p mÃ¡ÂºÂ·c Ã„â€˜Ã¡Â»â€¹nh (fallback) bÃ¡ÂºÂ±ng giÃƒÂ¡ trÃ¡Â»â€¹ giÃ¡ÂºÂ£ (`YOUR_CLIENT_ID`), PayOS SDK Ã„â€˜ÃƒÂ£ lÃ¡ÂºÂ¥y giÃƒÂ¡ trÃ¡Â»â€¹ giÃ¡ÂºÂ£ nÃƒÂ y Ã„â€˜Ã¡Â»Æ’ gÃ¡Â»Â­i Ã„â€˜i.
+- **KhÃ¡ÂºÂ¯c phÃ¡Â»Â¥c:**
+  - Hardcode trÃ¡Â»Â±c tiÃ¡ÂºÂ¿p cÃƒÂ¡c cÃ¡ÂºÂ·p Key cÃ¡Â»Â§a PayOS lÃƒÂ m giÃƒÂ¡ trÃ¡Â»â€¹ mÃ¡ÂºÂ·c Ã„â€˜Ã¡Â»â€¹nh thÃ¡ÂºÂ³ng vÃƒÂ o file properties (`${PAYOS_CLIENT_ID:37ef7825...}`).
+  - BÃ¡Â»â€¢ sung log bÃ¡ÂºÂ¯t ngoÃ¡ÂºÂ¡i lÃ¡Â»â€¡ chi tiÃ¡ÂºÂ¿t (`e.getMessage()`) trong `PaymentServiceImpl` Ã„â€˜Ã¡Â»Æ’ hiÃ¡Â»Æ’n thÃ¡Â»â€¹ tÃ¡ÂºÂ­n gÃ¡Â»â€˜c lÃƒÂ½ do PayOS tÃ¡Â»Â« chÃ¡Â»â€˜i lÃ¡Â»â€¡nh tÃ¡ÂºÂ¡o Payment Link sau nÃƒÂ y.
 
-### 2026-07-15: Bá»• sung tÃ­nh nÄƒng Lá»‹ch sá»­ Ä‘Æ¡n hÃ ng B2C
+### 2026-07-15: BÃ¡Â»â€¢ sung tÃƒÂ­nh nÃ„Æ’ng LÃ¡Â»â€¹ch sÃ¡Â»Â­ Ã„â€˜Ã†Â¡n hÃƒÂ ng B2C
 
-- **Thay Ä‘á»•i chÃ­nh:** ThÃªm mÃ n hÃ¬nh Lá»‹ch sá»­ ÄÆ¡n HÃ ng (Order History) vÃ  module Æ¯u Ä‘Ã£i (Offers) cho cá»­a hÃ ng B2C.
-- **Backend:** ThÃªm field createdAt vÃ  items vÃ o OrderResponse.java. ThÃªm method getMyOrders trong OrderService vÃ  API GET /api/v1/orders/my-orders.
-- **Frontend:** Cáº­p nháº­t top bar thÃªm 2 icon (ÄÆ¡n hÃ ng & Æ¯u Ä‘Ã£i), táº¡o popup hiá»ƒn thá»‹ max 5 Ä‘Æ¡n. Táº¡o mÃ n hÃ¬nh OrderHistoryPage Ä‘á»ƒ khÃ¡ch xem Ä‘áº§y Ä‘á»§ chi tiáº¿t cÃ¡c mÃ³n hÃ ng Ä‘Ã£ Ä‘áº·t.
+- **Thay Ã„â€˜Ã¡Â»â€¢i chÃƒÂ­nh:** ThÃƒÂªm mÃƒÂ n hÃƒÂ¬nh LÃ¡Â»â€¹ch sÃ¡Â»Â­ Ã„ Ã†Â¡n HÃƒÂ ng (Order History) vÃƒÂ  module Ã†Â¯u Ã„â€˜ÃƒÂ£i (Offers) cho cÃ¡Â»Â­a hÃƒÂ ng B2C.
+- **Backend:** ThÃƒÂªm field createdAt vÃƒÂ  items vÃƒÂ o OrderResponse.java. ThÃƒÂªm method getMyOrders trong OrderService vÃƒÂ  API GET /api/v1/orders/my-orders.
+- **Frontend:** CÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t top bar thÃƒÂªm 2 icon (Ã„ Ã†Â¡n hÃƒÂ ng & Ã†Â¯u Ã„â€˜ÃƒÂ£i), tÃ¡ÂºÂ¡o popup hiÃ¡Â»Æ’n thÃ¡Â»â€¹ max 5 Ã„â€˜Ã†Â¡n. TÃ¡ÂºÂ¡o mÃƒÂ n hÃƒÂ¬nh OrderHistoryPage Ã„â€˜Ã¡Â»Æ’ khÃƒÂ¡ch xem Ã„â€˜Ã¡ÂºÂ§y Ã„â€˜Ã¡Â»Â§ chi tiÃ¡ÂºÂ¿t cÃƒÂ¡c mÃƒÂ³n hÃƒÂ ng Ã„â€˜ÃƒÂ£ Ã„â€˜Ã¡ÂºÂ·t.
 
-## [16/07/2026] - NÃ¢ng cáº¥p giao diá»‡n Email thÃ´ng bÃ¡o
+## [16/07/2026] - NÃƒÂ¢ng cÃ¡ÂºÂ¥p giao diÃ¡Â»â€¡n Email thÃƒÂ´ng bÃƒÂ¡o
 
-**1. Táº§ng Backend (`EmailService.java`)**
+**1. TÃ¡ÂºÂ§ng Backend (`EmailService.java`)**
 
-- Thay má»›i toÃ n bá»™ mÃ£ HTML ná»™i bá»™ cá»§a cÃ¡c hÃ m gá»­i mail `sendOrderConfirmationEmail` (COD) vÃ  `sendPaymentSuccessEmail` (PayOS).
-- NÃ¢ng cáº¥p giao diá»‡n email sang dáº¡ng tháº» (Card UI) hiá»‡n Ä‘áº¡i: tÃ­ch há»£p thanh tiÃªu Ä‘á» tá»‘i mÃ u, banner thÃ´ng bÃ¡o tráº¡ng thÃ¡i bo gÃ³c vá»›i mÃ u sáº¯c Ä‘áº·c trÆ°ng (xanh lam cho xÃ¡c nháº­n Ä‘Æ¡n hÃ ng, xanh lÃ¡ cho thanh toÃ¡n thÃ nh cÃ´ng).
-- Cáº¥u trÃºc láº¡i cÃ¡c báº£ng hiá»ƒn thá»‹ chi tiáº¿t sáº£n pháº©m, cÆ°á»›c váº­n chuyá»ƒn vÃ  tá»•ng tiá»n Ä‘á»ƒ trá»±c quan vÃ  giá»‘ng thiáº¿t káº¿ máº«u (Figma/Images) hÆ¡n.
-- Thiáº¿t káº¿ láº¡i cÃ¡c khá»‘i cáº£nh bÃ¡o (nháº¯c nhá»Ÿ chuáº©n bá»‹ tiá»n máº·t) vÃ  cÃ¡c nÃºt hÃ nh Ä‘á»™ng (Call-to-Action) náº±m ngang Ä‘áº¹p máº¯t.
-- Táº­n dá»¥ng biáº¿n há»‡ thá»‘ng `fromName` Ä‘á»ƒ tá»± Ä‘á»™ng hiá»ƒn thá»‹ TÃªn Shop trÃªn tiÃªu Ä‘á» email thay vÃ¬ code cá»©ng (hardcode).
+- Thay mÃ¡Â»â€ºi toÃƒÂ n bÃ¡Â»â„¢ mÃƒÂ£ HTML nÃ¡Â»â„¢i bÃ¡Â»â„¢ cÃ¡Â»Â§a cÃƒÂ¡c hÃƒÂ m gÃ¡Â»Â­i mail `sendOrderConfirmationEmail` (COD) vÃƒÂ  `sendPaymentSuccessEmail` (PayOS).
+- NÃƒÂ¢ng cÃ¡ÂºÂ¥p giao diÃ¡Â»â€¡n email sang dÃ¡ÂºÂ¡ng thÃ¡ÂºÂ» (Card UI) hiÃ¡Â»â€¡n Ã„â€˜Ã¡ÂºÂ¡i: tÃƒÂ­ch hÃ¡Â»Â£p thanh tiÃƒÂªu Ã„â€˜Ã¡Â»  tÃ¡Â»â€˜i mÃƒÂ u, banner thÃƒÂ´ng bÃƒÂ¡o trÃ¡ÂºÂ¡ng thÃƒÂ¡i bo gÃƒÂ³c vÃ¡Â»â€ºi mÃƒÂ u sÃ¡ÂºÂ¯c Ã„â€˜Ã¡ÂºÂ·c trÃ†Â°ng (xanh lam cho xÃƒÂ¡c nhÃ¡ÂºÂ­n Ã„â€˜Ã†Â¡n hÃƒÂ ng, xanh lÃƒÂ¡ cho thanh toÃƒÂ¡n thÃƒÂ nh cÃƒÂ´ng).
+- CÃ¡ÂºÂ¥u trÃƒÂºc lÃ¡ÂºÂ¡i cÃƒÂ¡c bÃ¡ÂºÂ£ng hiÃ¡Â»Æ’n thÃ¡Â»â€¹ chi tiÃ¡ÂºÂ¿t sÃ¡ÂºÂ£n phÃ¡ÂºÂ©m, cÃ†Â°Ã¡Â»â€ºc vÃ¡ÂºÂ­n chuyÃ¡Â»Æ’n vÃƒÂ  tÃ¡Â»â€¢ng tiÃ¡Â» n Ã„â€˜Ã¡Â»Æ’ trÃ¡Â»Â±c quan vÃƒÂ  giÃ¡Â»â€˜ng thiÃ¡ÂºÂ¿t kÃ¡ÂºÂ¿ mÃ¡ÂºÂ«u (Figma/Images) hÃ†Â¡n.
+- ThiÃ¡ÂºÂ¿t kÃ¡ÂºÂ¿ lÃ¡ÂºÂ¡i cÃƒÂ¡c khÃ¡Â»â€˜i cÃ¡ÂºÂ£nh bÃƒÂ¡o (nhÃ¡ÂºÂ¯c nhÃ¡Â»Å¸ chuÃ¡ÂºÂ©n bÃ¡Â»â€¹ tiÃ¡Â» n mÃ¡ÂºÂ·t) vÃƒÂ  cÃƒÂ¡c nÃƒÂºt hÃƒÂ nh Ã„â€˜Ã¡Â»â„¢ng (Call-to-Action) nÃ¡ÂºÂ±m ngang Ã„â€˜Ã¡ÂºÂ¹p mÃ¡ÂºÂ¯t.
+- TÃ¡ÂºÂ­n dÃ¡Â»Â¥ng biÃ¡ÂºÂ¿n hÃ¡Â»â€¡ thÃ¡Â»â€˜ng `fromName` Ã„â€˜Ã¡Â»Æ’ tÃ¡Â»Â± Ã„â€˜Ã¡Â»â„¢ng hiÃ¡Â»Æ’n thÃ¡Â»â€¹ TÃƒÂªn Shop trÃƒÂªn tiÃƒÂªu Ã„â€˜Ã¡Â»  email thay vÃƒÂ¬ code cÃ¡Â»Â©ng (hardcode).
 
-**2. Táº§ng Backend (`Chat Real-time`)**
+**2. TÃ¡ÂºÂ§ng Backend (`Chat Real-time`)**
 
-- TÃ­ch há»£p `spring-boot-starter-websocket`, cáº¥u hÃ¬nh STOMP qua `/ws-chat` cÃ¹ng `WebSocketAuthInterceptor` kiá»ƒm tra JWT Token.
-- XÃ¢y dá»±ng sÆ¡ Ä‘á»“ dá»¯ liá»‡u Chat: `Conversation`, `ConversationMember`, `Message`. Há»— trá»£ Cursor Pagination báº±ng ID (`id < cursor`) siÃªu mÆ°á»£t vÃ  phÃ¢n quyá»n Staff rÃ nh máº¡ch.
-- Táº¡o REST API Ä‘a chá»©c nÄƒng: Láº¥y danh sÃ¡ch thoáº¡i (`ChatRestController`), load lá»‹ch sá»­ nháº¯n tin, vÃ  gá»­i áº£nh/file tháº³ng lÃªn Cloudinary thÃ´ng qua `UploadService`.
-- Láº¯ng nghe/phÃ¡t tin nháº¯n trá»±c tiáº¿p qua `@MessageMapping("/chat.send")` vÃ  tráº£ vá» qua `/topic/conversation/{conversationId}`.
+- TÃƒÂ­ch hÃ¡Â»Â£p `spring-boot-starter-websocket`, cÃ¡ÂºÂ¥u hÃƒÂ¬nh STOMP qua `/ws-chat` cÃƒÂ¹ng `WebSocketAuthInterceptor` kiÃ¡Â»Æ’m tra JWT Token.
+- XÃƒÂ¢y dÃ¡Â»Â±ng sÃ†Â¡ Ã„â€˜Ã¡Â»â€œ dÃ¡Â»Â¯ liÃ¡Â»â€¡u Chat: `Conversation`, `ConversationMember`, `Message`. HÃ¡Â»â€” trÃ¡Â»Â£ Cursor Pagination bÃ¡ÂºÂ±ng ID (`id < cursor`) siÃƒÂªu mÃ†Â°Ã¡Â»Â£t vÃƒÂ  phÃƒÂ¢n quyÃ¡Â» n Staff rÃƒÂ nh mÃ¡ÂºÂ¡ch.
+- TÃ¡ÂºÂ¡o REST API Ã„â€˜a chÃ¡Â»Â©c nÃ„Æ’ng: LÃ¡ÂºÂ¥y danh sÃƒÂ¡ch thoÃ¡ÂºÂ¡i (`ChatRestController`), load lÃ¡Â»â€¹ch sÃ¡Â»Â­ nhÃ¡ÂºÂ¯n tin, vÃƒÂ  gÃ¡Â»Â­i Ã¡ÂºÂ£nh/file thÃ¡ÂºÂ³ng lÃƒÂªn Cloudinary thÃƒÂ´ng qua `UploadService`.
+- LÃ¡ÂºÂ¯ng nghe/phÃƒÂ¡t tin nhÃ¡ÂºÂ¯n trÃ¡Â»Â±c tiÃ¡ÂºÂ¿p qua `@MessageMapping("/chat.send")` vÃƒÂ  trÃ¡ÂºÂ£ vÃ¡Â»  qua `/topic/conversation/{conversationId}`.
 
-**3. Kháº¯c phá»¥c lá»—i Frontend (`ChatWidget.tsx`)**
+**3. KhÃ¡ÂºÂ¯c phÃ¡Â»Â¥c lÃ¡Â»â€”i Frontend (`ChatWidget.tsx`)**
 
-- Sá»­a lá»—i á»©ng dá»¥ng React bá»‹ crash vá»›i thÃ´ng bÃ¡o `ReferenceError: FAQ_BUTTONS is not defined`.
-- Khai bÃ¡o láº¡i kiá»ƒu dá»¯ liá»‡u `ChatMsg` vÃ  háº±ng sá»‘ `FAQ_BUTTONS` ngay bÃªn trong file `ChatWidget.tsx` Ä‘á»ƒ sá»­a lá»—i thiáº¿u reference trong component.
+- SÃ¡Â»Â­a lÃ¡Â»â€”i Ã¡Â»Â©ng dÃ¡Â»Â¥ng React bÃ¡Â»â€¹ crash vÃ¡Â»â€ºi thÃƒÂ´ng bÃƒÂ¡o `ReferenceError: FAQ_BUTTONS is not defined`.
+- Khai bÃƒÂ¡o lÃ¡ÂºÂ¡i kiÃ¡Â»Æ’u dÃ¡Â»Â¯ liÃ¡Â»â€¡u `ChatMsg` vÃƒÂ  hÃ¡ÂºÂ±ng sÃ¡Â»â€˜ `FAQ_BUTTONS` ngay bÃƒÂªn trong file `ChatWidget.tsx` Ã„â€˜Ã¡Â»Æ’ sÃ¡Â»Â­a lÃ¡Â»â€”i thiÃ¡ÂºÂ¿u reference trong component.
 
 ## [2026-07-16] Refactor SOLID & Implement Real-time Chat
 
-- **Server**: TÃ¡ch logic DTO mapping sang ChatMapper. Táº¡o cÃ¡c interface ChatService, MessageService (DIP).
-- **Client**: CÃ i Ä‘áº·t @stomp/stompjs vÃ  sockjs-client. Táº¡o API layer chat.api.ts vÃ  hook useChatWebSocket.ts Ä‘á»ƒ bÃ³c tÃ¡ch logic máº¡ng khá»i view.
-- **View**: Refactor ChatWidget.tsx vÃ  Inbox.tsx thÃ nh Dumb Components, láº¥y dá»¯ liá»‡u qua Hook.
-- **Docs**: Cáº­p nháº­t mÃ£ nguá»“n thá»±c táº¿ vÃ o tÃ i liá»‡u 3_nghiá»‡p_vá»¥_chat_realtime.md.
+- **Server**: TÃƒÂ¡ch logic DTO mapping sang ChatMapper. TÃ¡ÂºÂ¡o cÃƒÂ¡c interface ChatService, MessageService (DIP).
+- **Client**: CÃƒÂ i Ã„â€˜Ã¡ÂºÂ·t @stomp/stompjs vÃƒÂ  sockjs-client. TÃ¡ÂºÂ¡o API layer chat.api.ts vÃƒÂ  hook useChatWebSocket.ts Ã„â€˜Ã¡Â»Æ’ bÃƒÂ³c tÃƒÂ¡ch logic mÃ¡ÂºÂ¡ng khÃ¡Â» i view.
+- **View**: Refactor ChatWidget.tsx vÃƒÂ  Inbox.tsx thÃƒÂ nh Dumb Components, lÃ¡ÂºÂ¥y dÃ¡Â»Â¯ liÃ¡Â»â€¡u qua Hook.
+- **Docs**: CÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t mÃƒÂ£ nguÃ¡Â»â€œn thÃ¡Â»Â±c tÃ¡ÂºÂ¿ vÃƒÂ o tÃƒÂ i liÃ¡Â»â€¡u 3_nghiÃ¡Â»â€¡p_vÃ¡Â»Â¥_chat_realtime.md.
 
 ## 2026-07-16
 
-### TÃ¡i cáº¥u trÃºc Server theo SOLID (Backend)
+### TÃƒÂ¡i cÃ¡ÂºÂ¥u trÃƒÂºc Server theo SOLID (Backend)
 
-- TÃ¡ch AuthServiceImpl thÃ nh AuthenticationServiceImpl, TokenManagementServiceImpl, OAuth2ServiceImpl, TwoFactorAuthServiceImpl.
-- TÃ¡ch EmailService thÃ nh AuthEmailServiceImpl vÃ  OrderEmailServiceImpl.
-- TÃ¡ch API upload khá»i ChatRestController sang MediaController vÃ  dÃ¹ng IMediaUploadService.
-- TÃ¡ch logic chuyá»ƒn Ä‘á»•i DTO sang ProductMapper.
-- ToÃ n bá»™ backend Ä‘Ã£ biÃªn dá»‹ch thÃ nh cÃ´ng.
+- TÃƒÂ¡ch AuthServiceImpl thÃƒÂ nh AuthenticationServiceImpl, TokenManagementServiceImpl, OAuth2ServiceImpl, TwoFactorAuthServiceImpl.
+- TÃƒÂ¡ch EmailService thÃƒÂ nh AuthEmailServiceImpl vÃƒÂ  OrderEmailServiceImpl.
+- TÃƒÂ¡ch API upload khÃ¡Â» i ChatRestController sang MediaController vÃƒÂ  dÃƒÂ¹ng IMediaUploadService.
+- TÃƒÂ¡ch logic chuyÃ¡Â»Æ’n Ã„â€˜Ã¡Â»â€¢i DTO sang ProductMapper.
+- ToÃƒÂ n bÃ¡Â»â„¢ backend Ã„â€˜ÃƒÂ£ biÃƒÂªn dÃ¡Â»â€¹ch thÃƒÂ nh cÃƒÂ´ng.
 
 ## 2026-07-16
 
-### TÃ¡i cáº¥u trÃºc Server sang Modular Monolith (Package-by-Feature)
+### TÃƒÂ¡i cÃ¡ÂºÂ¥u trÃƒÂºc Server sang Modular Monolith (Package-by-Feature)
 
-- Ãp dá»¥ng kiáº¿n trÃºc Package-by-Feature, nhÃ³m cÃ¡c class theo tá»«ng phÃ¢n há»‡ chá»©c nÄƒng (auth, media, order, payment, product, user) bÃªn trong tmin.modules.* thay vÃ¬ chia theo layer (controller, service, repository) nhÆ° trÆ°á»›c.
-- Di chuyá»ƒn cÃ¡c class cáº¥u hÃ¬nh vÃ  báº£o máº­t chung vÃ o tmin.core.*.
-- Loáº¡i bá» package tmin.common vÃ  loáº¡i bá» code trÃ¹ng láº·p báº±ng cÃ¡ch tÃ¡i sá»­ dá»¥ng trá»±c tiáº¿p cÃ¡c class (ApiResponse, PageInfo, cÃ¡c custom exception) Ä‘Æ°á»£c káº¿ thá»«a tá»« tmin-library.
-- Cáº­p nháº­t vÃ  fix lá»—i thiáº¿u import do thay Ä‘á»•i cáº¥u trÃºc package. Dá»± Ã¡n Ä‘Ã£ build thÃ nh cÃ´ng vÃ  cháº¡y á»•n Ä‘á»‹nh.
-- Logic cá»§a á»©ng dá»¥ng Ä‘Æ°á»£c giá»¯ nguyÃªn váº¹n 100% trÆ°á»›c vÃ  sau quÃ¡ trÃ¬nh refactor.
+- Ãƒ p dÃ¡Â»Â¥ng kiÃ¡ÂºÂ¿n trÃƒÂºc Package-by-Feature, nhÃƒÂ³m cÃƒÂ¡c class theo tÃ¡Â»Â«ng phÃƒÂ¢n hÃ¡Â»â€¡ chÃ¡Â»Â©c nÃ„Æ’ng (auth, media, order, payment, product, user) bÃƒÂªn trong  tmin.modules.* thay vÃƒÂ¬ chia theo layer (controller, service, repository) nhÃ†Â° trÃ†Â°Ã¡Â»â€ºc.
+- Di chuyÃ¡Â»Æ’n cÃƒÂ¡c class cÃ¡ÂºÂ¥u hÃƒÂ¬nh vÃƒÂ  bÃ¡ÂºÂ£o mÃ¡ÂºÂ­t chung vÃƒÂ o  tmin.core.*.
+- LoÃ¡ÂºÂ¡i bÃ¡Â»  package  tmin.common vÃƒÂ  loÃ¡ÂºÂ¡i bÃ¡Â»  code trÃƒÂ¹ng lÃ¡ÂºÂ·p bÃ¡ÂºÂ±ng cÃƒÂ¡ch tÃƒÂ¡i sÃ¡Â»Â­ dÃ¡Â»Â¥ng trÃ¡Â»Â±c tiÃ¡ÂºÂ¿p cÃƒÂ¡c class (ApiResponse, PageInfo, cÃƒÂ¡c custom exception) Ã„â€˜Ã†Â°Ã¡Â»Â£c kÃ¡ÂºÂ¿ thÃ¡Â»Â«a tÃ¡Â»Â«  tmin-library.
+- CÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t vÃƒÂ  fix lÃ¡Â»â€”i thiÃ¡ÂºÂ¿u import do thay Ã„â€˜Ã¡Â»â€¢i cÃ¡ÂºÂ¥u trÃƒÂºc package. DÃ¡Â»Â± ÃƒÂ¡n Ã„â€˜ÃƒÂ£ build thÃƒÂ nh cÃƒÂ´ng vÃƒÂ  chÃ¡ÂºÂ¡y Ã¡Â»â€¢n Ã„â€˜Ã¡Â»â€¹nh.
+- Logic cÃ¡Â»Â§a Ã¡Â»Â©ng dÃ¡Â»Â¥ng Ã„â€˜Ã†Â°Ã¡Â»Â£c giÃ¡Â»Â¯ nguyÃƒÂªn vÃ¡ÂºÂ¹n 100% trÃ†Â°Ã¡Â»â€ºc vÃƒÂ  sau quÃƒÂ¡ trÃƒÂ¬nh refactor.
 
 ## 2026-07-17
 
-### Tri?t tiï¿½u hoï¿½n toï¿½n s? ph? thu?c v?t lï¿½ gi?a cï¿½c module
+### Tri?t tiÃ¯Â¿Â½u hoÃ¯Â¿Â½n toÃ¯Â¿Â½n s? ph? thu?c v?t lÃ¯Â¿Â½ gi?a cÃ¯Â¿Â½c module
 
-- Xï¿½a b? cï¿½c annotation liï¿½n k?t chï¿½o (@ManyToOne, v.v.) gi?a cï¿½c entity khï¿½c module (Order, Invoice, Product, User) vï¿½ thay th? b?ng cï¿½c tru?ng luu tr? khï¿½a chï¿½nh thu?n tï¿½y (userId, productId, orderId).
-- B? sung cï¿½c InternalApi vï¿½ Dto t?i cï¿½c package pi trong t?ng module d? ph?c v? giao ti?p chï¿½o.
-- C?m truy c?p tr?c ti?p Repository c?a module khï¿½c. Toï¿½n b? l?nh g?i l?y thï¿½ng tin du?c chuy?n sang g?i thï¿½ng qua cï¿½c interface c?a InternalApi.
-- Thi?t l?p co ch? Event-Driven: Chuy?n logic c?p nh?t tr?ng thï¿½i don hï¿½ng (khi thanh toï¿½n thï¿½nh cï¿½ng) sang m?t Event r?i PaymentSuccessEvent d? tang tï¿½nh decoupled.
+- XÃ¯Â¿Â½a b? cÃ¯Â¿Â½c annotation liÃ¯Â¿Â½n k?t chÃ¯Â¿Â½o (@ManyToOne, v.v.) gi?a cÃ¯Â¿Â½c entity khÃ¯Â¿Â½c module (Order, Invoice, Product, User) vÃ¯Â¿Â½ thay th? b?ng cÃ¯Â¿Â½c tru?ng luu tr? khÃ¯Â¿Â½a chÃ¯Â¿Â½nh thu?n tÃ¯Â¿Â½y (userId, productId, orderId).
+- B? sung cÃ¯Â¿Â½c InternalApi vÃ¯Â¿Â½ Dto t?i cÃ¯Â¿Â½c package  pi trong t?ng module d? ph?c v? giao ti?p chÃ¯Â¿Â½o.
+- C?m truy c?p tr?c ti?p Repository c?a module khÃ¯Â¿Â½c. ToÃ¯Â¿Â½n b? l?nh g?i l?y thÃ¯Â¿Â½ng tin du?c chuy?n sang g?i thÃ¯Â¿Â½ng qua cÃ¯Â¿Â½c interface c?a InternalApi.
+- Thi?t l?p co ch? Event-Driven: Chuy?n logic c?p nh?t tr?ng thÃ¯Â¿Â½i don hÃ¯Â¿Â½ng (khi thanh toÃ¯Â¿Â½n thÃ¯Â¿Â½nh cÃ¯Â¿Â½ng) sang m?t Event r?i PaymentSuccessEvent d? tang tÃ¯Â¿Â½nh decoupled.
 
 ## [2026-07-17] Refactor OrderEmailServiceImpl
 
-- **Order**: Fix duplicate code for building HTML order items in sendOrderConfirmationEmail and sendPaymentSuccessEmail by extracting logic to uildOrderItemsHtml helper method.
+- **Order**: Fix duplicate code for building HTML order items in sendOrderConfirmationEmail and sendPaymentSuccessEmail by extracting logic to  uildOrderItemsHtml helper method.
 
 ## 2026-07-17: Refactor Frontend Architecture to Features-based
 
-- **Logic Added**: Refactored the entire frontend client to use a Feature-Driven Architecture (Feature-Sliced Design). Extracted components, API calls, and logic into specific domains (e.g. users, promotions, dashboard, inbox, payment, uth, products, orders).
+- **Logic Added**: Refactored the entire frontend client to use a Feature-Driven Architecture (Feature-Sliced Design). Extracted components, API calls, and logic into specific domains (e.g. users, promotions, dashboard, inbox, payment,  uth, products, orders).
 - **Files Modified**:
   - src/features/*: Created module directories containing pages, components, hooks, services, 	ypes.
   - src/core/routes/index.tsx: Consolidated routing to use feature modules.
@@ -267,58 +278,58 @@ File nÃ y ghi láº¡i toÃ n bá»™ cÃ¡c thay Ä‘á»•i, tÃ­nh nÄ
 
 ## [2026-07-17] Embedded State cho Order Email
 
-- **TÃ­nh nÄƒng**: Ãp dá»¥ng Embedded State cho Order Email. ThÃªm cá»™t email_status, email_retry_count vÃ o orders table.
-- **Logic thÃªm vÃ o**: Tracking tráº¡ng thÃ¡i gá»­i email PENDING, SENT, FAILED khi gá»­i mail COD vÃ  PayOS thÃ nh cÃ´ng hay tháº¥t báº¡i (á»Ÿ luá»“ng Async).
-- **API má»›i**: ThÃªm API POST /api/v1/orders/{id}/resend-email trong OrderController Ä‘á»ƒ admin cÃ³ thá»ƒ chá»§ Ä‘á»™ng gá»­i láº¡i mail bá»‹ lá»—i.
-- **Files modified**: Order.java, OrderEmailServiceImpl.java, OrderServiceImpl.java, OrderController.java. Táº¡o má»›i PaymentInternalApi.java, InvoiceDto.java.
-- **LÆ°á»›i an toÃ n**: ThÃªm OrderEmailRetryJob.java cháº¡y ngáº§m báº±ng @Scheduled(fixedDelay = 300000) Ä‘á»ƒ quÃ©t vÃ  tá»± Ä‘á»™ng gá»­i láº¡i cÃ¡c email tráº¡ng thÃ¡i PENDING hoáº·c FAILED (giá»›i háº¡n tá»‘i Ä‘a 3 láº§n thá»­, chá»‰ tÃ­nh cÃ¡c Ä‘Æ¡n hÃ ng táº¡o cÃ¡ch Ä‘Ã¢y hÆ¡n 5 phÃºt).
-- **Refactor**: RÃºt gá»n tÃªn hÃ m query trong OrderRepository thÃ nh indOrdersForEmailRetry báº±ng @Query vÃ  gá»¡ bá» toÃ n bá»™ Fully Qualified Class Names (FQCN) dÆ° thá»«a trong code theo chuáº©n Clean Code.
+- **TÃƒÂ­nh nÃ„Æ’ng**: Ãƒ p dÃ¡Â»Â¥ng Embedded State cho Order Email. ThÃƒÂªm cÃ¡Â»â„¢t email_status, email_retry_count vÃƒÂ o orders table.
+- **Logic thÃƒÂªm vÃƒÂ o**: Tracking trÃ¡ÂºÂ¡ng thÃƒÂ¡i gÃ¡Â»Â­i email PENDING, SENT, FAILED khi gÃ¡Â»Â­i mail COD vÃƒÂ  PayOS thÃƒÂ nh cÃƒÂ´ng hay thÃ¡ÂºÂ¥t bÃ¡ÂºÂ¡i (Ã¡Â»Å¸ luÃ¡Â»â€œng Async).
+- **API mÃ¡Â»â€ºi**: ThÃƒÂªm API POST /api/v1/orders/{id}/resend-email trong OrderController Ã„â€˜Ã¡Â»Æ’ admin cÃƒÂ³ thÃ¡Â»Æ’ chÃ¡Â»Â§ Ã„â€˜Ã¡Â»â„¢ng gÃ¡Â»Â­i lÃ¡ÂºÂ¡i mail bÃ¡Â»â€¹ lÃ¡Â»â€”i.
+- **Files modified**: Order.java, OrderEmailServiceImpl.java, OrderServiceImpl.java, OrderController.java. TÃ¡ÂºÂ¡o mÃ¡Â»â€ºi PaymentInternalApi.java, InvoiceDto.java.
+- **LÃ†Â°Ã¡Â»â€ºi an toÃƒÂ n**: ThÃƒÂªm OrderEmailRetryJob.java chÃ¡ÂºÂ¡y ngÃ¡ÂºÂ§m bÃ¡ÂºÂ±ng @Scheduled(fixedDelay = 300000) Ã„â€˜Ã¡Â»Æ’ quÃƒÂ©t vÃƒÂ  tÃ¡Â»Â± Ã„â€˜Ã¡Â»â„¢ng gÃ¡Â»Â­i lÃ¡ÂºÂ¡i cÃƒÂ¡c email trÃ¡ÂºÂ¡ng thÃƒÂ¡i PENDING hoÃ¡ÂºÂ·c FAILED (giÃ¡Â»â€ºi hÃ¡ÂºÂ¡n tÃ¡Â»â€˜i Ã„â€˜a 3 lÃ¡ÂºÂ§n thÃ¡Â» thá»­, chÃ¡Â»â€° tÃƒÂ­nh cÃƒÂ¡c Ã„â€˜Ã†Â¡n hÃƒÂ ng tÃ¡ÂºÂ¡o cÃƒÂ¡ch Ã„â€˜ÃƒÂ¢y hÃ†Â¡n 5 phÃƒÂºt).
+- **Refactor**: RÃƒÂºt gÃ¡Â» n tÃƒÂªn hÃƒÂ m query trong OrderRepository thÃƒÂ nh indOrdersForEmailRetry bÃ¡ÂºÂ±ng @Query vÃƒÂ  gÃ¡Â»Â¡ bÃ¡Â»  toÃƒÂ n bÃ¡Â»â„¢ Fully Qualified Class Names (FQCN) dÃ†Â° thÃ¡Â»Â«a trong code theo chuÃ¡ÂºÂ©n Clean Code.
 
-- **Refactor**: Chuyá»ƒn luá»“ng gá»­i email COD sang cÆ¡ cháº¿ Báº¥t Ä‘á»“ng bá»™ an toÃ n tuyá»‡t Ä‘á»‘i thÃ´ng qua TransactionalEventListener(AFTER_COMMIT) vá»›i OrderCreatedEvent vÃ  EmailListener thay vÃ¬ gá»i trá»±c tiáº¿p trong method táº¡o Ä‘Æ¡n.
-- **Documentation**: Viáº¿t láº¡i toÃ n bá»™ README.md cá»§a module Order theo cáº¥u trÃºc chi tiáº¿t (Sequence-level flow, State transition table, Known limitations, How to verify) nhÆ° tÃ i liá»‡u chuáº©n má»±c cá»§a há»‡ thá»‘ng.
+- **Refactor**: ChuyÃ¡Â»Æ’n luÃ¡Â»â€œng gÃ¡Â»Â­i email COD sang cÃ†Â¡ chÃ¡ÂºÂ¿ BÃ¡ÂºÂ¥t Ã„â€˜Ã¡Â»â€œng bÃ¡Â»â„¢ an toÃƒÂ n tuyÃ¡Â»â€¡t Ã„â€˜Ã¡Â»â€˜i thÃƒÂ´ng qua TransactionalEventListener(AFTER_COMMIT) vÃ¡Â»â€ºi OrderCreatedEvent vÃƒÂ  EmailListener thay vÃƒÂ¬ gÃ¡Â» i trÃ¡Â»Â±c tiÃ¡ÂºÂ¿p trong method tÃ¡ÂºÂ¡o Ã„â€˜Ã†Â¡n.
+- **Documentation**: ViÃ¡ÂºÂ¿t lÃ¡ÂºÂ¡i toÃƒÂ n bÃ¡Â»â„¢ README.md cÃ¡Â»Â§a module Order theo cÃ¡ÂºÂ¥u trÃƒÂºc chi tiÃ¡ÂºÂ¿t (Sequence-level flow, State transition table, Known limitations, How to verify) nhÃ†Â° tÃƒÂ i liÃ¡Â»â€¡u chuÃ¡ÂºÂ©n mÃ¡Â»Â±c cÃ¡Â»Â§a hÃ¡Â»â€¡ thÃ¡Â»â€˜ng.
 
 ## [2026-07-17] Mock Notification Menu Component
 
-- **Frontend**: Hoï¿½n thi?n component `NotificationMenu.tsx` trong layout chung, thay th? component tr?ng.
-- **UI/UX**: S? d?ng Popover d? hi?n th? danh sï¿½ch thï¿½ng bï¿½o, vï¿½ Dialog (Modal) d? hi?n th? chi ti?t khi click vï¿½o m?t thï¿½ng bï¿½o.
-- **Logic Added**: Thï¿½m mock data v?i nhi?u lo?i thï¿½ng bï¿½o (promotion, system, success, alert). X? lï¿½ click vï¿½o thï¿½ng bï¿½o t? dï¿½nh d?u dï¿½ d?c. Tï¿½ch h?p nï¿½t hï¿½nh d?ng trong modal (nhu nh?n uu dï¿½i) d? di?u hu?ng s? d?ng `useNavigate` v?i state d? li?u d? t? d?ng di?n.
+- **Frontend**: HoÃ¯Â¿Â½n thi?n component `NotificationMenu.tsx` trong layout chung, thay th? component tr?ng.
+- **UI/UX**: S? d?ng Popover d? hi?n th? danh sÃ¯Â¿Â½ch thÃ¯Â¿Â½ng bÃ¯Â¿Â½o, vÃ¯Â¿Â½ Dialog (Modal) d? hi?n th? chi ti?t khi click vÃ¯Â¿Â½o m?t thÃ¯Â¿Â½ng bÃ¯Â¿Â½o.
+- **Logic Added**: ThÃ¯Â¿Â½m mock data v?i nhi?u lo?i thÃ¯Â¿Â½ng bÃ¯Â¿Â½o (promotion, system, success, alert). X? lÃ¯Â¿Â½ click vÃ¯Â¿Â½o thÃ¯Â¿Â½ng bÃ¯Â¿Â½o t? dÃ¯Â¿Â½nh d?u dÃ¯Â¿Â½ d?c. TÃ¯Â¿Â½ch h?p nÃ¯Â¿Â½t hÃ¯Â¿Â½nh d?ng trong modal (nhu nh?n uu dÃ¯Â¿Â½i) d? di?u hu?ng s? d?ng `useNavigate` v?i state d? li?u d? t? d?ng di?n.
 
-## [2026-07-17] Khï¿½ch hï¿½ng xem l?ch s? vï¿½ H?y don
+## [2026-07-17] KhÃ¯Â¿Â½ch hÃ¯Â¿Â½ng xem l?ch s? vÃ¯Â¿Â½ H?y don
 
-- **Backend**: Thï¿½m hï¿½m l?y danh sï¿½ch don hï¿½ng c?a User trong `OrderRepository.java` vï¿½ `OrderService.java`. C?p nh?t Controller v?i 2 endpoint m?i: `GET /my-orders` vï¿½ `POST /{id}/cancel`.
-- **Frontend**: Kh?i t?o hï¿½m api `getMyOrders` vï¿½ `cancelOrder` trong `order.api.ts`. C?p nh?t hook `useOrderHistory.ts` d? x? lï¿½ fetch l?i danh sï¿½ch sau khi h?y.
-- **UI/UX**: Trong trang `OrderHistoryPage.tsx`, n?u don hï¿½ng dang ? tr?ng thï¿½i PENDING thï¿½ hi?n th? nï¿½t H?y don cï¿½ h?p tho?i Dialog c?nh bï¿½o xï¿½c nh?n. Nï¿½t h?y d? n?i b?t.
-- **Notification**: N?u khï¿½ch hï¿½ng h?y don thï¿½nh cï¿½ng, h? th?ng t? d?ng g?i qua `NotificationInternalApi` d? push m?t c?nh bï¿½o (ALERT) v? cho tï¿½i kho?n Admin.
--   * * 2 0 2 6 - 0 7 - 1 8 * * :   F i x e d   S p r i n g   B o o t   s t a r t u p   e r r o r   b y   i m p l e m e n t i n g   N o t i f i c a t i o n S e r v i c e   i n   N o t i f i c a t i o n S e r v i c e I m p l . j a v a .  
- -   * * 2 0 2 6 - 0 7 - 1 8 * * :   F i x e d   V i t e   i m p o r t   r e s o l u t i o n   e r r o r   b y   m a p p i n g   \ @ / \   a l i a s   t o   \ s r c / c o r e / \   i n   \ 	 s c o n f i g . j s o n \   a n d   \  i t e . c o n f i g . t s \   t o   a l i g n   w i t h   S h a d c n   U I   i m p o r t s .  
- 
+- **Backend**: ThÃ¯Â¿Â½m hÃ¯Â¿Â½m l?y danh sÃ¯Â¿Â½ch don hÃ¯Â¿Â½ng c?a User trong `OrderRepository.java` vÃ¯Â¿Â½ `OrderService.java`. C?p nh?t Controller v?i 2 endpoint m?i: `GET /my-orders` vÃ¯Â¿Â½ `POST /{id}/cancel`.
+- **Frontend**: Kh?i t?o hÃ¯Â¿Â½m api `getMyOrders` vÃ¯Â¿Â½ `cancelOrder` trong `order.api.ts`. C?p nh?t hook `useOrderHistory.ts` d? x? lÃ¯Â¿Â½ fetch l?i danh sÃ¯Â¿Â½ch sau khi h?y.
+- **UI/UX**: Trong trang `OrderHistoryPage.tsx`, n?u don hÃ¯Â¿Â½ng dang ? tr?ng thÃ¯Â¿Â½i PENDING thÃ¯Â¿Â½ hi?n th? nÃ¯Â¿Â½t H?y don cÃ¯Â¿Â½ h?p tho?i Dialog c?nh bÃ¯Â¿Â½o xÃ¯Â¿Â½c nh?n. NÃ¯Â¿Â½t h?y d? n?i b?t.
+- **Notification**: N?u khÃ¯Â¿Â½ch hÃ¯Â¿Â½ng h?y don thÃ¯Â¿Â½nh cÃ¯Â¿Â½ng, h? th?ng t? d?ng g?i qua `NotificationInternalApi` d? push m?t c?nh bÃ¯Â¿Â½o (ALERT) v? cho tÃ¯Â¿Â½i kho?n Admin.
+-   * * 2 0 2 6 - 0 7 - 1 8 * * :   F i x e d   S p r i n g   B o o t   s t a r t u p   e r r o r   b y   i m p l e m e n t i n g   N o t i f i c a t i o n S e r v i c e   i n   N o t i f i c a t i o n S e r v i c e I m p l . j a v a .  
+ -   * * 2 0 2 6 - 0 7 - 1 8 * * :   F i x e d   V i t e   i m p o r t   r e s o l u t i o n   e r r o r   b y   m a p p i n g   \ @ / \   a l i a s   t o   \ s r c / c o r e / \   i n   \ 	 s c o n f i g . j s o n \   a n d   \   i t e . c o n f i g . t s \   t o   a l i g n   w i t h   S h a d c n   U I   i m p o r t s .  
+ 
 ## [21/07/2026] - Code Review & Quality Assessment
 
-**Táº¡o file Ä‘Ã¡nh giÃ¡:**
+**TÃ¡ÂºÂ¡o file Ã„â€˜ÃƒÂ¡nh giÃƒÂ¡:**
 
-- Táº¡o má»›i `done.md` táº¡i root project: ÄÃ¡nh giÃ¡ toÃ n diá»‡n cháº¥t lÆ°á»£ng code cho cáº£ Server (Spring Boot) vÃ  Client (React/Vite).
-- PhÃ¢n tÃ­ch 7 module server (auth, order, payment, notification, product, user, media) vÃ  8 feature client (auth, dashboard, inbox, orders, payment, products, promotions, users).
-- ÄÃ¡nh giÃ¡ tá»•ng thá»ƒ: 7.5/10
+- TÃ¡ÂºÂ¡o mÃ¡Â»â€ºi `done.md` tÃ¡ÂºÂ¡i root project: Ã„ ÃƒÂ¡nh giÃƒÂ¡ toÃƒÂ n diÃ¡Â»â€¡n chÃ¡ÂºÂ¥t lÃ†Â°Ã¡Â»Â£ng code cho cÃ¡ÂºÂ£ Server (Spring Boot) vÃƒÂ  Client (React/Vite).
+- PhÃƒÂ¢n tÃƒÂ­ch 7 module server (auth, order, payment, notification, product, user, media) vÃƒÂ  8 feature client (auth, dashboard, inbox, orders, payment, products, promotions, users).
+- Ã„ ÃƒÂ¡nh giÃƒÂ¡ tÃ¡Â»â€¢ng thÃ¡Â»Æ’: 7.5/10
 
-**Káº¿t quáº£ Ä‘Ã¡nh giÃ¡ chÃ­nh:**
+**KÃ¡ÂºÂ¿t quÃ¡ÂºÂ£ Ã„â€˜ÃƒÂ¡nh giÃƒÂ¡ chÃƒÂ­nh:**
 
-- 7 Ä‘iá»ƒm máº¡nh (kiáº¿n trÃºc modular, Auth security xuáº¥t sáº¯c, event-driven payment, email retry system)
-- 8 Ä‘iá»ƒm cáº§n cáº£i thiá»‡n (hardcode localhost, duplicate API, FQCN violations, alert thay toast, stub notification)
-- 10 cÆ¡ há»™i tá»‘i Æ°u (BigDecimal, SecureRandom, Thymeleaf templates, idempotency check, mock data replacement)
-- Checklist 12 action items vá»›i priority P0/P1/P2 vÃ  effort estimate
+- 7 Ã„â€˜iÃ¡Â»Æ’m mÃ¡ÂºÂ¡nh (kiÃ¡ÂºÂ¿n trÃƒÂºc modular, Auth security xuÃ¡ÂºÂ¥t sÃ¡ÂºÂ¯c, event-driven payment, email retry system)
+- 8 Ã„â€˜iÃ¡Â»Æ’m cÃ¡ÂºÂ§n cÃ¡ÂºÂ£i thiÃ¡Â»â€¡n (hardcode localhost, duplicate API, FQCN violations, alert thay toast, stub notification)
+- 10 cÃ†Â¡ hÃ¡Â»â„¢i tÃ¡Â»â€˜i Ã†Â°u (BigDecimal, SecureRandom, Thymeleaf templates, idempotency check, mock data replacement)
+- Checklist 12 action items vÃ¡Â»â€ºi priority P0/P1/P2 vÃƒÂ  effort estimate
 
 
-**Cáº­p nháº­t code theo Code Review Phase 1:**
+**CÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t code theo Code Review Phase 1:**
 
-- Cáº¥u hÃ¬nh \rontendUrl\ thÃ´ng qua \pplication-default.properties\ (\${FRONTEND_URL}\) cho \OrderEmailServiceImpl\ vÃ  \PaymentServiceImpl\.
-- DÃ¹ng \import.meta.env.VITE_API_URL\ trong \callApi.ts\.
-- Gá»™p vÃ  refactor API call vÃ o \eatures/orders/services/order.api.ts\, xÃ³a bá» \core/api/order.api.ts\ thá»«a.
-- ThÃªm \	oast()\ thay tháº¿ cho \lert()\ trong \OrderHistoryPage\.
-- Dá»n dáº¹p Clean Code (xÃ³a FQCN) trong cÃ¡c file \OrderEmailServiceImpl\, \AuthenticationServiceImpl\, \OrderController\, \OrderRepository\.
-- Sá»­a lá»—i Dependency Inversion (tiÃªm Interface \IOrderEmailService\) trong \OrderEmailRetryJob\.
-- Thay \Random\ báº±ng \SecureRandom\ trong \TwoFactorAuthServiceImpl\.
-- ThÃªm \existsByOrderId\ vÃ o \InvoiceRepository\ Ä‘á»ƒ kiá»ƒm tra tÃ­nh lÅ©y Ä‘áº³ng trong \PaymentServiceImpl\ khi nháº­n webhook.
-- CÃ i Ä‘áº·t truy váº¥n DB thá»±c táº¿ cho \NotificationServiceImpl\.
+- CÃ¡ÂºÂ¥u hÃƒÂ¬nh \rontendUrl\ thÃƒÂ´ng qua \ pplication-default.properties\ (\${FRONTEND_URL}\) cho \OrderEmailServiceImpl\ vÃƒÂ  \PaymentServiceImpl\.
+- DÃƒÂ¹ng \import.meta.env.VITE_API_URL\ trong \callApi.ts\.
+- GÃ¡Â»â„¢p vÃƒÂ  refactor API call vÃƒÂ o \eatures/orders/services/order.api.ts\, xÃƒÂ³a bÃ¡Â»  \core/api/order.api.ts\ thÃ¡Â»Â«a.
+- ThÃƒÂªm \	oast()\ thay thÃ¡ÂºÂ¿ cho \ lert()\ trong \OrderHistoryPage\.
+- DÃ¡Â» n dÃ¡ÂºÂ¹p Clean Code (xÃƒÂ³a FQCN) trong cÃƒÂ¡c file \OrderEmailServiceImpl\, \AuthenticationServiceImpl\, \OrderController\, \OrderRepository\.
+- SÃ¡Â» sá»­a lÃ¡Â»â€”i Dependency Inversion (tiÃƒÂªm Interface \IOrderEmailService\) trong \OrderEmailRetryJob\.
+- Thay \Random\ bÃ¡ÂºÂ±ng \SecureRandom\ trong \TwoFactorAuthServiceImpl\.
+- ThÃƒÂªm \existsByOrderId\ vÃƒÂ o \InvoiceRepository\ Ã„â€˜Ã¡Â»Æ’ kiÃ¡Â»Æ’m tra tÃƒÂ­nh lÃ…Â©y Ã„â€˜Ã¡ÂºÂ³ng trong \PaymentServiceImpl\ khi nhÃ¡ÂºÂ­n webhook.
+- CÃƒÂ i Ã„â€˜Ã¡ÂºÂ·t truy vÃ¡ÂºÂ¥n DB thÃ¡Â»Â±c tÃ¡ÂºÂ¿ cho \NotificationServiceImpl\.
 
 
 ## [21/07/2026] - Fix PayOS API Exception
@@ -327,17 +338,17 @@ File nÃ y ghi láº¡i toÃ n bá»™ cÃ¡c thay Ä‘á»•i, tÃ­nh nÄ
 - **Files Modified**: PaymentServiceImpl.java
 
 ## [21/07/2026] - Redesign Order Details UI
-- **Logic Added**: Redesigned the order details section to be more compact, matching the requested 'siÃªu nhá» nháº¯n' UI/UX standard with refined typography, colors, and layout.
+- **Logic Added**: Redesigned the order details section to be more compact, matching the requested 'siÃƒÂªu nhÃ¡Â»  nhÃ¡ÂºÂ¯n' UI/UX standard with refined typography, colors, and layout.
 - **Files Modified**: client/src/features/orders/pages/OrderHistoryPage.tsx
 
 - **Bug Fix**: Added productImageUrl to OrderItem entity and mapped it in OrderItemResponse so order history displays the correct product image instead of a placeholder. Note: Only applies to newly placed orders.
-- **UI Tweak**: Adjusted PENDING status badge color (amber-100 bg, amber-800 text) in OrderHistoryPage to match the visual weight of the Há»§y Ä‘Æ¡n button.
+- **UI Tweak**: Adjusted PENDING status badge color (amber-100 bg, amber-800 text) in OrderHistoryPage to match the visual weight of the HÃ¡Â»Â§y Ã„â€˜Ã†Â¡n button.
 
 ## [21/07/2026] - Redesign Email Templates
-- **UI Tweak**: Redesigned both order-confirmation.html (COD) and payment-success.html (PayOS) to a modern, premium 'siÃªu nhá» nháº¯n' UI/UX standard with softer backgrounds, rounded corners, and cleaner typography.
+- **UI Tweak**: Redesigned both order-confirmation.html (COD) and payment-success.html (PayOS) to a modern, premium 'siÃƒÂªu nhÃ¡Â»  nhÃ¡ÂºÂ¯n' UI/UX standard with softer backgrounds, rounded corners, and cleaner typography.
 - **Files Modified**: server/src/main/resources/templates/email/order-confirmation.html, server/src/main/resources/templates/email/payment-success.html
 
-- **UI Tweak**: Removed the XCircle icon from the 'Há»§y Ä‘Æ¡n' button in OrderHistoryPage to make it look cleaner.
+- **UI Tweak**: Removed the XCircle icon from the 'HÃ¡Â»Â§y Ã„â€˜Ã†Â¡n' button in OrderHistoryPage to make it look cleaner.
 
 ### 2026-07-21
 - Updated database.md to sync with Java entity changes: converted money fields to DECIMAL(19,2), added email_status, email_retry_count in orders, product_image_url in order_items, and last_seen_notification_at in users.
@@ -348,27 +359,84 @@ File nÃ y ghi láº¡i toÃ n bá»™ cÃ¡c thay Ä‘á»•i, tÃ­nh nÄ
 ## 2026-07-22
 - **Fix (Client):** Added optional `shippingFee?: number` property to `OrderResponse` interface in `client\src\features\orders\services\order.api.ts` to fix TypeScript compilation error regarding missing property.
 - **Fix (Client & Server):** Fixed staff creation bug where empty phone numbers caused unique constraint violation in database. Added strict frontend validation for phone format (must be 10 digits starting with 0 if provided). Added backend validation and handled empty phone strings by treating them as null to avoid DuplicateResourceException on empty strings.
-- **Fix (Client):** Sá»­a lá»—i hiá»ƒn thá»‹ badge chÆ°a Ä‘á»c áº£o á»Ÿ Widget Chat (ChatWidget.tsx). Badge máº·c Ä‘á»‹nh khÃ´ng cÃ²n hiá»ƒn thá»‹ sá»‘ 1 ngay khi vÃ o trang, mÃ  thay vÃ o Ä‘Ã³ Ä‘áº¿m sá»‘ tin nháº¯n chÆ°a Ä‘á»c thá»±c sá»± nháº­n Ä‘Æ°á»£c khi widget Ä‘ang Ä‘Ã³ng.
+- **Fix (Client):** SÃ¡Â» sá»­a lÃ¡Â»â€”i hiÃ¡Â»Æ’n thÃ¡Â»â€¹ badge chÃ†Â°a Ã„â€˜Ã¡Â» c Ã¡ÂºÂ£o Ã¡Â»Å¸ Widget Chat (ChatWidget.tsx). Badge mÃ¡ÂºÂ·c Ã„â€˜Ã¡Â»â€¹nh khÃƒÂ´ng cÃƒÂ²n hiÃ¡Â»Æ’n thÃ¡Â»â€¹ sÃ¡Â»â€˜ 1 ngay khi vÃƒÂ o trang, mÃƒÂ  thay vÃƒÂ o Ã„â€˜ÃƒÂ³ Ã„â€˜Ã¡ÂºÂ¿m sÃ¡Â»â€˜ tin nhÃ¡ÂºÂ¯n chÃ†Â°a Ã„â€˜Ã¡Â» c thÃ¡Â»Â±c sÃ¡Â»Â± nhÃ¡ÂºÂ­n Ã„â€˜Ã†Â°Ã¡Â»Â£c khi widget Ã„â€˜ang Ã„â€˜ÃƒÂ³ng.
 - **Feature (Client & Server):** Bot chat auto-replies are now persisted in the database via a new endpoint (/api/v1/chat/{conversationId}/bot-reply). Bot messages are broadcasted properly over WebSocket and rendered on the left side of the chat interface as an admin/staff, ensuring chat history is fully saved instead of disappearing on reload.
 - **Feature (Server & Client):** Refactored chat unread count to emulate Messenger/Zalo behavior. Unread message count and "mark as read" are now bidirectional and user-specific. Admin sees unread count of customer messages, and Customer sees unread count of admin/bot messages.
 - **Fix (Client):** Chat widget now accurately shows historical unread count upon page load (instead of 0) and prevents auto-marking messages as read while the widget is closed.
-- **Fix (Client):** Replaced hardcoded badge "3" on the Admin Sidebar ("Há»— trá»£ KhÃ¡ch hÃ ng") with a dynamic unread conversations counter. The sidebar now fetches real-time unread counts from the database and updates via WebSocket.
+- **Fix (Client):** Replaced hardcoded badge "3" on the Admin Sidebar ("HÃ¡Â»â€” trÃ¡Â»Â£ KhÃƒÂ¡ch hÃƒÂ ng") with a dynamic unread conversations counter. The sidebar now fetches real-time unread counts from the database and updates via WebSocket.
 - **Fix (Client):** Removed auto-selection of the first conversation when opening Admin Inbox. The inbox now opens to a blank screen, preserving the unread badge of the first conversation until the admin explicitly clicks on it.
 ### 22/07/2026 - Fix Chat System Critical Bugs (Phase 1)
-- **client/src/core/types/chat.ts**: Xï¿½a cï¿½c fields data vï¿½ success l?i trong ConversationDTO.
-- **client/src/core/components/common/ChatWidget.tsx**: S?a l?i logic guestReady gï¿½y k?t mï¿½n hï¿½nh guest form, xï¿½a dead code, t?i uu vi?c truy?n thï¿½ng tin user.
-- **client/src/core/store/useChatWebSocket.ts**: X? lï¿½ Optimistic Update (hi?n th? g?i ngay l?p t?c), fix l?i duplicate tin nh?n, kh?c ph?c stale closure c?a isViewing, dï¿½ng WS URL qua env vï¿½ thï¿½m tï¿½nh nang fetch l?i tin nh?n b? miss sau khi reconnect.
-- **server/src/main/java/atmin/modules/chat/controller/ChatWebSocketController.java**: S?a Full Qualified Class Name thï¿½nh standard import.
+- **client/src/core/types/chat.ts**: XÃ¯Â¿Â½a cÃ¯Â¿Â½c fields data vÃ¯Â¿Â½ success l?i trong ConversationDTO.
+- **client/src/core/components/common/ChatWidget.tsx**: S?a l?i logic guestReady gÃ¯Â¿Â½y k?t mÃ¯Â¿Â½n hÃ¯Â¿Â½nh guest form, xÃ¯Â¿Â½a dead code, t?i uu vi?c truy?n thÃ¯Â¿Â½ng tin user.
+- **client/src/core/store/useChatWebSocket.ts**: X? lÃ¯Â¿Â½ Optimistic Update (hi?n th? g?i ngay l?p t?c), fix l?i duplicate tin nh?n, kh?c ph?c stale closure c?a isViewing, dÃ¯Â¿Â½ng WS URL qua env vÃ¯Â¿Â½ thÃ¯Â¿Â½m tÃ¯Â¿Â½nh nang fetch l?i tin nh?n b? miss sau khi reconnect.
+- **server/src/main/java/atmin/modules/chat/controller/ChatWebSocketController.java**: S?a Full Qualified Class Name thÃ¯Â¿Â½nh standard import.
 
 ### 22/07/2026 - Feature Enhancements Chat System (Phase 2)
-- **server/.../repository/ChatMessageRepository.java**: Thï¿½m query indByConversationIdAndCreatedAtLessThanOrderByCreatedAtDesc ph?c v? cursor-based pagination.
-- **server/.../service/ChatServiceImpl.java**: Tï¿½ch h?p cursor pagination cho method getMessages.
-- **server/.../controller/ChatWebSocketController.java**: Thï¿½m endpoint @MessageMapping("/chat.typing") d? pub/sub s? ki?n typing.
-- **client/src/core/store/useChatWebSocket.ts**: Thï¿½m tr?ng thï¿½i vï¿½ logic debounce typing, debounce markAsRead, hï¿½m loadMore h? tr? infinity scroll.
-- **client/src/core/components/common/ChatWidget.tsx**: Thï¿½m UI Infinite Scroll, skeleton loading, hi?n th? indicator Typing vï¿½ tick tr?ng thï¿½i tin nh?n (?/??).
+- **server/.../repository/ChatMessageRepository.java**: ThÃ¯Â¿Â½m query indByConversationIdAndCreatedAtLessThanOrderByCreatedAtDesc ph?c v? cursor-based pagination.
+- **server/.../service/ChatServiceImpl.java**: TÃ¯Â¿Â½ch h?p cursor pagination cho method getMessages.
+- **server/.../controller/ChatWebSocketController.java**: ThÃ¯Â¿Â½m endpoint @MessageMapping("/chat.typing") d? pub/sub s? ki?n typing.
+- **client/src/core/store/useChatWebSocket.ts**: ThÃ¯Â¿Â½m tr?ng thÃ¯Â¿Â½i vÃ¯Â¿Â½ logic debounce typing, debounce markAsRead, hÃ¯Â¿Â½m loadMore h? tr? infinity scroll.
+- **client/src/core/components/common/ChatWidget.tsx**: ThÃ¯Â¿Â½m UI Infinite Scroll, skeleton loading, hi?n th? indicator Typing vÃ¯Â¿Â½ tick tr?ng thÃ¯Â¿Â½i tin nh?n (?/??).
 
 ### 22/07/2026 - Sync Phase 2 Features to Admin Inbox
-- **client/src/features/inbox/pages/AdminInbox.tsx**: C?p nh?t logic hi?n th? d?m s? lu?ng khï¿½ch hï¿½ng ch? (unreadConversations). Tï¿½ch h?p Infinite Scroll, hi?u ?ng Typing Indicator, vï¿½ hi?n th? tr?ng thï¿½i tin nh?n (Sent/Delivered/Read) cho mï¿½n hï¿½nh chat c?a nhï¿½n viï¿½n.
+- **client/src/features/inbox/pages/AdminInbox.tsx**: C?p nh?t logic hi?n th? d?m s? lu?ng khÃ¯Â¿Â½ch hÃ¯Â¿Â½ng ch? (unreadConversations). TÃ¯Â¿Â½ch h?p Infinite Scroll, hi?u ?ng Typing Indicator, vÃ¯Â¿Â½ hi?n th? tr?ng thÃ¯Â¿Â½i tin nh?n (Sent/Delivered/Read) cho mÃ¯Â¿Â½n hÃ¯Â¿Â½nh chat c?a nhÃ¯Â¿Â½n viÃ¯Â¿Â½n.
 
 ### 22/07/2026 - Fix loi Realtime Read Receipts
 - **client/src/core/store/useChatWebSocket.ts**: Sua loi kiem tra sai userId khi nhan su kien STOMP `/read`. Cap nhat logic de danh dau toan bo tin nhan khong phai cua `readerId` thanh `READ` thay vi phu thuoc vao custom `myId`, giup xu ly that nhanh va chinh xac status "Da doc" theo thoi gian thuc tren ca 2 phia Admin & Khach hang.
+
+### 22/07/2026 - Fix loi Serialization cho STOMP Realtime Read Receipts
+- **server/src/main/java/atmin/modules/chat/service/ChatServiceImpl.java**: Fix loi serialize object qua WebSocket (thay the `Optional.of(Map.of(...))` thanh `Map.of(...)`) giup client parse dung duoc payload.readerId trong su kien STOMP `/read`. Hien tuong nay gay ra viec loi 2 dau tich khong hoat dong realtime. Hien tai, client co the lang nghe va update trang thai tin nhan thanh "Da doc" thoi gian thuc.
+
+## [22/07/2026] - Triá»ƒn khai tÃ­nh nÄƒng theo dÃµi tráº¡ng thÃ¡i Online/Offline (Presence)
+
+**1. Backend**
+- **atmin.modules.user.entity.User**: ThÃªm cá»™t `isOnline` vÃ  `lastSeenAt` Ä‘á»ƒ lÆ°u trá»¯ dá»¯ liá»‡u.
+- **atmin.modules.user.api.UserInternalApi**: Bá»• sung hÃ m `updateUserPresence` phá»¥c vá»¥ giao tiáº¿p chÃ©o an toÃ n.
+- **atmin.modules.chat.service.PresenceManager**: Khá»Ÿi táº¡o in-memory cache quáº£n lÃ½ connection báº±ng `ConcurrentHashMap`. Há»— trá»£ Grace Period (5 giÃ¢y) báº±ng `ScheduledExecutorService` Ä‘á»ƒ ngÄƒn cháº·n spam tráº¡ng thÃ¡i offline khi f5/nhÃ¡y máº¡ng.
+- **atmin.modules.chat.listener.WebSocketEventListener**: Báº¯t sá»± kiá»‡n káº¿t ná»‘i/ngáº¯t káº¿t ná»‘i WebSocket vÃ  Ä‘áº©y dá»¯ liá»‡u vÃ o `PresenceManager`.
+- **atmin.modules.chat.controller.ChatController**: ThÃªm endpoint `GET /api/v1/chat/presence` cho phÃ©p táº£i nhanh tráº¡ng thÃ¡i Online ngay khi má»Ÿ trang mÃ  khÃ´ng cáº§n chá» socket.
+- **atmin.modules.chat.dto.ConversationDTO**: ThÃªm biáº¿n `participantId` Ä‘á»ƒ frontend cÃ³ thá»ƒ Ä‘á»‘i chiáº¿u presence.
+
+**2. Frontend**
+- **client/src/core/store/useChatWebSocket.ts**: Cáº­p nháº­t logic Ä‘á»ƒ load `initialPresence` qua API REST, Ä‘á»“ng thá»i subscribe `/topic/presence` Ä‘á»ƒ cáº­p nháº­t tráº¡ng thÃ¡i liÃªn tá»¥c.
+- **client/src/features/inbox/pages/AdminInbox.tsx**: Thay tháº¿ thÃ´ng bÃ¡o "Äang trá»±c tuyáº¿n" tÄ©nh báº±ng hÃ m tÃ­nh thá»i gian thá»±c "Hoáº¡t Ä‘á»™ng X phÃºt trÆ°á»›c" thÃ´ng qua dá»¯ liá»‡u STOMP WebSocket. ThÃªm dáº¥u tick trÃ²n mÃ u xanh lÃ¡ Ä‘á»ƒ biá»ƒu thá»‹ khÃ¡ch hÃ ng Ä‘ang online á»Ÿ danh sÃ¡ch bÃªn trÃ¡i.
+
+## [22/07/2026] - Sá»­a lá»—i Admin bá»‹ vÄƒng Ä‘Äƒng nháº­p khi táº£i láº¡i trang
+
+**1. Frontend**
+- **client/src/features/auth/components/AuthInit.tsx**: Sá»­a lá»—i Race Condition gÃ¢y ra do React StrictMode khi gá»i API `/auth/refresh` 2 láº§n liÃªn tiáº¿p cÃ¹ng má»™t thá»i Ä‘iá»ƒm. Viá»‡c gá»i 2 láº§n báº±ng cÃ¹ng 1 refresh_token khiáº¿n mÃ¡y chá»§ kÃ­ch hoáº¡t cÆ¡ cháº¿ chá»‘ng Reuse Attack vÃ  Ä‘Ã¡nh dáº¥u toÃ n bá»™ phiÃªn báº£n lÃ  khÃ´ng há»£p lá»‡, dáº«n Ä‘áº¿n admin bá»‹ vÄƒng khá»i há»‡ thá»‘ng má»—i khi báº¥m táº£i láº¡i trang (F5). CÃ¡ch sá»­a lÃ  cache Promise cá»§a request refresh Ä‘á»ƒ cháº·n double fetch.
+## [22/07/2026] - C?p nh?t giao di?n nh?p OTP
+- **Frontend**: C?p nh?t CSS cho ô nh?p OTP trong trang ResetPassword.tsx gi?ng v?i ph?n 2FA c?a AdminLogin.tsx d? th?ng nh?t giao di?n.
+
+
+## [22/07/2026] - Fix l?i Reset Password API
+- **Frontend**: C?p nh?t hàm g?i API resetPassword trong auth.api.ts và ResetPassword.tsx d? truy?n thêm tham s? confirmPassword, kh?c ph?c l?i Validation Failed tr? v? t? Backend.
+
+
+## [22/07/2026] - Thêm ch?c nang G?i l?i mã OTP
+- **Frontend**: C?p nh?t trang ResetPassword.tsx, truy?n state email t? trang ForgotPassword.tsx sang. Thêm logic d?m ngu?c 60 giây và cho phép g?i l?i mã OTP tr?c ti?p t? trang d?t l?i m?t kh?u, tuong t? tính nang bên trang Admin.
+
+
+## [22/07/2026] - C?p nh?t lu?ng Ðang xu?t
+- **Frontend**: C?p nh?t LayoutAtmin.tsx và callApi.ts d? t? d?ng di?u hu?ng ngu?i dùng v? dúng trang dang nh?p tuong ?ng v?i phân quy?n c?a h? sau khi dang xu?t ho?c h?t h?n phiên (Admin/Staff v? \/admin-login\, Khách hàng/Ð?i lý v? \/login\).
+
+
+## [22/07/2026] - ThÃªm chá»©c nÄƒng Quáº£n lÃ½ Sáº£n pháº©m
+- **Backend**: 
+  - Táº¡o CreateProductDto, bá»• sung cÃ¡c API endpoint POST, PUT, DELETE trong ProductController.
+  - Triá»ƒn khai logic trong ProductService cho phÃ©p thÃªm má»›i, sá»­a, vÃ  xÃ³a má»m sáº£n pháº©m.
+  - TÃ­ch há»£p tÃ­nh nÄƒng Upload áº£nh sá»­ dá»¥ng module media cÃ³ sáºµn (POST /api/v1/media/upload).
+  - Bá»• sung logic educeStock trong ProductInternalApi vÃ  tá»± Ä‘á»™ng gá»i má»—i khi cÃ³ Ä‘Æ¡n hÃ ng má»›i (OrderServiceImpl).
+- **Frontend**: 
+  - Thay tháº¿ dá»¯ liá»‡u mock trong useAdminProducts báº±ng @tanstack/react-query gá»i API thá»±c.
+  - XÃ¢y dá»±ng ProductFormModal.tsx cho phÃ©p Ä‘iá»n thÃ´ng tin, quáº£n lÃ½ mÃ u sáº¯c, kÃ­ch cá»¡ vÃ  thiáº¿t láº­p tá»“n kho (stock) cho tá»«ng biáº¿n thá»ƒ (variant).
+  - TÃ­ch há»£p Modal vÃ  tÃ­nh nÄƒng sá»­a/xÃ³a vÃ o AdminProducts.tsx.
+
+- 2026-07-22: Cập nhật và bổ sung README.md cho toàn bộ 10 modules backend (auth, chat, dashboard, media, notification, order, payment, product, promotion, user) với luồng tương tác BE - Client chi tiết.
+- 2026-07-22: Fix lỗi tràn trang (sticky footer) ở các form modal của Product và Promotion. Fix lỗi LazyInitializationException và URL mapping gây lỗi không xem được danh sách Ví Voucher bên Client. Khởi tạo dữ liệu phân quyền mẫu chi tiết hơn cho các Role STAFF, AGENT, CUSTOMER trong DataSeeder.
+- 2026-07-22: Đã kết nối API lấy danh sách Nhân viên (Staff) từ Backend lên Frontend, thay thế cho dữ liệu giả lập (mock data) trên trang Quản lý Nhân viên.
+- 2026-07-22: Bổ sung thêm các mẫu phân quyền nhanh (Quản lý, CSKH) và viết lại chú thích bảng phân quyền cho dễ hiểu hơn trong component StaffPermModal.
+- 2026-07-22: Thêm hiệu ứng màu sắc (active state) để làm nổi bật mẫu phân quyền đang được áp dụng trong bảng Quản lý Nhân viên.
+- 2026-07-23: Cải thiện giao diện bảng Quản lý Nhân viên: căn chỉnh lại các cột, làm gọn ID (tránh bị tràn dòng), sửa font chữ cột email và hiển thị nhãn quyền hạn ngắn gọn dễ hiểu hơn.
+- 2026-07-23: Thiết kế lại mục Hướng dẫn phân quyền (Role Info) ở trang Quản lý Nhân viên thành dạng danh sách thẻ (card) trực quan, có icon minh họa và giải thích chi tiết cho cả 5 chức danh mẫu.
+- 2026-07-23: Sửa lỗi Frontend gọi API tạo nhân viên 2 lần khi click đúp chuột (gây ra tình trạng tạo 2 tài khoản trùng email và gửi 2 email xác nhận). Thêm trạng thái isSubmitting để vô hiệu hóa nút submit trong lúc đang gọi API.

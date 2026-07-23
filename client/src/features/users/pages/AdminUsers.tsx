@@ -13,6 +13,7 @@ export function AdminUsers() {
     showAdd, setShowAdd,
     newStaff, setNewStaff,
     statusFilter, setStatusFilter,
+    isSubmitting,
     handleSavePerms,
     handleToggleStatus,
     handleAddStaff,
@@ -44,8 +45,8 @@ export function AdminUsers() {
             <InputField label="Chức danh" icon={Settings} value={newStaff.jobTitle} onChange={v => setNewStaff(p => ({ ...p, jobTitle: v }))} placeholder="Chọn chức danh..." options={["Nhân viên Sales", "Kế toán trưởng", "Thủ kho", "Nhân viên CSKH", "Trưởng phòng", "Giám đốc"]} />
           </div>
           <div className="flex items-center gap-3">
-            <button onClick={handleAddStaff} className="text-sm px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2"><CheckCircle size={13} /> Tạo & Cài đặt quyền sau</button>
-            <button onClick={() => setShowAdd(false)} className="text-sm px-4 py-2 border border-border rounded-lg hover:bg-muted transition-colors">Hủy</button>
+            <button onClick={handleAddStaff} disabled={isSubmitting} className="text-sm px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"><CheckCircle size={13} /> {isSubmitting ? "Đang tạo..." : "Tạo & Cài đặt quyền sau"}</button>
+            <button onClick={() => setShowAdd(false)} disabled={isSubmitting} className="text-sm px-4 py-2 border border-border rounded-lg hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed">Hủy</button>
             <p className="text-xs text-muted-foreground ml-2">Mật khẩu tạm sẽ được gửi qua email. Nhân viên cần đổi mật khẩu lần đầu đăng nhập.</p>
           </div>
         </div>
@@ -68,12 +69,12 @@ export function AdminUsers() {
 
       {/* Staff table */}
       <div className="bg-card border border-border rounded-xl overflow-hidden">
-        <div className="flex items-center gap-4 px-4 py-3 border-b border-border bg-muted/20">
+        <div className="flex items-center gap-6 px-5 py-3 border-b border-border bg-muted/10">
           {(["Tất cả", "Hoạt động", "Tạm khóa"] as const).map(tab => (
             <button key={tab} onClick={() => setStatusFilter(tab)}
-              className={`text-sm font-medium pb-1 transition-colors relative ${statusFilter === tab ? "text-accent" : "text-muted-foreground hover:text-foreground"}`}>
+              className={`text-sm font-medium transition-colors relative pb-1 ${statusFilter === tab ? "text-accent" : "text-muted-foreground hover:text-foreground"}`}>
               {tab}
-              {statusFilter === tab && <div className="absolute -bottom-[13px] left-0 right-0 h-0.5 bg-accent" />}
+              {statusFilter === tab && <div className="absolute -bottom-[13px] left-0 right-0 h-0.5 bg-accent rounded-t" />}
             </button>
           ))}
         </div>
@@ -100,25 +101,28 @@ export function AdminUsers() {
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${s.status === "Tạm khóa" ? "bg-red-100 text-red-600" : "bg-accent/15 text-accent"}`}>
                         {s.name[0]}
                       </div>
-                      <div>
-                        <p className="font-medium text-sm">{s.name}</p>
-                        <p className="text-xs text-muted-foreground">{s.id}</p>
+                      <div className="max-w-[120px]">
+                        <p className="font-medium text-sm truncate" title={s.name}>{s.name}</p>
+                        <p className="text-[11px] text-muted-foreground truncate" title={s.id}>#{s.id.substring(0, 8)}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-xs font-mono text-muted-foreground">{s.email}</td>
+                  <td className="px-4 py-3 text-sm text-muted-foreground">{s.email}</td>
                   <td className="px-4 py-3">
-                    <span className="text-xs px-2 py-0.5 bg-muted text-foreground border border-border rounded-full font-medium">{s.jobTitle || "—"}</span>
+                    <span className="text-xs px-2 py-0.5 bg-muted/80 text-foreground border border-border rounded-md font-medium whitespace-nowrap">{s.jobTitle || "—"}</span>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${total > 0 ? "bg-accent/10 text-accent" : "bg-muted text-muted-foreground"}`}>
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded ${total > 0 ? "bg-accent/10 text-accent border border-accent/20" : "bg-muted text-muted-foreground border border-border"}`}>
                         {total} quyền
                       </span>
-                      {modules.slice(0, 2).map(m => (
-                        <span key={m.key} className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">{m.label.split(" ").slice(0, 2).join(" ")}</span>
-                      ))}
-                      {modules.length > 2 && <span className="text-xs text-muted-foreground">+{modules.length - 2}</span>}
+                      {(() => {
+                        const shortLabels: Record<string, string> = { products: "Sản phẩm", inventory: "Kho", orders: "Đơn hàng", agents: "Đại lý", debts: "Công nợ", promotions: "Voucher", reports: "Báo cáo", inbox: "CSKH" };
+                        return modules.slice(0, 2).map(m => (
+                          <span key={m.key} className="text-[11px] text-muted-foreground bg-muted border border-border px-1.5 py-0.5 rounded whitespace-nowrap">{shortLabels[m.key] || m.key}</span>
+                        ));
+                      })()}
+                      {modules.length > 2 && <span className="text-[11px] text-muted-foreground whitespace-nowrap font-medium">+{modules.length - 2} module</span>}
                     </div>
                   </td>
                   <td className="px-4 py-3"><StatusBadge status={s.status} /></td>
@@ -143,17 +147,25 @@ export function AdminUsers() {
       </div>
 
       {/* Role info */}
-      <div className="bg-muted/40 border border-border rounded-xl p-5">
-        <h3 className="text-sm font-semibold mb-3 flex items-center gap-2"><Info size={14} className="text-muted-foreground" />Hướng dẫn phân quyền</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-muted-foreground">
+      <div className="bg-muted/20 border border-border rounded-xl overflow-hidden mt-2">
+        <div className="bg-muted/40 px-5 py-3.5 border-b border-border flex items-center gap-2">
+          <Info size={16} className="text-accent" />
+          <h3 className="text-sm font-semibold">Gợi ý phân quyền theo bộ phận (Mẫu nhanh)</h3>
+        </div>
+        <div className="p-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[
-            { title: "Nhân viên Kho", hint: "Cấp: Xem/Sửa Tồn kho + Xem/Sửa Đơn hàng" },
-            { title: "Kế toán", hint: "Cấp: Xem Công nợ + Sửa Công nợ + Xem Báo cáo" },
-            { title: "Sales", hint: "Cấp: Toàn bộ Đơn hàng + Xem/Duyệt Đại lý + Khuyến mãi" },
+            { title: "Kế toán", icon: "💰", hint: "Chỉ tập trung vào dòng tiền. Được cấp quyền xem/sửa công nợ và xem báo cáo doanh thu." },
+            { title: "Nhân viên Kho", icon: "📦", hint: "Quản lý luân chuyển hàng hóa. Được cấp quyền xem/sửa tồn kho và cập nhật đơn hàng." },
+            { title: "Sales", icon: "🤝", hint: "Phát triển kinh doanh. Được quyền xử lý toàn bộ đơn hàng, đại lý và tạo khuyến mãi." },
+            { title: "CSKH", icon: "🎧", hint: "Hỗ trợ khách hàng. Chỉ cấp quyền chat inbox, xem (nhưng không sửa) đơn hàng & khuyến mãi." },
+            { title: "Quản lý (Full)", icon: "👑", hint: "Toàn quyền quản lý các nghiệp vụ hàng ngày (Sản phẩm, Kho, Đơn hàng, Đại lý...), trừ cài đặt hệ thống lõi." },
           ].map(r => (
-            <div key={r.title} className="flex gap-2">
-              <ChevronRight size={13} className="shrink-0 mt-0.5 text-accent" />
-              <div><strong className="text-foreground">{r.title}:</strong> {r.hint}</div>
+            <div key={r.title} className="bg-card border border-border/80 rounded-lg p-4 shadow-sm hover:border-accent/40 hover:shadow-md transition-all">
+              <div className="flex items-center gap-2.5 mb-2">
+                <span className="text-lg bg-muted/50 w-8 h-8 flex items-center justify-center rounded-md">{r.icon}</span>
+                <strong className="text-sm text-foreground">{r.title}</strong>
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed">{r.hint}</p>
             </div>
           ))}
         </div>

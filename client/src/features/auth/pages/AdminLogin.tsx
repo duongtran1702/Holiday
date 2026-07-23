@@ -49,6 +49,9 @@ export function AdminLoginPage() {
             <div className="space-y-4">
               <InputField label="Email nội bộ" icon={Mail} type="email" placeholder="admin@atmin.vn" value={adminEmail} onChange={setAdminEmail} required />
               <InputField label="Mật khẩu hệ thống" icon={Lock} type="password" placeholder="••••••••" value={adminPw} onChange={setAdminPw} required />
+              <div className="flex justify-end mt-[-8px]">
+                <button type="button" onClick={() => navigate("/forgot-password")} className="text-xs font-semibold text-accent hover:underline">Quên mật khẩu?</button>
+              </div>
               {adminError && (
                 <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
                   <AlertCircle size={14} className="shrink-0 mt-0.5" /><p>{adminError}</p>

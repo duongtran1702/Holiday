@@ -77,8 +77,13 @@ api.interceptors.response.use(
             } catch (err: any) {
                 processQueue(err, null);
                 if (err.response?.status === 401 || err.response?.status === 403) {
+                    const role = store.getState().auth.userRole;
                     store.dispatch(logout());
-                    window.location.href = '/login';
+                    if (role === 'admin' || role === 'staff') {
+                        window.location.href = '/admin-login';
+                    } else {
+                        window.location.href = '/login';
+                    }
                 }
                 return Promise.reject(err);
             } finally {

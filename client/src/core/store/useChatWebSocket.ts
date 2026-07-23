@@ -21,10 +21,12 @@ export function useChatWebSocket({ token, conversationId, onAdminUpdate, onNewMe
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
+  const [presenceMap, setPresenceMap] = useState<Record<string, { online: boolean, lastSeenAt?: string }>>({});
   const clientRef = useRef<Client | null>(null);
   const subscriptionRef = useRef<StompSubscription | null>(null);
   const typingSubRef = useRef<StompSubscription | null>(null);
   const readSubRef = useRef<StompSubscription | null>(null);
+  const presenceSubRef = useRef<StompSubscription | null>(null);
   const isViewingRef = useRef(isViewing);
   const userIdRef = useRef(userId);
 
@@ -65,6 +67,21 @@ export function useChatWebSocket({ token, conversationId, onAdminUpdate, onNewMe
       setHasMore(true);
     }
   }, [conversationId, token]);
+
+  // Load initial presence
+  useEffect(() => {
+    if (token) {
+      chatApi.getPresence().then(res => {
+        if (res?.data) {
+          const initPresence: Record<string, { online: boolean }> = {};
+          res.data.forEach(id => {
+            initPresence[id] = { online: true };
+          });
+          setPresenceMap(prev => ({ ...prev, ...initPresence }));
+        }
+      }).catch(err => console.error("Failed to load presence:", err));
+    }
+  }, [token]);
 
   // Optionally mark as read when viewing status changes to true
   useEffect(() => {
@@ -116,6 +133,18 @@ export function useChatWebSocket({ token, conversationId, onAdminUpdate, onNewMe
           onAdminUpdate();
         });
       }
+      
+      presenceSubRef.current = client.subscribe('/topic/presence', (msg: IMessage) => {
+        try {
+          const data = JSON.parse(msg.body);
+          setPresenceMap(prev => ({
+            ...prev,
+            [data.userId]: { online: data.online, lastSeenAt: data.lastSeenAt }
+          }));
+        } catch (e) {
+          console.error("Failed to parse presence msg:", e);
+        }
+      });
     };
 
     client.onStompError = (frame) => {
@@ -315,6 +344,7 @@ export function useChatWebSocket({ token, conversationId, onAdminUpdate, onNewMe
     isLoadingMore,
     loadMore,
     typingUsers,
-    sendTyping
+    sendTyping,
+    presenceMap
   };
 }

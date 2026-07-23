@@ -6,21 +6,70 @@ Module này quản lý việc bảo mật cốt lõi: Xác thực danh tính (Lo
 
 Mọi yêu cầu truy cập vào hệ thống đều phải đi qua chốt chặn bảo mật. Module này tách biệt hoàn toàn khỏi logic người dùng thông thường (User Module) để tập trung duy nhất vào Authentication & Authorization. Thiết kế này giúp dễ dàng thay thế công nghệ bảo mật (VD: đổi JWT sang Session) mà không ảnh hưởng đến toàn bộ ứng dụng, đồng thời tập trung xử lý các rủi ro bảo mật như chiếm quyền điều khiển (Token theft) thông qua Token Blacklisting.
 
-## 2. Sơ đồ luồng chi tiết (Sequence-level flow)
+## 2. Sơ đồ luồng chi tiết & Tương tác BE - Client
 
-**Luồng Login cơ bản:**
+Dưới đây là luồng Đăng nhập nâng cao kết hợp Xác minh 2 bước (2FA), cho thấy cách Server và Client phối hợp với nhau.
+
+**Luồng Login có 2FA:**
 ```text
-[Client] → POST /api/v1/auth/login
+[Client: useAdminLogin.ts] 
+    1. Gọi authApi.login({ email, password })
     ↓ 
-[AuthController] → [AuthenticationServiceImpl.authenticate()]
-    ↓
-    1. Spring Security: Xác thực email/password.
+[Server: AuthController] → [AuthenticationServiceImpl.authenticate()]
+    2. Spring Security: Xác thực email/password.
         ❌ Sai → Throw BadCredentialsException
-    2. Kiểm tra trạng thái User (Đã bị khoá? Đã xác thực email chưa?)
     3. Kiểm tra 2FA
-        ⚠️ Nếu bật 2FA → Trả về thông báo yêu cầu nhập mã OTP
-    4. Nếu OK hết → Gọi TokenManagementService tạo AccessToken & RefreshToken
-    5. Trả JWT về cho Client.
+        ⚠️ Bật 2FA → Server trả về HTTP 200: { user, require2fa: true }
+    ↓
+[Client: useAdminLogin.ts]
+    4. Nhận response, nếu `require2fa` === true:
+        - Đổi state sang nhập OTP (`setAdminStep("otp")`)
+        - Không lưu Access Token, không chuyển trang.
+    5. User nhập mã OTP trên UI → Gọi authApi.verify2fa({ email, otpCode })
+    ↓
+[Server: AuthController] → [TwoFactorAuthServiceImpl.verifyOtp()]
+    6. Kiểm tra mã OTP. Nếu đúng → Cấp AccessToken.
+    ↓
+[Client: useAdminLogin.ts]
+    7. Lưu JWT vào Redux, điều hướng vào `/admin`.
+```
+
+### Core Code Snippet (Client)
+
+*File: `client/src/features/auth/hooks/useAdminLogin.ts`*
+```typescript
+const handleAdminCreds = async () => {
+    try {
+        const response = await authApi.login({ email: adminEmail, password: adminPw, portal: 'admin' });
+        const { user, require2fa, accessToken } = response.data;
+        
+        // Nếu user có bật 2FA, backend sẽ không cấp token ngay mà trả về require2fa = true
+        if (require2fa) {
+            setAdminStep("otp"); // Chuyển UI sang màn hình nhập OTP
+            setCountdown(60);
+        } else {
+            // Không có 2FA, đăng nhập thành công ngay
+            dispatch(setCredentials({ user, accessToken, role: roleStr }));
+            navigate("/admin");
+        }
+    } catch (err: any) {
+        // Xử lý lỗi (sai pass, locked, ...)
+    }
+};
+
+const handleOtpVerify = async () => {
+    const code = otp.join("");
+    try {
+        const response = await authApi.verify2fa({ email: adminEmail, otpCode: code });
+        const { user, accessToken } = response.data;
+        
+        // Cập nhật Redux sau khi verify thành công
+        dispatch(setCredentials({ user, accessToken, role: roleStr }));
+        navigate("/admin");
+    } catch (err: any) {
+        // Xử lý sai mã OTP
+    }
+};
 ```
 
 ## 3. Bảng trạng thái đầy đủ + điều kiện chuyển trạng thái (State transition table)
@@ -72,9 +121,9 @@ GOOGLE_CLIENT_SECRET=...
 ## 7. Rủi ro đã biết / Chưa xử lý (Known limitations)
 
 - Nếu lộ JWT Access Token, kẻ gian có thể truy cập hệ thống cho đến khi token hết hạn (hiện tại chưa quét blacklist liên tục với Access Token để tối ưu performance, chỉ quét lúc Refresh).
-- Chưa có cơ chế Rate Limiting chống Brute-force Login (ví dụ khoá 15 phút nếu sai password 5 lần liên tiếp).
+- Cơ chế Rate Limiting chống Brute-force Login đã được triển khai ở Client (Lock sau 5 lần), nhưng ở tầng API/Server chưa có giới hạn IP (Cần thêm filter nếu đưa lên production).
 
 ## 8. Cách test / kiểm tra thủ công (How to verify)
 
-1. **Test Login**: Dùng Postman gửi POST `/login` với email/pass sai → Expect 401. Gửi đúng → Expect nhận Access Token.
+1. **Test Login 2FA Flow**: Login tài khoản có bật 2FA → Màn hình đổi sang nhập OTP, check Network tab sẽ thấy `/login` trả về `require2fa: true`. Nhập OTP → Chuyển vào dashboard.
 2. **Test Blacklist (Logout)**: Lấy Token gửi `/logout`. Sau đó dùng lại Token đó gửi request lấy profile `/users/me`. Expect: Bị từ chối (401 Unauthorized).

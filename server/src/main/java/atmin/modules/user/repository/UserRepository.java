@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -20,4 +21,7 @@ public interface UserRepository extends JpaRepository<User, String> {
     Optional<LocalDateTime> findPasswordChangedAtByUsername(@Param("username") String username);
 
     Optional<User> findByResetToken(String resetToken);
+
+    List<User> findByRoles_NameAndDeletedAtIsNull(String roleName);
+    List<User> findByEmailInAndDeletedAtIsNull(java.util.List<String> emails);
 }

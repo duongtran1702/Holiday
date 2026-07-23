@@ -30,7 +30,7 @@ export function LayoutAtmin() {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate("/login");
+    navigate("/admin-login");
   };
 
   return (

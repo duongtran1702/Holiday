@@ -22,6 +22,7 @@ export interface ConversationDTO {
     type: ConversationType;
     name: string;
     avatarUrl?: string;
+    participantId?: string;
     unreadCount: number;
     lastMessage?: MessageDTO;
     createdAt: string;

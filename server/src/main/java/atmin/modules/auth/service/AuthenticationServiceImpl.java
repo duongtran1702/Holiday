@@ -156,7 +156,8 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
             throw new IllegalArgumentException("Tài khoản Google không thể đổi mật khẩu.");
         }
 
-        String token = UUID.randomUUID().toString();
+        // Generate a 6-digit numeric OTP for reset password
+        String token = String.format("%06d", new java.util.Random().nextInt(999999));
         user.setResetToken(token);
         user.setResetTokenExpiry(LocalDateTime.now().plusMinutes(10));
         userRepository.save(user);

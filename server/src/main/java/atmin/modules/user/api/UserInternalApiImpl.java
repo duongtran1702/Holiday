@@ -48,6 +48,16 @@ public class UserInternalApiImpl implements UserInternalApi {
         }
     }
 
+    @Override
+    @Transactional
+    public void updateUserPresence(String userId, boolean isOnline, java.time.LocalDateTime lastSeenAt) {
+        userRepository.findById(userId).ifPresent(user -> {
+            user.setIsOnline(isOnline);
+            user.setLastSeenAt(lastSeenAt);
+            userRepository.save(user);
+        });
+    }
+
     private UserDto mapToDto(User user) {
         return UserDto.builder()
                 .id(user.getId())

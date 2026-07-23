@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
+import atmin.modules.user.dto.StaffResponseDTO;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/admin/users")
@@ -24,5 +27,10 @@ public class AdminUserController {
         adminUserService.createStaff(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.created("Tạo tài khoản nhân viên thành công", null));
+    }
+
+    @GetMapping("/staff")
+    public ResponseEntity<ApiResponse<List<StaffResponseDTO>>> getAllStaffs() {
+        return ResponseEntity.ok(ApiResponse.success("Lấy danh sách nhân viên thành công", adminUserService.getAllStaffs()));
     }
 }

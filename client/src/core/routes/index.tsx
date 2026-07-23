@@ -10,7 +10,7 @@ import { authRoutes } from '../../features/auth';
 import { orderAdminRoutes, orderB2BRoutes, orderCustomerRoutes } from '../../features/orders';
 import { productAdminRoutes, B2CPortal } from '../../features/products';
 import { userAdminRoutes } from '../../features/users';
-import { promotionAdminRoutes } from '../../features/promotions';
+import { promotionAdminRoutes, promotionUserRoutes } from '../../features/promotions';
 import { inboxAdminRoutes } from '../../features/inbox';
 import { dashboardAdminRoutes } from '../../features/dashboard';
 import { paymentRoutes } from '../../features/payment';
@@ -51,6 +51,7 @@ export const routers = createBrowserRouter([
         children: [
             { index: true, element: <Navigate to="portal" replace /> },
             ...orderB2BRoutes,
+            ...promotionUserRoutes,
             { path: 'tier', element: <TierProgress totalQty={150} /> }
         ]
     },
@@ -66,6 +67,14 @@ export const routers = createBrowserRouter([
                 )
             },
             ...orderCustomerRoutes.map(r => ({
+                path: r.path,
+                element: (
+                    <PrivateRouter allowedRoles={['customer']}>
+                        {r.element}
+                    </PrivateRouter>
+                )
+            })),
+            ...promotionUserRoutes.map(r => ({
                 path: r.path,
                 element: (
                     <PrivateRouter allowedRoles={['customer']}>

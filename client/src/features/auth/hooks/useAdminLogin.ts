@@ -57,12 +57,15 @@ export const useAdminLogin = () => {
 
     const handleResendOtp = async () => {
         setAdminError("");
+        if (countdown > 0) return;
+        setCountdown(60);
+        
         try {
             await authApi.login({ email: adminEmail, password: adminPw });
-            setCountdown(60);
             setOtp(["", "", "", "", "", ""]);
             otpRefs.current[0]?.focus();
         } catch (err: any) {
+            setCountdown(0);
             setAdminError(err.response?.data?.message || "Không thể gửi lại mã OTP.");
         }
     };

@@ -20,5 +20,8 @@ export const chatApi = {
     },
     sendBotReply: (conversationId: string, content: string) => {
         return callApi<ApiResponse<MessageDTO>>(`/chat/${conversationId}/bot-reply`, 'POST', { content, contentType: 'TEXT' });
+    },
+    getPresence: () => {
+        return callApi<ApiResponse<string[]>>(`/chat/presence`, 'GET');
     }
 };

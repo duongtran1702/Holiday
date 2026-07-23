@@ -22,6 +22,18 @@ const ROLE_LABEL: Record<string, string> = {
   GROUP: "Nhóm",
 };
 
+const formatTimeAgo = (dateStr: string) => {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  if (diffInSeconds < 60) return "vừa xong";
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  if (diffInMinutes < 60) return `${diffInMinutes} phút trước`;
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) return `${diffInHours} giờ trước`;
+  return date.toLocaleDateString();
+};
+
 export function AdminInbox() {
   const [convos, setConvos] = useState<ConversationDTO[]>([]);
   const [activeId, setActiveId] = useState<string>("");
@@ -41,7 +53,7 @@ export function AdminInbox() {
     });
   };
 
-  const { messages, sendMessage, isConnected, hasMore, isLoadingMore, loadMore, typingUsers, sendTyping } = useChatWebSocket({ 
+  const { messages, sendMessage, isConnected, hasMore, isLoadingMore, loadMore, typingUsers, sendTyping, presenceMap } = useChatWebSocket({ 
     token, 
     conversationId: activeId,
     onAdminUpdate: () => fetchConvos(),
@@ -126,10 +138,18 @@ export function AdminInbox() {
               className={`w-full text-left px-4 py-3 hover:bg-muted/40 transition-colors ${activeId === c.id ? "bg-accent/5 border-l-2 border-accent" : ""}`}>
               <div className="flex items-start gap-2.5">
                 {c.avatarUrl ? (
-                  <img src={c.avatarUrl} alt="" className="w-8 h-8 rounded-full object-cover shrink-0 mt-0.5" />
+                  <div className="relative shrink-0 mt-0.5">
+                    <img src={c.avatarUrl} alt="" className="w-8 h-8 rounded-full object-cover" />
+                    {c.participantId && presenceMap[c.participantId]?.online && (
+                      <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></span>
+                    )}
+                  </div>
                 ) : (
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 ${c.type === "GROUP" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"}`}>
+                  <div className={`relative shrink-0 mt-0.5 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${c.type === "GROUP" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"}`}>
                     {c.name ? c.name[0] : "K"}
+                    {c.participantId && presenceMap[c.participantId]?.online && (
+                      <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></span>
+                    )}
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
@@ -175,7 +195,16 @@ export function AdminInbox() {
                     {ROLE_LABEL[active.type] || ROLE_LABEL.DIRECT}
                   </span>
                 </div>
-                <p className="text-xs text-muted-foreground mt-0.5">{isConnected ? "Đang trực tuyến" : "Đang kết nối..."}</p>
+                {(() => {
+                  const p = active.participantId ? presenceMap[active.participantId] : null;
+                  if (p?.online) {
+                    return <p className="text-xs text-green-500 mt-0.5 font-medium">● Đang trực tuyến</p>;
+                  }
+                  if (p?.lastSeenAt) {
+                    return <p className="text-xs text-muted-foreground mt-0.5">Hoạt động {formatTimeAgo(p.lastSeenAt)}</p>;
+                  }
+                  return <p className="text-xs text-muted-foreground mt-0.5">Ngoại tuyến</p>;
+                })()}
               </div>
               {/* Actions */}
               <div className="flex items-center gap-2 shrink-0">

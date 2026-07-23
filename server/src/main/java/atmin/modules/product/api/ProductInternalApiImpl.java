@@ -20,6 +20,23 @@ public class ProductInternalApiImpl implements ProductInternalApi {
         return mapToDto(product);
     }
 
+    @Override
+    @Transactional
+    public void reduceStock(String productId, String variant, int quantity) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found: " + productId));
+        
+        if (product.getStock() != null && product.getStock().containsKey(variant)) {
+            int currentStock = product.getStock().get(variant);
+            if (currentStock >= quantity) {
+                product.getStock().put(variant, currentStock - quantity);
+                productRepository.save(product);
+            } else {
+                throw new RuntimeException("Số lượng tồn kho không đủ cho phân loại: " + variant);
+            }
+        }
+    }
+
     private ProductDto mapToDto(Product product) {
         return ProductDto.builder()
                 .id(product.getId())

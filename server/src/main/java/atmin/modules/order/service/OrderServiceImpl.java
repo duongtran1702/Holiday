@@ -79,6 +79,10 @@ public class OrderServiceImpl implements OrderService {
                     .selectedSize(itemDto.getSelectedSize())
                     .build();
             orderItems.add(orderItem);
+
+            // Giảm số lượng tồn kho theo variant
+            String variant = itemDto.getSelectedSize() + "-" + itemDto.getSelectedColor();
+            productInternalApi.reduceStock(product.getId(), variant, itemDto.getQuantity());
         }
 
         order.setTotalAmount(totalAmount);

@@ -19,5 +19,11 @@ export const authApi = {
     },
     changePassword: (data: any) => {
         return callApi<ApiResponse<void>>('/auth/change-password', 'POST', data);
+    },
+    forgotPassword: (data: { email: string }) => {
+        return callApi<ApiResponse<void>>('/auth/forgot-password', 'POST', data);
+    },
+    resetPassword: (data: { token: string; newPassword: string; confirmPassword: string }) => {
+        return callApi<ApiResponse<void>>('/auth/reset-password', 'POST', data);
     }
 };

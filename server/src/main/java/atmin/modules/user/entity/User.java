@@ -57,7 +57,7 @@ public class User extends BaseEntity implements UserDetails {
 
     @Builder.Default
     @Column(name = "is_enabled")
-    private boolean isEnabled = true;
+    private Boolean isEnabled = true;
 
     @Column(name = "reset_token")
     private String resetToken;
@@ -74,6 +74,13 @@ public class User extends BaseEntity implements UserDetails {
 
     @Column(name = "last_seen_notification_at")
     private LocalDateTime lastSeenNotificationAt;
+
+    @Column(name = "is_online")
+    @Builder.Default
+    private Boolean isOnline = false;
+
+    @Column(name = "last_seen_at")
+    private LocalDateTime lastSeenAt;
 
     @JoinTable(
             name = "user_role",
@@ -131,6 +138,6 @@ public class User extends BaseEntity implements UserDetails {
     @Override
     @NullMarked
     public boolean isEnabled() {
-        return this.isEnabled && !this.isDeleted();
+        return Boolean.TRUE.equals(this.isEnabled) && !this.isDeleted();
     }
 }
