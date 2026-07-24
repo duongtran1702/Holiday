@@ -8,7 +8,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import jakarta.persistence.criteria.Predicate;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +26,45 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductDto> getAllProducts() {
         return productRepository.findAll().stream().map(this::mapToDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<ProductDto> getProducts(String search, String category, String sort, Pageable pageable) {
+        Specification<Product> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(cb.equal(root.get("status"), "ACTIVE"));
+            
+            if (search != null && !search.trim().isEmpty()) {
+                predicates.add(cb.like(cb.lower(root.get("name")), "%" + search.toLowerCase() + "%"));
+            }
+            if (category != null && !category.trim().isEmpty() && !category.equalsIgnoreCase("Tất cả")) {
+                predicates.add(cb.equal(root.get("category"), category));
+            }
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        if (sort != null && !sort.trim().isEmpty()) {
+            Sort springSort = Sort.unsorted();
+            switch (sort) {
+                case "Giá tăng":
+                    springSort = Sort.by("price").ascending();
+                    break;
+                case "Giá giảm":
+                    springSort = Sort.by("price").descending();
+                    break;
+                case "Đánh giá":
+                    springSort = Sort.by("rating").descending();
+                    break;
+                case "Mới nhất":
+                default:
+                    springSort = Sort.by("createdAt").descending();
+                    break;
+            }
+            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), springSort);
+        }
+
+        Page<Product> page = productRepository.findAll(spec, pageable);
+        return page.map(this::mapToDto);
     }
 
     @Override
@@ -66,6 +112,7 @@ public class ProductServiceImpl implements ProductService {
         product.setReviews(dto.getReviews() != null ? dto.getReviews() : 0);
         product.setImage(dto.getImage());
         product.setBadge(dto.getBadge());
+        product.setStatus(dto.getStatus() != null ? dto.getStatus() : "ACTIVE");
         product.setColors(dto.getColors());
         product.setSizes(dto.getSizes());
         product.setStock(dto.getStock());
@@ -82,6 +129,7 @@ public class ProductServiceImpl implements ProductService {
                 .reviews(product.getReviews())
                 .image(product.getImage())
                 .badge(product.getBadge())
+                .status(product.getStatus())
                 .colors(product.getColors())
                 .sizes(product.getSizes())
                 .stock(product.getStock())

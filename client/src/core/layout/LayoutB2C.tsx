@@ -1,9 +1,9 @@
 import React from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { ShoppingCart, Search, LogOut } from "lucide-react";
-import { atminDispatch } from "../hook/reduxHook";
-import { logout } from "../redux/slice/authSlice";
-import { CartDrawer } from "../../components/common/CartDrawer";
+import { atminDispatch } from "../store/reduxHook";
+import { logout } from "../../features/auth";
+import { CartDrawer } from "../components/common/CartDrawer";
 import { NotificationMenu } from "./NotificationMenu";
 
 export function LayoutB2C() {
@@ -47,7 +47,7 @@ export function LayoutB2C() {
         <Outlet />
       </main>
       
-      <CartDrawer open={cartOpen} setOpen={setCartOpen} cart={[]} setCart={() => {}} />
+      {cartOpen && <CartDrawer cart={[]} setCart={() => {}} onClose={() => setCartOpen(false)} />}
     </div>
   );
 }

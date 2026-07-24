@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AuthRole, UserInfo } from '../../types/index';
+import { AuthRole, UserInfo } from '../../../core/types/index';
 
 interface AuthState {
     userRole: AuthRole | null;

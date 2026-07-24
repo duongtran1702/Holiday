@@ -12,4 +12,7 @@ public interface UserVoucherWalletRepository extends JpaRepository<UserVoucherWa
     List<UserVoucherWallet> findByUserIdAndDeletedAtIsNullOrderByCreatedAtDesc(String userId);
     Optional<UserVoucherWallet> findByUserIdAndPromotionIdAndDeletedAtIsNull(String userId, String promotionId);
     boolean existsByUserIdAndPromotionIdAndDeletedAtIsNull(String userId, String promotionId);
+
+    @org.springframework.data.jpa.repository.Query("SELECT w.userId FROM UserVoucherWallet w WHERE w.promotionId = :promotionId AND w.userId IN :userIds AND w.deletedAt IS NULL")
+    List<String> findExistingUserIdsByPromotionIdAndUserIds(@org.springframework.data.repository.query.Param("promotionId") String promotionId, @org.springframework.data.repository.query.Param("userIds") List<String> userIds);
 }

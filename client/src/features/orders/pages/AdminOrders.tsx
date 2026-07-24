@@ -90,7 +90,7 @@ export function AdminOrders() {
       <div className="flex gap-1 flex-wrap">{statuses.map(s=><button key={s} onClick={()=>setFilter(s)} className={`text-xs px-3 py-1.5 rounded-lg border transition-colors ${filter===s?"bg-primary text-primary-foreground border-primary":"border-border text-muted-foreground hover:text-foreground hover:border-primary/40"}`}>{statusLabels[s] || s}</button>)}</div>
       <div className="bg-card border border-border rounded-xl overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-muted/60"><tr>{["Mã đơn","Ngày tạo","Kênh","Số SP","Tổng tiền","Trạng thái","Vận chuyển",""].map(h=><th key={h} className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">{h}</th>)}</tr></thead>
+          <thead className="bg-muted/60"><tr>{["Mã đơn","Ngày tạo","Khách hàng","Kênh","Số SP","Tổng tiền","Trạng thái","Vận chuyển",""].map(h=><th key={h} className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">{h}</th>)}</tr></thead>
           <tbody className="divide-y divide-border">
             {isLoading ? (
               <tr><td colSpan={8} className="text-center py-10"><Loader2 className="animate-spin mx-auto text-accent" /></td></tr>
@@ -100,6 +100,12 @@ export function AdminOrders() {
               <tr key={o.id} className="hover:bg-muted/30 transition-colors">
                 <td className="px-4 py-3 font-mono text-xs text-accent">#{o.orderCode}</td>
                 <td className="px-4 py-3 text-sm font-medium">{new Date(o.createdAt).toLocaleDateString()}</td>
+                <td className="px-4 py-3">
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">{o.customerName || "Khách ẩn danh"}</span>
+                    <span className="text-xs text-muted-foreground">{o.customerPhone || "Chưa có SĐT"}</span>
+                  </div>
+                </td>
                 <td className="px-4 py-3"><span className={`text-xs px-2 py-0.5 rounded-full font-medium bg-blue-50 text-blue-700`}>B2C</span></td>
                 <td className="px-4 py-3 text-xs text-muted-foreground">{o.items ? o.items.length : 0}</td>
                 <td className="px-4 py-3 font-mono font-medium text-sm">{fmt(o.totalAmount)}</td>
@@ -139,6 +145,11 @@ export function AdminOrders() {
                 <div className="space-y-1 bg-muted/30 p-3 rounded-lg border border-border/50">
                   <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Trạng thái chung</p>
                   <StatusBadge status={viewOrder.status} />
+                </div>
+                <div className="space-y-1 bg-muted/30 p-3 rounded-lg border border-border/50">
+                  <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Khách hàng</p>
+                  <p className="text-sm font-medium">{viewOrder.customerName || "Khách ẩn danh"}</p>
+                  <p className="text-xs text-muted-foreground">{viewOrder.customerPhone} {viewOrder.customerEmail ? `- ${viewOrder.customerEmail}` : ''}</p>
                 </div>
                 <div className="space-y-1 bg-muted/30 p-3 rounded-lg border border-border/50">
                   <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Thanh toán</p>

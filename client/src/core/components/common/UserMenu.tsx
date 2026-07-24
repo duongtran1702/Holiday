@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { User, Lock, LogOut, Settings, ChevronDown } from "lucide-react";
 import { useSelector } from "react-redux";
-import { RootState } from "../../redux/store/store";
+import { RootState } from "../../store/store";
 
 export function UserMenu({ onOpenProfile, onLogout }: { onOpenProfile: () => void; onLogout?: () => void }) {
   const user = useSelector((state: RootState) => state.auth.user);

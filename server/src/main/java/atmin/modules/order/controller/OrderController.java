@@ -3,13 +3,15 @@ package atmin.modules.order.controller;
 import atmin.common.response.ApiResponse;
 import atmin.modules.order.dto.OrderRequest;
 import atmin.modules.order.dto.OrderResponse;
+import atmin.modules.order.dto.OrderUpdateRequest;
 import atmin.modules.order.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.security.access.prepost.PreAuthorize;
+
 import java.util.List;
 
 @RestController
@@ -33,12 +35,14 @@ public class OrderController {
     }
 
     @PostMapping("/{id}/resend-email")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<String>> resendEmail(@PathVariable String id) {
         orderService.resendOrderEmail(id, true);
         return ResponseEntity.ok(ApiResponse.success("Đã yêu cầu gửi lại email thành công", null));
     }
     
     @PostMapping("/resend-all-failed-emails")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Integer>> resendAllFailedEmails() {
         int successCount = orderService.resendAllFailedEmails();
         return ResponseEntity.ok(ApiResponse.success("Đã gửi lại thành công " + successCount + " email lỗi", successCount));
@@ -59,17 +63,17 @@ public class OrderController {
     }
 
     @GetMapping("/all")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('VIEW_ORDERS') or hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<List<OrderResponse>>> getAllOrders() {
         List<OrderResponse> responses = orderService.getAllOrders();
         return ResponseEntity.ok(ApiResponse.success("Lấy danh sách tất cả đơn hàng thành công", responses));
     }
 
     @PatchMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('UPDATE_ORDERS') or hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<OrderResponse>> updateOrder(
             @PathVariable String id,
-            @RequestBody atmin.modules.order.dto.OrderUpdateRequest request) {
+            @RequestBody OrderUpdateRequest request) {
         OrderResponse response = orderService.updateOrder(id, request);
         return ResponseEntity.ok(ApiResponse.success("Cập nhật đơn hàng thành công", response));
     }

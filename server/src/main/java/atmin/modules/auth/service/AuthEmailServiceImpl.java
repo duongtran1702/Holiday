@@ -8,6 +8,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.mail.MailAuthenticationException;
 
 @Service
 @RequiredArgsConstructor
@@ -57,7 +58,7 @@ public class AuthEmailServiceImpl implements IAuthEmailService {
             mailSender.send(message);
             log.info("Reset password email successfully sent to {}", toEmail);
 
-        } catch (org.springframework.mail.MailAuthenticationException e) {
+        } catch (MailAuthenticationException e) {
             log.error("Lỗi xác thực Email Server khi gửi link Reset Password: {}", e.getMessage());
             throw new IllegalArgumentException("Cấu hình Email Server bị sai (Sai mật khẩu hoặc App Password). Vui lòng liên hệ Admin cấu hình lại application.properties.");
         } catch (Exception e) {
@@ -94,7 +95,7 @@ public class AuthEmailServiceImpl implements IAuthEmailService {
             mailSender.send(message);
             log.info("2FA OTP email successfully sent to {}", toEmail);
 
-        } catch (org.springframework.mail.MailAuthenticationException e) {
+        } catch (MailAuthenticationException e) {
             log.error("Lỗi xác thực Email Server khi gửi mã OTP 2FA: {}", e.getMessage());
             throw new IllegalArgumentException("Cấu hình Email Server bị sai (Sai mật khẩu ứng dụng). Vui lòng cấu hình lại MAIL_PASSWORD để có thể gửi mã OTP.");
         } catch (Exception e) {

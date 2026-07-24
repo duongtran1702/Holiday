@@ -25,7 +25,7 @@ public class NotificationServiceImpl implements NotificationService {
         long unresolvedCount = notificationRepository.countByIsResolvedFalse();
         long unreadCount = notificationRepository.countByIsReadFalse();
         
-        List<Notification> latestNotifications = notificationRepository.findAllByOrderByCreatedAtDesc(PageRequest.of(0, 50));
+        List<Notification> latestNotifications = notificationRepository.findAllByTargetRoleOrderByCreatedAtDesc("ADMIN", PageRequest.of(0, 50));
         
         List<NotificationResponse> responses = latestNotifications.stream()
                 .map(NotificationResponse::fromEntity)
@@ -33,6 +33,24 @@ public class NotificationServiceImpl implements NotificationService {
 
         return NotificationListResponse.builder()
                 .unresolvedCount(unresolvedCount)
+                .unreadCount(unreadCount)
+                .notifications(responses)
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public NotificationListResponse getMyNotifications(String userId) {
+        long unreadCount = notificationRepository.countByTargetUserIdAndIsReadFalse(userId);
+        
+        List<Notification> latestNotifications = notificationRepository.findByTargetUserIdOrderByCreatedAtDesc(userId, PageRequest.of(0, 50));
+        
+        List<NotificationResponse> responses = latestNotifications.stream()
+                .map(NotificationResponse::fromEntity)
+                .collect(Collectors.toList());
+
+        return NotificationListResponse.builder()
+                .unresolvedCount(0) // Customers don't have resolved logic
                 .unreadCount(unreadCount)
                 .notifications(responses)
                 .build();

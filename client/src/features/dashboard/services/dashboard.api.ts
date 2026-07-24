@@ -10,6 +10,9 @@ export interface DashboardResponse {
     revenueChartData: any;
     orderStatusData: any;
     recentOrders: OrderResponse[];
+    totalCustomers?: number;
+    newCustomersToday?: number;
+    lowStockProducts?: any[];
 }
 
 export const dashboardApi = {

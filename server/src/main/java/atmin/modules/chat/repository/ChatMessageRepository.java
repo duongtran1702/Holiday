@@ -20,11 +20,14 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, String
     Page<ChatMessage> findByConversationIdAndCreatedAtLessThanOrderByCreatedAtDesc(String conversationId, java.time.LocalDateTime createdAt, Pageable pageable);
 
     @Modifying
-    @Query("UPDATE ChatMessage c SET c.status = 'READ' WHERE c.conversation.id = :conversationId AND c.status != 'READ' AND c.sender.id != :readerId")
+    @Query("UPDATE ChatMessage c SET c.status = 'READ' WHERE c.conversationId = :conversationId AND c.status != 'READ' AND c.senderId != :readerId")
     void markAsReadForUser(@Param("conversationId") String conversationId, @Param("readerId") String readerId);
     
-    @Query("SELECT COUNT(c) FROM ChatMessage c WHERE c.conversation.id = :conversationId AND c.status != 'READ' AND c.sender.id != :readerId")
+    @Query("SELECT COUNT(c) FROM ChatMessage c WHERE c.conversationId = :conversationId AND c.status != 'READ' AND c.senderId != :readerId")
     int countUnreadMessagesForUser(@Param("conversationId") String conversationId, @Param("readerId") String readerId);
     
     ChatMessage findFirstByConversationIdOrderByCreatedAtDesc(String conversationId);
+    
+    @Modifying
+    void deleteByConversationId(String conversationId);
 }

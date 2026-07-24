@@ -4,6 +4,7 @@ import atmin.modules.payment.entity.Invoice;
 import atmin.modules.payment.repository.InvoiceRepository;
 import atmin.modules.order.api.OrderDto;
 import atmin.modules.order.api.OrderInternalApi;
+import atmin.modules.payment.dto.PaymentRequestDto;
 import atmin.common.event.PaymentSuccessEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -34,16 +35,16 @@ public class PaymentServiceImpl implements PaymentService {
     private String frontendUrl;
 
     @Override
-    public String createPaymentLink(atmin.modules.order.entity.Order order) {
+    public String createPaymentLink(PaymentRequestDto request) {
         try {
-            String desc = "Thanh toan don " + order.getOrderCode();
+            String desc = "Thanh toan don " + request.getOrderCode();
             if (desc.length() > 25) {
                 desc = desc.substring(0, 25);
             }
             
             CreatePaymentLinkRequest paymentData = CreatePaymentLinkRequest.builder()
-                    .orderCode(order.getOrderCode())
-                    .amount(order.getTotalAmount().longValue())
+                    .orderCode(request.getOrderCode())
+                    .amount(request.getAmount().longValue())
                     .description(desc)
                     .returnUrl(frontendUrl + "/payment/success")
                     .cancelUrl(frontendUrl + "/payment/cancel")

@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Client, IMessage, StompSubscription } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
-import { chatApi } from '../api/chat.api';
-import { MessageDTO, MessageRequest } from '../types';
+import { chatApi } from '../services/chat.api';
+import { MessageDTO, MessageRequest } from '../../../core/types';
 
 interface UseChatOptions {
   token: string | null;

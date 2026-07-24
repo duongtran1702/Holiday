@@ -51,7 +51,7 @@ public class Order extends BaseEntity {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Transient
     private List<OrderItem> orderItems;
 
     @Enumerated(EnumType.STRING)

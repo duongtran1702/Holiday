@@ -15,5 +15,6 @@ public interface OrderService {
     // Admin methods
     List<OrderResponse> getAllOrders();
     OrderResponse updateOrder(String orderId, atmin.modules.order.dto.OrderUpdateRequest request);
+    java.util.Map<String, Long> getOrderCountsByUserIds(List<String> userIds);
 }
 

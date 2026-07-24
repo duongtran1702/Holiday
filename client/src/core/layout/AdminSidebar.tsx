@@ -3,8 +3,7 @@ import { Package, Users, FileText, Tag, BarChart3, Lock, Shield, ShieldCheck, Me
 import { AuthRole, PermSet } from "../types/index";
 import { countPerms } from "../utils/helpers";
 import { useState, useEffect } from "react";
-import { chatApi } from "../api/chat.api";
-import { useChatWebSocket } from "../store/useChatWebSocket";
+import { chatApi, useChatWebSocket } from "../../features/inbox";
 import { useSelector } from "react-redux";
 
 type AdminTab = "overview" | "orders" | "products" | "agents" | "promotions" | "inbox" | "users";
@@ -107,6 +106,10 @@ export function AdminSidebar({ userRole, staffPerms, user }: Readonly<{ userRole
             <button onClick={() => navigate("/admin/users")}
               className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-colors text-left ${location.pathname.includes("users") ? "bg-accent text-white" : "text-primary-foreground/60 hover:text-primary-foreground hover:bg-white/10"}`}>
               <ShieldCheck size={15} />NV & Phân quyền
+            </button>
+            <button onClick={() => navigate("/admin/customers")}
+              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-colors text-left ${location.pathname.includes("customers") ? "bg-accent text-white" : "text-primary-foreground/60 hover:text-primary-foreground hover:bg-white/10"}`}>
+              <Users size={15} />Khách hàng
             </button>
           </>
         )}

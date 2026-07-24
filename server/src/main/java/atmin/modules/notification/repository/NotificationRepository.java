@@ -20,6 +20,9 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
     List<Notification> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
     List<Notification> findAllByTargetRoleOrderByCreatedAtDesc(String targetRole, Pageable pageable);
+    
+    List<Notification> findByTargetUserIdOrderByCreatedAtDesc(String userId, Pageable pageable);
+    long countByTargetUserIdAndIsReadFalse(String userId);
 
     Optional<Notification> findFirstByTypeAndEntityIdAndIsResolvedFalse(String type, String entityId);
 

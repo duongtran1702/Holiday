@@ -23,6 +23,7 @@ public class ProductDto {
     private Integer reviews;
     private String image;
     private String badge;
+    private String status;
     private java.util.Set<String> colors;
     private java.util.Set<String> sizes;
     private Map<String, Integer> stock;

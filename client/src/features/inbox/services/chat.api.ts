@@ -1,5 +1,5 @@
-import { callApi } from '../utils/callApi';
-import { ConversationDTO, MessageDTO, ApiResponse } from '../types';
+import { callApi } from '../../../core/utils/callApi';
+import { ConversationDTO, MessageDTO, ApiResponse } from '../../../core/types';
 
 export const chatApi = {
     startConversation: () => {

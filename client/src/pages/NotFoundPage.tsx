@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from 'antd';
 import { motion } from "motion/react";
 import { Home } from "lucide-react";
 
@@ -67,15 +66,12 @@ export const NotFoundPage: React.FC = () => {
                     </p>
                     
                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                        <Button
-                            type="primary"
-                            size="large"
-                            icon={<Home className="w-5 h-5 mr-2" />}
-                            className="md:mx-0 shadow-lg !bg-gradient-to-r !from-blue-600 !to-indigo-500 hover:!from-blue-500 hover:!to-indigo-400 !border-none font-bold h-14 px-8 text-white text-lg rounded-xl flex items-center justify-center w-full md:w-auto"
+                        <button
+                            className="md:mx-0 shadow-lg bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-500 hover:to-indigo-400 border-none font-bold h-14 px-8 text-white text-lg rounded-xl flex items-center justify-center w-full md:w-auto"
                             onClick={() => nvg('/')}
                         >
-                            Về trang chủ
-                        </Button>
+                            <Home className="w-5 h-5 mr-2" /> Về trang chủ
+                        </button>
                     </motion.div>
                 </motion.div>
             </div>

@@ -2,16 +2,17 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../../core/components/ui/overlay/Dialog';
 import { Button } from '../../../core/components/ui/forms/Button';
 import { Input } from '../../../core/components/ui/forms/Input';
-import { promotionService, PromotionCreateReq } from '../services/promotionService';
+import { promotionService, PromotionCreateReq, Promotion } from '../services/promotionService';
 import { toast } from 'sonner';
 
 interface PromotionFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  initialData?: Promotion | null;
 }
 
-export function PromotionFormModal({ isOpen, onClose, onSuccess }: PromotionFormModalProps) {
+export function PromotionFormModal({ isOpen, onClose, onSuccess, initialData }: PromotionFormModalProps) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<PromotionCreateReq>({
     code: '',
@@ -27,6 +28,38 @@ export function PromotionFormModal({ isOpen, onClose, onSuccess }: PromotionForm
 
   const [hasExpiry, setHasExpiry] = useState(false);
   const [hasLimit, setHasLimit] = useState(false);
+
+  React.useEffect(() => {
+    if (initialData && isOpen) {
+      setFormData({
+        code: initialData.code,
+        type: initialData.type,
+        discountPercentage: initialData.discountPercentage || 0,
+        discountAmount: initialData.discountAmount || 0,
+        minOrderValue: initialData.minOrderValue,
+        targetType: initialData.targetType,
+        expiryDate: initialData.expiryDate ? new Date(initialData.expiryDate).toISOString().slice(0, 16) : null,
+        usageLimit: initialData.usageLimit || null,
+        specificEmails: ''
+      });
+      setHasExpiry(!!initialData.expiryDate);
+      setHasLimit(!!initialData.usageLimit);
+    } else if (isOpen) {
+      setFormData({
+        code: '',
+        type: 'PERCENT',
+        discountPercentage: 0,
+        discountAmount: 0,
+        minOrderValue: 0,
+        targetType: 'ALL',
+        expiryDate: null,
+        usageLimit: null,
+        specificEmails: ''
+      });
+      setHasExpiry(false);
+      setHasLimit(false);
+    }
+  }, [initialData, isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,8 +80,13 @@ export function PromotionFormModal({ isOpen, onClose, onSuccess }: PromotionForm
       payload.minOrderValue = Number(payload.minOrderValue);
       if (payload.usageLimit) payload.usageLimit = Number(payload.usageLimit);
       
-      await promotionService.createPromotion(payload);
-      toast.success('Tạo voucher thành công');
+      if (initialData) {
+        await promotionService.updatePromotion(initialData.id, payload);
+        toast.success('Cập nhật voucher thành công');
+      } else {
+        await promotionService.createPromotion(payload);
+        toast.success('Tạo voucher thành công');
+      }
       onSuccess();
       onClose();
     } catch (error: any) {
@@ -62,7 +100,7 @@ export function PromotionFormModal({ isOpen, onClose, onSuccess }: PromotionForm
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px] flex flex-col p-0 gap-0 overflow-hidden max-h-[90vh]">
         <DialogHeader className="p-6 pb-4 shrink-0 border-b">
-          <DialogTitle>Tạo Voucher mới</DialogTitle>
+          <DialogTitle>{initialData ? 'Cập nhật Voucher' : 'Tạo Voucher mới'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
@@ -167,6 +205,7 @@ export function PromotionFormModal({ isOpen, onClose, onSuccess }: PromotionForm
               className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
               value={formData.targetType}
               onChange={e => setFormData({...formData, targetType: e.target.value as any})}
+              disabled={!!initialData}
             >
               <option value="ALL">Tất cả mọi người</option>
               <option value="CUSTOMER">Chỉ Khách hàng (B2C)</option>
@@ -193,7 +232,7 @@ export function PromotionFormModal({ isOpen, onClose, onSuccess }: PromotionForm
           <DialogFooter className="p-6 pt-4 border-t shrink-0 bg-background">
             <Button type="button" variant="outline" onClick={onClose}>Hủy</Button>
             <Button type="submit" disabled={loading} className="bg-primary hover:bg-primary/90 text-primary-foreground">
-              {loading ? 'Đang tạo...' : 'Tạo Voucher'}
+              {loading ? (initialData ? 'Đang cập nhật...' : 'Đang tạo...') : (initialData ? 'Cập nhật Voucher' : 'Tạo Voucher')}
             </Button>
           </DialogFooter>
         </form>

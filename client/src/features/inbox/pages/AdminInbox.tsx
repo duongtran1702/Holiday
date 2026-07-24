@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { Send, Paperclip, ArrowLeft } from "lucide-react";
 import { useSelector } from "react-redux";
-import { useChatWebSocket } from "../../../core/store/useChatWebSocket";
-import { chatApi } from "../../../core/api/chat.api";
+import { useChatWebSocket } from "../hooks/useChatWebSocket";
+import { chatApi } from "../services/chat.api";
 import { ConversationDTO } from "../../../core/types";
 
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { promotionService, UserVoucher } from "../services/promotionService";
 import { fmt } from "../../../core/utils/format";
 import { toast } from "sonner";
@@ -13,8 +13,8 @@ export function MyPromotions() {
   const fetchVouchers = async () => {
     try {
       setLoading(true);
-      const data = await promotionService.getMyVouchers();
-      setVouchers(data);
+      const res = await promotionService.getMyVouchers();
+      setVouchers(res || []);
     } catch (error) {
       toast.error("Không thể tải ví voucher");
     } finally {

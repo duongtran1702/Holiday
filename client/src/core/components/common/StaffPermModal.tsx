@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { User, X, CheckCircle, Settings, Phone, Mail, ShieldCheck, Save, Info } from "lucide-react";
 import { PermSet, StaffMember } from "../../types/index";
-import { defaultPerms, STAFF_PRESETS } from "../../utils/mockData";
+import { defaultPerms } from "../../utils/mockData";
 import { countPerms } from "../../utils/helpers";
 import { InputField } from "./InputField";
 import { PermissionMatrix } from "./PermissionMatrix";

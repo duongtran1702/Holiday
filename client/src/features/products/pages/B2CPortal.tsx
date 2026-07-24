@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
 import { ShoppingCart, Search, Filter, ArrowRight, Gift, ClipboardList } from "lucide-react";
-import { StarRating } from "../../../core/components/common/StarRating";
+
 import { ProductCard } from "../../../core/components/common/ProductCard";
 import { CartDrawer } from "../../../core/components/common/CartDrawer";
 import { ChatWidget } from "../../../core/components/common/ChatWidget";
@@ -8,13 +8,14 @@ import { ProfileModal } from "../../../core/components/common/ProfileModal";
 import { UserMenu } from "../../../core/components/common/UserMenu";
 import { OffersModal } from "../../../core/components/common/OffersModal";
 import { OrderHistoryPopup } from "../../../core/components/common/OrderHistoryPopup";
+import { ProductDetailModal } from "../../../core/components/common/ProductDetailModal";
 
 import { useNavigate } from 'react-router-dom';
 import { atminDispatch } from '../../../core/store/reduxHook';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../../core/store/store/store';
+import { RootState } from '../../../core/store/store';
 import { CheckoutModal } from '../../../core/components/common/CheckoutModal';
-import { logout } from '../../../core/store/slice/authSlice';
+import { logout } from '../../auth';
 import { useB2CPortal } from '../hooks/useB2CPortal';
 
 export function B2CPortal() {
@@ -23,6 +24,7 @@ export function B2CPortal() {
   const user = useSelector((state: RootState) => state.auth.user);
   
   const {
+    loading,
     cart, setCart,
     cartOpen, setCartOpen,
     profileOpen, setProfileOpen,
@@ -35,7 +37,10 @@ export function B2CPortal() {
     categories,
     filtered,
     addToCart,
-    cartCount
+    cartCount,
+    hasMore,
+    loadMore,
+    selectedProduct, setSelectedProduct
   } = useB2CPortal();
 
   const historyRef = useRef<HTMLDivElement>(null);
@@ -101,7 +106,7 @@ export function B2CPortal() {
       </header>
       <OffersModal isOpen={offersOpen} onClose={() => setOffersOpen(false)} />
       <section className="relative h-[420px] overflow-hidden">
-        <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&h=600&fit=crop&auto=format" alt="Holiday Fashion" className="w-full h-full object-cover" />
+        <img src="/images/b2c-banner.jpg" alt="Holiday Fashion" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-r from-primary/75 via-primary/40 to-transparent" />
         <div className="absolute inset-0 flex items-center">
           <div className="max-w-screen-xl mx-auto px-8 md:px-14">
@@ -125,33 +130,35 @@ export function B2CPortal() {
             </select>
           </div>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-          {filtered.map(p=><ProductCard key={p.id} product={p} onAdd={addToCart} />)}
-        </div>
-      </section>
-      <section className="bg-secondary border-y border-border py-10 px-5">
-        <div className="max-w-screen-xl mx-auto text-center">
-          <h3 style={{ fontFamily: "'Playfair Display', serif" }} className="text-lg font-semibold mb-5">Khách hàng nói gì</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              { name: "Nguyễn Thị Lan", text: "Áo polo chất lượng tuyệt vời, mặc thoáng mát. Sẽ ủng hộ Atmin lần nữa!", rating: 5, product: "Áo Polo Atmin Classic" },
-              { name: "Trần Minh Hoàng", text: "Quần jeans vừa vặn, chất vải tốt không phai màu sau nhiều lần giặt.", rating: 5, product: "Quần Jeans Slim Fit" },
-              { name: "Phạm Thu Hương", text: "Đầm floral siêu cute, nhận hàng đúng hẹn, đóng gói cẩn thận!", rating: 4, product: "Đầm Floral Summer" },
-            ].map((r,i) => (
-              <div key={i} className="bg-card p-4 rounded-xl border border-border text-left">
-                <StarRating rating={r.rating} />
-                <p className="text-sm mt-2.5 mb-2.5 text-foreground/75 italic leading-relaxed">"{r.text}"</p>
-                <p className="text-sm font-medium">{r.name}</p>
-                <p className="text-xs text-muted-foreground">{r.product}</p>
-              </div>
-            ))}
+        {loading && filtered.length === 0 ? (
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>
-        </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+              {filtered.map(p=><ProductCard key={p.id} product={p} onAdd={addToCart} onClick={setSelectedProduct} />)}
+            </div>
+            {hasMore && (
+              <div className="flex justify-center mt-8">
+                <button 
+                  onClick={loadMore} 
+                  disabled={loading}
+                  className="px-6 py-2.5 bg-background border-2 border-border rounded-xl text-sm font-semibold hover:border-accent hover:text-accent transition-colors disabled:opacity-50"
+                >
+                  {loading ? "Đang tải..." : "Xem thêm sản phẩm"}
+                </button>
+              </div>
+            )}
+          </>
+        )}
       </section>
+
       {cartOpen && <CartDrawer cart={cart} setCart={setCart} onClose={()=>setCartOpen(false)} onCheckout={handleCheckoutClick} />}
       {profileOpen && <ProfileModal onClose={()=>setProfileOpen(false)} />}
       {checkoutOpen && <CheckoutModal cart={cart} setCart={setCart} onClose={()=>setCheckoutOpen(false)} onSuccess={() => setCheckoutOpen(false)} />}
-      <ChatWidget loggedInAs={{ name: "Nguyễn Văn Minh", role: "customer" }} />
+      {selectedProduct && <ProductDetailModal product={selectedProduct} onClose={() => setSelectedProduct(null)} onAdd={addToCart} />}
+      <ChatWidget loggedInAs={user ? { name: user.fullName, role: "customer" } : undefined} />
     </div>
   );
 }

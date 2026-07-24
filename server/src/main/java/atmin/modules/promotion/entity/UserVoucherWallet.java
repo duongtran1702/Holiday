@@ -1,7 +1,7 @@
 package atmin.modules.promotion.entity;
 
 import atmin.core.base.BaseEntity;
-import atmin.modules.user.entity.User;
+
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -28,13 +28,11 @@ public class UserVoucherWallet extends BaseEntity {
     @Column(length = 36)
     private String id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(name = "user_id", nullable = false)
+    private String userId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "promotion_id", nullable = false)
-    private Promotion promotion;
+    @Column(name = "promotion_id", nullable = false)
+    private String promotionId;
 
     @Column(nullable = false, length = 20)
     @Builder.Default

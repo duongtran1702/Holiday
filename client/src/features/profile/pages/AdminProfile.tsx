@@ -2,8 +2,8 @@ import { useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Camera, Save, Lock, Shield, MapPin, Phone, Mail, User } from "lucide-react";
 import { toast } from "sonner";
-import { updateUser } from "../../../core/store/slice/authSlice";
-import { userApi } from "../../../core/api/user.api";
+import { updateUser } from "../../auth";
+import { userApi } from "../services/user.api";
 import { authApi } from "../../auth/services/auth.api";
 
 export function AdminProfile() {
@@ -46,7 +46,10 @@ export function AdminProfile() {
   };
 
   const handleSaveProfile = async () => {
-    if (!profile.fullName.trim()) return toast.error("Họ tên không được để trống");
+    if (!profile.fullName.trim()) {
+      toast.error("Họ tên không được để trống");
+      return;
+    }
     
     setLoading(true);
     try {
@@ -64,10 +67,12 @@ export function AdminProfile() {
 
   const handleChangePassword = async () => {
     if (!pass.oldPassword || !pass.newPassword || !pass.confirmPassword) {
-      return toast.error("Vui lòng nhập đủ thông tin mật khẩu");
+      toast.error("Vui lòng nhập đủ thông tin mật khẩu");
+      return;
     }
     if (pass.newPassword !== pass.confirmPassword) {
-      return toast.error("Mật khẩu xác nhận không khớp");
+      toast.error("Mật khẩu xác nhận không khớp");
+      return;
     }
     
     setLoading(true);
@@ -136,8 +141,7 @@ export function AdminProfile() {
                     <input 
                       value={profile.fullName} 
                       onChange={e => setProfile({...profile, fullName: e.target.value})}
-                      disabled={!isAdmin}
-                      className="w-full pl-9 pr-3 py-2 text-sm bg-background border border-border rounded-lg focus:outline-none focus:border-accent disabled:opacity-50"
+                      className="w-full pl-9 pr-3 py-2 text-sm bg-background border border-border rounded-lg focus:outline-none focus:border-accent"
                     />
                   </div>
                 </div>
@@ -159,8 +163,7 @@ export function AdminProfile() {
                     <input 
                       value={profile.phone} 
                       onChange={e => setProfile({...profile, phone: e.target.value})}
-                      disabled={!isAdmin}
-                      className="w-full pl-9 pr-3 py-2 text-sm bg-background border border-border rounded-lg focus:outline-none focus:border-accent disabled:opacity-50"
+                      className="w-full pl-9 pr-3 py-2 text-sm bg-background border border-border rounded-lg focus:outline-none focus:border-accent"
                     />
                   </div>
                 </div>
@@ -171,8 +174,7 @@ export function AdminProfile() {
                     <input 
                       value={profile.address} 
                       onChange={e => setProfile({...profile, address: e.target.value})}
-                      disabled={!isAdmin}
-                      className="w-full pl-9 pr-3 py-2 text-sm bg-background border border-border rounded-lg focus:outline-none focus:border-accent disabled:opacity-50"
+                      className="w-full pl-9 pr-3 py-2 text-sm bg-background border border-border rounded-lg focus:outline-none focus:border-accent"
                     />
                   </div>
                 </div>
@@ -180,7 +182,7 @@ export function AdminProfile() {
               <div className="pt-2 flex justify-end">
                 <button 
                   onClick={handleSaveProfile}
-                  disabled={loading || !isAdmin}
+                  disabled={loading}
                   className="flex items-center gap-2 bg-accent text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-accent/90 disabled:opacity-50 transition-colors"
                 >
                   <Save size={16} /> Lưu thông tin

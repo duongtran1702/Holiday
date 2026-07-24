@@ -12,6 +12,7 @@ export interface CreateOrderRequest {
     shippingAddress: string;
     phoneNumber: string;
     paymentMethod: 'COD' | 'PAYOS';
+    voucherCode?: string;
     items: OrderItemRequest[];
 }
 
@@ -37,6 +38,9 @@ export interface OrderResponse {
     shippingStatus?: 'NOT_SHIPPED' | 'SHIPPING' | 'DELIVERED';
     estimatedDeliveryDate?: string;
     items: OrderItemResponse[];
+    customerName?: string;
+    customerEmail?: string;
+    customerPhone?: string;
 }
 
 export const orderApi = {

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { atminDispatch } from '../../../core/store/reduxHook';
-import { setCredentials } from '../../../core/store/slice/authSlice';
+import { setCredentials } from '../store/authSlice';
 import { authApi } from '../services/auth.api';
 import { AuthRole } from '../../../core/types/index';
 

@@ -1,9 +1,9 @@
 import { Outlet, useNavigate } from "react-router-dom";
-import { Bell, LogOut, Shield, ShieldCheck } from "lucide-react";
+import { LogOut, Shield, ShieldCheck } from "lucide-react";
 import { countPerms } from "../utils/helpers";
 import { AdminSidebar } from "./AdminSidebar";
 import { atminDispatch, atminSelector } from "../store/reduxHook";
-import { logout } from "../store/slice/authSlice";
+import { logout } from "../../features/auth";
 import { PERMISSION_MODULES } from "../utils/mockData";
 import { PermSet } from "../types/index";
 import { NotificationMenu } from "./NotificationMenu";
@@ -14,19 +14,38 @@ export function LayoutAtmin() {
   const { userRole, user } = atminSelector((state) => state.auth);
   
   const isAdmin = userRole === "admin";
-  const DEMO_STAFF_ACCOUNT = {
-    name: "Trần Anh Vũ",
-    jobTitle: "Chuyên viên QHKH",
-    permissions: { orders: { view: true, edit: true, delete: false }, products: { view: true, edit: false, delete: false }, inbox: { view: true, edit: true, delete: false } }
+  
+  // Convert flat permission array to PermSet structure if not admin
+  const mapPermissionsToPermSet = (perms: string[] = []): PermSet => {
+    return {
+      products: { 
+        view: perms.includes("VIEW_PRODUCTS"), 
+        add: perms.includes("CREATE_PRODUCTS"), 
+        edit: perms.includes("UPDATE_PRODUCTS"), 
+        delete: perms.includes("DELETE_PRODUCTS") 
+      },
+      orders: { 
+        view: perms.includes("VIEW_ORDERS"), 
+        process: perms.includes("UPDATE_ORDERS") 
+      },
+      customers: { 
+        view: perms.includes("VIEW_USERS"), 
+        edit: perms.includes("UPDATE_USERS") 
+      },
+      settings: { 
+        view: perms.includes("VIEW_SETTINGS"), 
+        edit: perms.includes("UPDATE_SETTINGS") 
+      }
+    };
   };
 
   const staffPerms: PermSet = isAdmin
     ? Object.fromEntries(PERMISSION_MODULES.map(m => [m.key, Object.fromEntries(m.actions.map(a => [a, true]))]))
-    : DEMO_STAFF_ACCOUNT.permissions;
+    : mapPermissionsToPermSet(user?.permissions || []);
 
   const staffInfo = isAdmin
     ? { initials: user?.fullName ? user.fullName[0] : "A", name: user?.fullName || "Admin User", badge: "Admin" }
-    : { initials: user?.fullName ? user.fullName[0] : DEMO_STAFF_ACCOUNT.name[0], name: user?.fullName || DEMO_STAFF_ACCOUNT.name, badge: DEMO_STAFF_ACCOUNT.jobTitle };
+    : { initials: user?.fullName ? user.fullName[0] : "S", name: user?.fullName || "Staff", badge: "Nhân viên" };
 
   const handleLogout = () => {
     dispatch(logout());
@@ -47,7 +66,7 @@ export function LayoutAtmin() {
             )}
           </div>
           <div className="flex items-center gap-3">
-            {isAdmin && (
+            {(isAdmin || staffPerms?.reports?.view) && (
               <NotificationMenu />
             )}
             {!isAdmin && (

@@ -30,6 +30,7 @@ public class DashboardService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final atmin.modules.user.api.UserInternalApi userInternalApi;
 
     @Transactional(readOnly = true)
     public DashboardResponse getDashboardMetrics() {
@@ -50,23 +51,59 @@ public class DashboardService {
         ).getContent();
         
         List<OrderResponse> recentOrders = recentOrdersEntities.stream()
-                .map(o -> OrderResponse.fromEntity(o, null))
+                .map(o -> {
+                    atmin.modules.user.api.UserDto u = null;
+                    try {
+                        u = userInternalApi.getUserById(o.getUserId());
+                    } catch (Exception e) {}
+                    String cName = u != null ? u.getFullName() : "Unknown";
+                    String cEmail = u != null ? u.getEmail() : "";
+                    String cPhone = u != null ? u.getPhoneNumber() : o.getPhoneNumber();
+                    return OrderResponse.fromEntity(o, null, cName, cEmail, cPhone);
+                })
                 .collect(Collectors.toList());
                 
-        // Calculate lowStockSkuCount
+        // Calculate lowStockSkuCount and lowStockProducts
         List<Product> products = productRepository.findAll();
-        long lowStockSkuCount = products.stream()
-                .filter(p -> p.getStock() != null)
-                .flatMap(p -> p.getStock().values().stream())
-                .filter(qty -> qty <= 5)
-                .count();
+        List<Map<String, Object>> lowStockProducts = new ArrayList<>();
+        long lowStockSkuCount = 0;
+        
+        for (Product p : products) {
+            if (p.getStock() != null) {
+                for (Map.Entry<String, Integer> entry : p.getStock().entrySet()) {
+                    if (entry.getValue() <= 5) {
+                        lowStockSkuCount++;
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("sku", entry.getKey());
+                        map.put("stock", entry.getValue());
+                        lowStockProducts.add(map);
+                    }
+                }
+            }
+        }
+        
+        lowStockProducts.sort(Comparator.comparing(m -> (Integer) m.get("stock")));
+        if (lowStockProducts.size() > 5) {
+            lowStockProducts = lowStockProducts.subList(0, 5);
+        }
 
         // Calculate activeAgents
         List<User> users = userRepository.findAll(); // Caution: might trigger lazy loading if roles are accessed.
         long activeAgents = 0;
+        long totalCustomers = 0;
+        long newCustomersToday = 0;
         try {
             activeAgents = users.stream()
                 .filter(u -> u.isEnabled() && u.getRoles().stream().anyMatch(r -> r.getName().equalsIgnoreCase("AGENT")))
+                .count();
+                
+            List<User> customers = users.stream()
+                .filter(u -> u.getRoles().stream().anyMatch(r -> r.getName().equalsIgnoreCase("CUSTOMER")))
+                .collect(Collectors.toList());
+                
+            totalCustomers = customers.size();
+            newCustomersToday = customers.stream()
+                .filter(u -> u.getCreatedAt() != null && !u.getCreatedAt().isBefore(startOfDay) && !u.getCreatedAt().isAfter(endOfDay))
                 .count();
         } catch (Exception e) {
             // Fallback if lazy loading fails
@@ -116,8 +153,11 @@ public class DashboardService {
                 .newOrders(newOrdersCount)
                 .lowStockSkuCount((int) lowStockSkuCount)
                 .activeAgents((int) activeAgents)
+                .totalCustomers((int) totalCustomers)
+                .newCustomersToday((int) newCustomersToday)
                 .revenueChartData(revenueChartData)
                 .orderStatusData(orderStatusData)
+                .lowStockProducts(lowStockProducts)
                 .recentOrders(recentOrders)
                 .build();
     }

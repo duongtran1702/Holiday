@@ -18,9 +18,27 @@ export interface ProductDto {
 
 export type CreateProductDto = Omit<ProductDto, 'id'>;
 
+export interface PageResponse<T> {
+    content: T[];
+    totalPages: number;
+    totalElements: number;
+    last: boolean;
+    size: number;
+    number: number;
+}
+
 export const productService = {
+    getProducts: (params?: { page?: number; size?: number; search?: string; category?: string; sort?: string }) => {
+        const queryParams = new URLSearchParams();
+        if (params?.page !== undefined) queryParams.append('page', params.page.toString());
+        if (params?.size !== undefined) queryParams.append('size', params.size.toString());
+        if (params?.search) queryParams.append('search', params.search);
+        if (params?.category) queryParams.append('category', params.category);
+        if (params?.sort) queryParams.append('sort', params.sort);
+        return callApi<ApiResponse<PageResponse<ProductDto>>>(`/products?${queryParams.toString()}`, 'GET');
+    },
     getAllProducts: () => {
-        return callApi<ApiResponse<ProductDto[]>>('/products', 'GET');
+        return callApi<ApiResponse<ProductDto[]>>('/products/all', 'GET');
     },
     createProduct: (data: CreateProductDto) => {
         return callApi<ApiResponse<ProductDto>>('/products', 'POST', data);

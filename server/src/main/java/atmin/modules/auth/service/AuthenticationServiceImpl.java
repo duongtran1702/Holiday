@@ -9,6 +9,9 @@ import atmin.modules.user.entity.Role;
 import atmin.modules.user.entity.User;
 import atmin.modules.user.repository.RoleRepository;
 import atmin.modules.user.repository.UserRepository;
+import atmin.modules.user.entity.AgentProfile;
+import atmin.modules.user.entity.AgentStatus;
+import atmin.modules.user.repository.AgentProfileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,6 +34,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final AgentProfileRepository agentProfileRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final ITokenManagementService tokenManagementService;
@@ -66,6 +70,53 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         userRepository.save(newUser);
 
         return tokenManagementService.buildAuthResponse(newUser, true);
+    }
+
+    @Override
+    @Transactional
+    public AuthResponse registerAgent(AgentRegisterRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Dữ liệu đăng ký không được để trống");
+        }
+        if (userRepository.existsByEmailAndDeletedAtIsNull(request.getEmail())) {
+            throw new DuplicateResourceException("Email đã tồn tại trong hệ thống: " + request.getEmail());
+        }
+        if (request.getPhone() != null && userRepository.existsByPhoneNumberAndDeletedAtIsNull(request.getPhone())) {
+            throw new DuplicateResourceException("Số điện thoại đã được sử dụng: " + request.getPhone());
+        }
+
+        Role agentRole = roleRepository.findByNameAndDeletedAtIsNull("AGENT")
+                .orElseGet(() -> roleRepository.save(Role.builder().name("AGENT").build()));
+
+        User newUser = User.builder()
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .fullName(request.getName())
+                .phoneNumber(request.getPhone())
+                .status("pending") // Chờ duyệt
+                .isEnabled(false) // Bị khóa cho đến khi duyệt
+                .roles(Set.of(agentRole))
+                .build();
+
+        userRepository.save(newUser);
+
+        AgentProfile agentProfile = AgentProfile.builder()
+                .userId(newUser.getId())
+                .businessName(request.getBusiness())
+                .taxCode(request.getTax())
+                .businessAddress(request.getAddress())
+                .status(AgentStatus.PENDING)
+                .build();
+        
+        agentProfileRepository.save(agentProfile);
+
+        // Sinh response nhưng không kèm token để đảm bảo bảo mật vì isEnabled=false
+        return AuthResponse.builder()
+                .accessToken(null)
+                .refreshToken(null)
+                .user(AuthResponse.UserInfo.fromUser(newUser))
+                .require2fa(false)
+                .build();
     }
 
     @Override

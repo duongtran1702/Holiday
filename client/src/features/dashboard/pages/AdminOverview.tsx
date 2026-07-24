@@ -18,12 +18,13 @@ export function AdminOverview() {
 
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 xl:grid-cols-5 gap-4">
         {[
           { label: "Doanh thu hôm nay", value: fmt(metrics.todayRevenue), delta: "Hôm nay", icon: DollarSign, color: "text-emerald-600", bg: "bg-emerald-50" },
           { label: "Đơn hàng mới", value: metrics.newOrders.toString(), delta: "Hôm nay", icon: ShoppingBag, color: "text-blue-600", bg: "bg-blue-50" },
-          { label: "SKU sắp hết hàng", value: `${metrics.lowStockSkuCount} SKU`, delta: "Cần nhập kho", icon: AlertTriangle, color: "text-amber-600", bg: "bg-amber-50" },
-          { label: "Đại lý hoạt động", value: metrics.activeAgents.toString(), delta: "Hiện tại", icon: Users, color: "text-purple-600", bg: "bg-purple-50" },
+          { label: "SKU sắp hết", value: `${metrics.lowStockSkuCount} SKU`, delta: "Cần nhập kho", icon: AlertTriangle, color: "text-amber-600", bg: "bg-amber-50" },
+          { label: "Khách hàng B2C", value: metrics.totalCustomers?.toString() || "0", delta: `+${metrics.newCustomersToday || 0} hôm nay`, icon: Users, color: "text-indigo-600", bg: "bg-indigo-50" },
+          { label: "Đại lý B2B", value: metrics.activeAgents.toString(), delta: "Hoạt động", icon: Users, color: "text-purple-600", bg: "bg-purple-50" },
         ].map((card) => (
           <div key={card.label} className="bg-card border border-border rounded-xl p-4">
             <div className="flex items-start justify-between mb-3">
@@ -68,12 +69,16 @@ export function AdminOverview() {
           <div className="border-t border-border pt-3">
             <h4 className="text-xs font-semibold mb-2.5 text-muted-foreground uppercase tracking-wider">Cảnh báo kho thấp</h4>
             <div className="space-y-1.5">
-              {[{sku:"ATMIN-POLO-NV-XXL",stock:3},{sku:"FLORAL-YE-L",stock:2},{sku:"MAXI-WH-XL",stock:1}].map(a=>(
-                <div key={a.sku} className="flex items-center justify-between">
-                  <span className="text-xs font-mono text-muted-foreground">{a.sku}</span>
-                  <span className={`text-xs font-bold ${a.stock<=2?"text-destructive":"text-amber-600"}`}>{a.stock}</span>
-                </div>
-              ))}
+              {metrics.lowStockProducts && metrics.lowStockProducts.length > 0 ? (
+                metrics.lowStockProducts.map((a: any) => (
+                  <div key={a.sku} className="flex items-center justify-between">
+                    <span className="text-xs font-mono text-muted-foreground">{a.sku}</span>
+                    <span className={`text-xs font-bold ${a.stock<=2?"text-destructive":"text-amber-600"}`}>{a.stock}</span>
+                  </div>
+                ))
+              ) : (
+                <div className="text-xs text-muted-foreground italic">Không có cảnh báo.</div>
+              )}
             </div>
           </div>
         </div>

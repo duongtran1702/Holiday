@@ -23,5 +23,6 @@ public interface UserRepository extends JpaRepository<User, String> {
     Optional<User> findByResetToken(String resetToken);
 
     List<User> findByRoles_NameAndDeletedAtIsNull(String roleName);
-    List<User> findByEmailInAndDeletedAtIsNull(java.util.List<String> emails);
+    List<User> findByEmailInAndDeletedAtIsNull(List<String> emails);
+    List<User> findByIdInAndDeletedAtIsNull(List<String> ids);
 }

@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface ProductRepository extends JpaRepository<Product, String> {
+public interface ProductRepository extends JpaRepository<Product, String>, org.springframework.data.jpa.repository.JpaSpecificationExecutor<Product> {
     @NullMarked
     @EntityGraph(attributePaths = {"colors", "sizes", "stock"})
     List<Product> findAll();

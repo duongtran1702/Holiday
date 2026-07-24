@@ -14,10 +14,13 @@ public class DashboardResponse {
     private int newOrders;
     private int lowStockSkuCount;
     private int activeAgents;
+    private int totalCustomers;
+    private int newCustomersToday;
     
     // Using Object to keep it flexible, or create specific classes
     private Object revenueChartData;
     private Object orderStatusData;
+    private Object lowStockProducts;
     
     private List<OrderResponse> recentOrders;
 }

@@ -34,38 +34,16 @@ export interface AppNotification {
   actionText?: string;
 }
 
+const mapNotificationType = (type: string, severity: string): NotificationType => {
+  if (type === 'ORDER' || type === 'AGENT') return 'success';
+  if (type === 'PROMOTION') return 'promotion';
+  if (severity === 'WARNING' || severity === 'CRITICAL') return 'alert';
+  return 'system';
+};
+
 // --- Mock Data ---
-const MOCK_NOTIFICATIONS: AppNotification[] = [
-  {
-    id: 'notif-1',
-    title: '🎉 Ưu đãi đặc biệt mùa hè',
-    message: 'Giảm ngay 20% cho tất cả đơn hàng từ 10 triệu đồng. Nhấn "Nhận ưu đãi" để tự động áp dụng mã giảm giá vào đơn hàng tiếp theo của bạn.',
-    type: 'promotion',
-    isRead: false,
-    createdAt: new Date().toISOString(),
-    actionUrl: '/orders', 
-    actionData: { discountCode: 'SUMMER20', prefill: true },
-    actionText: 'Nhận ưu đãi ngay'
-  },
-  {
-    id: 'notif-2',
-    title: '⚠️ Lịch bảo trì hệ thống',
-    message: 'Hệ thống sẽ tạm ngừng hoạt động để nâng cấp vào lúc 00:00 - 02:00 ngày mai. Vui lòng lưu lại công việc đang dang dở.',
-    type: 'system',
-    isRead: false,
-    createdAt: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
-  },
-  {
-    id: 'notif-3',
-    title: 'Đơn hàng #ORD-001 đã hoàn thành',
-    message: 'Đơn hàng của đối tác B2B Vingroup đã được giao thành công.',
-    type: 'success',
-    isRead: true,
-    createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-    actionUrl: '/orders',
-    actionText: 'Xem chi tiết đơn'
-  }
-];
+import { notificationApi } from '../api/notification.api';
+import { toast } from 'sonner';
 
 const getIconForType = (type: NotificationType) => {
   switch (type) {
@@ -85,16 +63,50 @@ const getIconForType = (type: NotificationType) => {
 export function NotificationMenu() {
   const navigate = useNavigate();
   const { userRole } = atminSelector((state) => state.auth);
-  const [notifications, setNotifications] = useState<AppNotification[]>(MOCK_NOTIFICATIONS);
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [selectedNotif, setSelectedNotif] = useState<AppNotification | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+  const fetchNotifications = async () => {
+    try {
+      const res = userRole === 'admin' || userRole === 'staff' 
+        ? await notificationApi.getNotifications()
+        : await notificationApi.getMyNotifications();
+        
+      setUnreadCount(res.unreadCount);
+      setNotifications(res.notifications.map(n => ({
+        id: n.id,
+        title: n.title || 'Thông báo mới',
+        message: n.message,
+        type: mapNotificationType(n.entityType, n.severity),
+        isRead: n.isRead,
+        createdAt: n.createdAt,
+        actionUrl: n.actionUrl,
+        actionData: n.metadata,
+        actionText: n.actionUrl ? 'Xem chi tiết' : undefined
+      })));
+    } catch (error) {
+      console.error('Failed to fetch notifications', error);
+    }
+  };
 
-  const handleNotificationClick = (notif: AppNotification) => {
-    // Mark as read when clicked
-    setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, isRead: true } : n));
+  React.useEffect(() => {
+    fetchNotifications();
+    // Optional: setup polling or WebSocket here
+  }, [userRole]);
+
+  const handleNotificationClick = async (notif: AppNotification) => {
+    if (!notif.isRead) {
+      setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, isRead: true } : n));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+      try {
+        await notificationApi.markAsRead([notif.id]);
+      } catch (error) {
+        console.error('Failed to mark as read', error);
+      }
+    }
     setSelectedNotif(notif);
     setIsModalOpen(true);
     setIsPopoverOpen(false); // Close dropdown
@@ -114,8 +126,17 @@ export function NotificationMenu() {
     }
   };
 
-  const markAllAsRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+  const markAllAsRead = async () => {
+    const unreadIds = notifications.filter(n => !n.isRead).map(n => n.id);
+    if (unreadIds.length > 0) {
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+      setUnreadCount(0);
+      try {
+        await notificationApi.markAsRead(unreadIds);
+      } catch (error) {
+        toast.error('Lỗi khi đánh dấu đã đọc');
+      }
+    }
   };
 
   const formatTime = (isoString: string) => {

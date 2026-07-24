@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, X, Upload } from "lucide-react";
+import { Loader2, Upload } from "lucide-react";
 import { 
     Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription 
 } from "../../../core/components/ui/overlay/Dialog";

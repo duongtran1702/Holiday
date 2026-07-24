@@ -11,6 +11,9 @@ export const authApi = {
     register: (data: RegisterRequest) => {
         return callApi<ApiResponse<AuthResponse>>('/auth/register', 'POST', data);
     },
+    registerAgent: (data: any) => {
+        return callApi<ApiResponse<AuthResponse>>('/auth/register/agent', 'POST', data);
+    },
     loginWithGoogle: (data: { accessToken: string }) => {
         return callApi<ApiResponse<AuthResponse>>('/auth/google', 'POST', data);
     },

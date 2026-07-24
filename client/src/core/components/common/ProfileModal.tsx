@@ -1,10 +1,11 @@
 import React, { useState, useRef } from "react";
 import { User, X, AlertTriangle, Camera, Lock } from "lucide-react";
 import { useSelector } from "react-redux";
-import { RootState } from "../../store/store/store";
+import { RootState } from "../../store/store";
 import { useDispatch } from "react-redux";
-import { updateUser } from "../../store/slice/authSlice";
-import { userApi } from "../../api/user.api";
+import { updateUser } from "../../../features/auth";
+import { userApi } from "../../../features/profile/services/user.api";
+import { authApi } from "../../../features/auth/services/auth.api";
 
 import { toast } from "sonner";
 
@@ -67,7 +68,27 @@ export function ProfileModal({ onClose }: { onClose: () => void }) {
     }
   };
 
-  const handleSavePassword = () => { setSaved(true); setTimeout(() => setSaved(false), 2000); };
+  const handleSavePassword = async () => { 
+    if (pwForm.next !== pwForm.confirm) {
+      toast.error("Mật khẩu không khớp");
+      return;
+    }
+    const toastId = toast.loading("Đang đổi mật khẩu...");
+    try {
+      await authApi.changePassword({ 
+        oldPassword: pwForm.current, 
+        newPassword: pwForm.next, 
+        confirmPassword: pwForm.confirm 
+      });
+      setSaved(true); 
+      toast.success("Đổi mật khẩu thành công!", { id: toastId });
+      setTimeout(() => setSaved(false), 2000); 
+      setPwForm({ current: "", next: "", confirm: "" });
+    } catch(err: any) {
+      console.error(err);
+      toast.error(err.response?.data?.message || "Đổi mật khẩu thất bại. Vui lòng kiểm tra lại mật khẩu hiện tại.", { id: toastId });
+    }
+  };
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />

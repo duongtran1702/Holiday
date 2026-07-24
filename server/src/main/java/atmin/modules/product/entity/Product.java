@@ -34,6 +34,7 @@ public class Product extends BaseEntity {
     private Integer reviews;
     private String image;
     private String badge;
+    private String status = "ACTIVE"; // DRAFT, ACTIVE, OUT_OF_STOCK
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "product_colors", joinColumns = @JoinColumn(name = "product_id"))

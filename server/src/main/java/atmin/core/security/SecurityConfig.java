@@ -1,10 +1,12 @@
 package atmin.core.security;
 
+import atmin.common.response.ApiErrorResponse;
 import atmin.core.security.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -16,6 +18,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.time.LocalDateTime;
 
 import static jakarta.servlet.DispatcherType.ERROR;
 
@@ -25,15 +30,15 @@ import static jakarta.servlet.DispatcherType.ERROR;
 public class SecurityConfig {
     private final MdcLoggingFilter mdcLoggingFilter;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {
         return (request, response, authException) -> {
             response.setStatus(401);
             response.setContentType("application/json;charset=UTF-8");
-            atmin.common.response.ApiErrorResponse apiError = atmin.common.response.ApiErrorResponse.builder()
-                    .timestamp(java.time.LocalDateTime.now())
+            ApiErrorResponse apiError = ApiErrorResponse.builder()
+                    .timestamp(LocalDateTime.now())
                     .status(401)
                     .error("Unauthorized")
                     .message("Xác thực thất bại: " + authException.getMessage())
@@ -48,8 +53,8 @@ public class SecurityConfig {
         return (request, response, accessDeniedException) -> {
             response.setStatus(403);
             response.setContentType("application/json;charset=UTF-8");
-            atmin.common.response.ApiErrorResponse apiError = atmin.common.response.ApiErrorResponse.builder()
-                    .timestamp(java.time.LocalDateTime.now())
+            ApiErrorResponse apiError = ApiErrorResponse.builder()
+                    .timestamp(LocalDateTime.now())
                     .status(403)
                     .error("Forbidden")
                     .message("Bạn không có quyền truy cập tài nguyên này")
@@ -72,7 +77,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) {
         http
-                .cors(org.springframework.security.config.Customizer.withDefaults())
+                .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .dispatcherTypeMatchers(ERROR).permitAll()

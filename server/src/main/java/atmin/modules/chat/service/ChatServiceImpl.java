@@ -8,8 +8,8 @@ import atmin.modules.chat.entity.ChatMessage;
 import atmin.modules.chat.entity.Conversation;
 import atmin.modules.chat.repository.ChatMessageRepository;
 import atmin.modules.chat.repository.ConversationRepository;
-import atmin.modules.user.entity.User;
-import atmin.modules.user.repository.UserRepository;
+import atmin.modules.user.api.UserInternalApi;
+import atmin.modules.user.api.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -27,7 +27,7 @@ public class ChatServiceImpl implements ChatService {
 
     private final ConversationRepository conversationRepository;
     private final ChatMessageRepository chatMessageRepository;
-    private final UserRepository userRepository;
+    private final UserInternalApi userInternalApi;
     private final SimpMessagingTemplate messagingTemplate;
 
     @Override
@@ -35,10 +35,14 @@ public class ChatServiceImpl implements ChatService {
     public ConversationDTO startOrGetConversation(String customerId) {
         Conversation conversation = conversationRepository.findByCustomerIdAndStatus(customerId, "OPEN")
                 .orElseGet(() -> {
-                    User customer = userRepository.findById(customerId)
-                            .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
+                    UserDto customer;
+                    try {
+                        customer = userInternalApi.getUserById(customerId);
+                    } catch (Exception e) {
+                        throw new ResourceNotFoundException("Customer not found");
+                    }
                     Conversation newConv = Conversation.builder()
-                            .customer(customer)
+                            .customerId(customer.getId())
                             .type("DIRECT")
                             .name("Chat với " + customer.getFullName())
                             .avatarUrl(customer.getAvatarUrl())
@@ -100,22 +104,20 @@ public class ChatServiceImpl implements ChatService {
         Conversation conversation = conversationRepository.findById(request.getConversationId())
                 .orElseThrow(() -> new ResourceNotFoundException("Conversation not found"));
         
-        User sender;
+        UserDto sender;
         if ("bot".equals(senderId)) {
-            sender = userRepository.findById("bot").orElseGet(() -> {
-                User bot = User.builder()
-                        .id("bot")
-                        .email("bot@atmin.vn")
-                        .fullName("Holiday Bot")
-                        .password("")
-                        .status("active")
-                        .isEnabled(true)
-                        .build();
-                return userRepository.save(bot);
-            });
+            try {
+                sender = userInternalApi.getUserById("bot");
+            } catch (Exception e) {
+                // If bot does not exist, we just mock it for chat or it should be created by user service
+                throw new ResourceNotFoundException("Bot not found, please create bot user first");
+            }
         } else {
-            sender = userRepository.findById(senderId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Sender not found"));
+            try {
+                sender = userInternalApi.getUserById(senderId);
+            } catch (Exception e) {
+                throw new ResourceNotFoundException("Sender not found");
+            }
         }
 
         ChatMessage replyTo = null;
@@ -124,12 +126,12 @@ public class ChatServiceImpl implements ChatService {
         }
 
         ChatMessage message = ChatMessage.builder()
-                .conversation(conversation)
-                .sender(sender)
+                .conversationId(conversation.getId())
+                .senderId(sender.getId())
                 .content(request.getContent())
                 .contentType(request.getContentType() != null ? request.getContentType() : "TEXT")
                 .mediaUrl(request.getMediaUrl())
-                .replyTo(replyTo)
+                .replyToId(replyTo != null ? replyTo.getId() : null)
                 .status("SENT")
                 .build();
 
@@ -151,17 +153,24 @@ public class ChatServiceImpl implements ChatService {
         String name = conversation.getName();
         String avatarUrl = conversation.getAvatarUrl();
 
-        if ("DIRECT".equals(conversation.getType()) && conversation.getCustomer() != null) {
-            name = conversation.getCustomer().getFullName();
-            avatarUrl = conversation.getCustomer().getAvatarUrl();
+        UserDto customer = null;
+        if (conversation.getCustomerId() != null) {
+            try {
+                customer = userInternalApi.getUserById(conversation.getCustomerId());
+            } catch(Exception e) {}
+        }
+
+        if ("DIRECT".equals(conversation.getType()) && customer != null) {
+            name = customer.getFullName();
+            avatarUrl = customer.getAvatarUrl();
         }
         
         return ConversationDTO.builder()
                 .id(conversation.getId())
                 .type(conversation.getType())
-                .name(name != null ? name : (conversation.getCustomer() != null ? conversation.getCustomer().getFullName() : ""))
-                .avatarUrl(avatarUrl != null ? avatarUrl : (conversation.getCustomer() != null ? conversation.getCustomer().getAvatarUrl() : ""))
-                .participantId(conversation.getCustomer() != null ? conversation.getCustomer().getId() : null)
+                .name(name != null ? name : (customer != null ? customer.getFullName() : ""))
+                .avatarUrl(avatarUrl != null ? avatarUrl : (customer != null ? customer.getAvatarUrl() : ""))
+                .participantId(customer != null ? customer.getId() : null)
                 .unreadCount(unreadCount)
                 .lastMessage(lastMessageDTO)
                 .createdAt(conversation.getCreatedAt())
@@ -169,16 +178,21 @@ public class ChatServiceImpl implements ChatService {
     }
 
     private MessageDTO mapToMessageDTO(ChatMessage message) {
+        UserDto sender = null;
+        try {
+            sender = userInternalApi.getUserById(message.getSenderId());
+        } catch(Exception e) {}
+
         return MessageDTO.builder()
                 .id(message.getId())
-                .conversationId(message.getConversation().getId())
-                .senderId(message.getSender().getId())
-                .senderName(message.getSender().getFullName())
-                .senderAvatar(message.getSender().getAvatarUrl())
+                .conversationId(message.getConversationId())
+                .senderId(message.getSenderId())
+                .senderName(sender != null ? sender.getFullName() : "Unknown")
+                .senderAvatar(sender != null ? sender.getAvatarUrl() : null)
                 .content(message.getContent())
                 .contentType(message.getContentType())
                 .mediaUrl(message.getMediaUrl())
-                .replyToId(message.getReplyTo() != null ? message.getReplyTo().getId() : null)
+                .replyToId(message.getReplyToId())
                 .status(message.getStatus())
                 .createdAt(message.getCreatedAt())
                 .build();

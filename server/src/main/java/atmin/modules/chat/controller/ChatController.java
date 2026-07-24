@@ -1,17 +1,21 @@
 package atmin.modules.chat.controller;
 
-import atmin.common.response.ApiResponse;
 import atmin.common.exception.ResourceNotFoundException;
+import atmin.common.response.ApiResponse;
 import atmin.modules.chat.dto.ConversationDTO;
 import atmin.modules.chat.dto.MessageDTO;
+import atmin.modules.chat.dto.MessageRequest;
 import atmin.modules.chat.service.ChatService;
+import atmin.modules.chat.service.PresenceManager;
 import atmin.modules.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/chat")
@@ -20,6 +24,7 @@ public class ChatController {
 
     private final ChatService chatService;
     private final UserRepository userRepository;
+    private final PresenceManager presenceManager;
 
     private String resolveUserId(Authentication authentication) {
         String email = authentication.getName();
@@ -42,6 +47,7 @@ public class ChatController {
     }
 
     @GetMapping("/conversations")
+    @PreAuthorize("hasAuthority('VIEW_INBOX') or hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<List<ConversationDTO>>> getAllConversations(Authentication authentication) {
         String adminId = resolveUserId(authentication);
         return ResponseEntity.ok(ApiResponse.success("Thành công", chatService.getAllConversations(adminId)));
@@ -68,16 +74,18 @@ public class ChatController {
     }
 
     @PostMapping("/{conversationId}/bot-reply")
+    @PreAuthorize("hasAuthority('CREATE_INBOX') or hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<MessageDTO>> sendBotReply(
             @PathVariable String conversationId,
-            @RequestBody atmin.modules.chat.dto.MessageRequest request) {
+            @RequestBody MessageRequest request) {
         request.setConversationId(conversationId);
         MessageDTO messageDTO = chatService.processMessage(request, "bot");
         return ResponseEntity.ok(ApiResponse.success("Thành công", messageDTO));
     }
 
     @GetMapping("/presence")
-    public ResponseEntity<ApiResponse<java.util.Set<String>>> getOnlineUsers(@org.springframework.beans.factory.annotation.Autowired atmin.modules.chat.service.PresenceManager presenceManager) {
+    @PreAuthorize("hasAuthority('VIEW_INBOX') or hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<Set<String>>> getOnlineUsers() {
         return ResponseEntity.ok(ApiResponse.success("Thành công", presenceManager.getOnlineUsers()));
     }
 }

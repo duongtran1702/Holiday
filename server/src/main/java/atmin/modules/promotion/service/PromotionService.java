@@ -64,14 +64,21 @@ public class PromotionService {
             targetUsers = userRepository.findAll(); // ALL
         }
 
+        List<String> targetUserIds = targetUsers.stream().map(User::getId).collect(Collectors.toList());
+        List<String> existingUserIds = userVoucherWalletRepository.findExistingUserIdsByPromotionIdAndUserIds(promotion.getId(), targetUserIds);
+        java.util.Set<String> existingSet = new java.util.HashSet<>(existingUserIds);
+
+        List<UserVoucherWallet> walletsToSave = new java.util.ArrayList<>();
+        List<Notification> notificationsToSave = new java.util.ArrayList<>();
+
         for (User user : targetUsers) {
-            if (!userVoucherWalletRepository.existsByUserIdAndPromotionIdAndDeletedAtIsNull(user.getId(), promotion.getId())) {
+            if (!existingSet.contains(user.getId())) {
                 UserVoucherWallet wallet = UserVoucherWallet.builder()
-                        .user(user)
-                        .promotion(promotion)
+                        .userId(user.getId())
+                        .promotionId(promotion.getId())
                         .status("AVAILABLE")
                         .build();
-                userVoucherWalletRepository.save(wallet);
+                walletsToSave.add(wallet);
 
                 Notification notification = Notification.builder()
                         .type("promotion")
@@ -83,8 +90,15 @@ public class PromotionService {
                         .targetUserId(user.getId())
                         .actionUrl("/promotions")
                         .build();
-                notificationRepository.save(notification);
+                notificationsToSave.add(notification);
             }
+        }
+
+        if (!walletsToSave.isEmpty()) {
+            userVoucherWalletRepository.saveAll(walletsToSave);
+        }
+        if (!notificationsToSave.isEmpty()) {
+            notificationRepository.saveAll(notificationsToSave);
         }
 
         return mapToDto(promotion);
@@ -98,10 +112,61 @@ public class PromotionService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    public PromotionDTO updatePromotion(String id, PromotionCreateReq req) {
+        Promotion promotion = promotionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Khuyến mãi không tồn tại"));
+
+        if (!promotion.getCode().equals(req.getCode()) && promotionRepository.findByCodeAndDeletedAtIsNull(req.getCode()).isPresent()) {
+            throw new IllegalArgumentException("Mã khuyến mãi đã tồn tại: " + req.getCode());
+        }
+
+        promotion.setCode(req.getCode());
+        promotion.setDiscountPercentage(req.getDiscountPercentage());
+        promotion.setDiscountAmount(req.getDiscountAmount());
+        promotion.setMinOrderValue(req.getMinOrderValue());
+        promotion.setType(req.getType());
+        promotion.setExpiryDate(req.getExpiryDate());
+        promotion.setUsageLimit(req.getUsageLimit());
+        // Target type usually shouldn't change after creation because wallets are already distributed, 
+        // but we can update basic fields.
+
+        promotion = promotionRepository.save(promotion);
+        return mapToDto(promotion);
+    }
+
+    @Transactional
+    public void deletePromotion(String id) {
+        Promotion promotion = promotionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Khuyến mãi không tồn tại"));
+        promotionRepository.delete(promotion); // soft delete via @SQLDelete
+    }
+
+    @Transactional
+    public void togglePromotionStatus(String id) {
+        Promotion promotion = promotionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Khuyến mãi không tồn tại"));
+        if ("ACTIVE".equals(promotion.getStatus())) {
+            promotion.setStatus("INACTIVE");
+        } else {
+            promotion.setStatus("ACTIVE");
+        }
+        promotionRepository.save(promotion);
+    }
+
     @Transactional(readOnly = true)
     public List<UserVoucherDTO> getMyVouchers(String userId) {
         return userVoucherWalletRepository.findByUserIdAndDeletedAtIsNullOrderByCreatedAtDesc(userId).stream()
-                .map(this::mapToUserVoucherDto)
+                .map(wallet -> {
+                    Promotion p = promotionRepository.findById(wallet.getPromotionId())
+                            .orElseThrow(() -> new IllegalArgumentException("Promotion not found"));
+                    return UserVoucherDTO.builder()
+                            .id(wallet.getId())
+                            .promotion(mapToDto(p))
+                            .status(wallet.getStatus())
+                            .createdAt(wallet.getCreatedAt())
+                            .build();
+                })
                 .collect(Collectors.toList());
     }
 
@@ -109,10 +174,60 @@ public class PromotionService {
     public void deleteMyVoucher(String userId, String voucherId) {
         UserVoucherWallet wallet = userVoucherWalletRepository.findById(voucherId)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy voucher"));
-        if (!wallet.getUser().getId().equals(userId)) {
+        if (!wallet.getUserId().equals(userId)) {
             throw new IllegalArgumentException("Bạn không có quyền xoá voucher này");
         }
         userVoucherWalletRepository.delete(wallet); // soft delete
+    }
+
+    @Transactional(readOnly = true)
+    public PromotionDTO validateVoucher(String code, java.math.BigDecimal totalAmount, String userId) {
+        Promotion promotion = promotionRepository.findByCodeAndDeletedAtIsNull(code)
+                .orElseThrow(() -> new IllegalArgumentException("Mã giảm giá không tồn tại hoặc đã hết hạn"));
+
+        if (!"ACTIVE".equals(promotion.getStatus())) {
+            throw new IllegalArgumentException("Mã giảm giá không còn hoạt động");
+        }
+        
+        if (promotion.getExpiryDate() != null && promotion.getExpiryDate().isBefore(java.time.LocalDateTime.now())) {
+            throw new IllegalArgumentException("Mã giảm giá đã hết hạn");
+        }
+
+        if (promotion.getUsageLimit() != null && promotion.getUsedCount() >= promotion.getUsageLimit()) {
+            throw new IllegalArgumentException("Mã giảm giá đã hết lượt sử dụng");
+        }
+
+        if (totalAmount.compareTo(promotion.getMinOrderValue()) < 0) {
+            throw new IllegalArgumentException("Đơn hàng chưa đạt giá trị tối thiểu để áp dụng mã này");
+        }
+
+        UserVoucherWallet wallet = userVoucherWalletRepository.findByUserIdAndPromotionIdAndDeletedAtIsNull(userId, promotion.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Bạn không sở hữu mã giảm giá này"));
+
+        if (!"AVAILABLE".equals(wallet.getStatus())) {
+            throw new IllegalArgumentException("Mã giảm giá này đã được sử dụng hoặc đã hết hạn");
+        }
+
+        return mapToDto(promotion);
+    }
+
+    @Transactional
+    public void useVoucher(String code, String userId) {
+        Promotion promotion = promotionRepository.findByCodeAndDeletedAtIsNull(code)
+                .orElseThrow(() -> new IllegalArgumentException("Mã giảm giá không tồn tại"));
+                
+        UserVoucherWallet wallet = userVoucherWalletRepository.findByUserIdAndPromotionIdAndDeletedAtIsNull(userId, promotion.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Bạn không sở hữu mã giảm giá này"));
+                
+        if (!"AVAILABLE".equals(wallet.getStatus())) {
+            throw new IllegalArgumentException("Mã giảm giá này đã được sử dụng hoặc đã hết hạn");
+        }
+        
+        wallet.setStatus("USED");
+        userVoucherWalletRepository.save(wallet);
+
+        promotion.setUsedCount(promotion.getUsedCount() + 1);
+        promotionRepository.save(promotion);
     }
 
     private PromotionDTO mapToDto(Promotion promotion) {
@@ -131,12 +246,4 @@ public class PromotionService {
                 .build();
     }
 
-    private UserVoucherDTO mapToUserVoucherDto(UserVoucherWallet wallet) {
-        return UserVoucherDTO.builder()
-                .id(wallet.getId())
-                .promotion(mapToDto(wallet.getPromotion()))
-                .status(wallet.getStatus())
-                .createdAt(wallet.getCreatedAt())
-                .build();
-    }
 }

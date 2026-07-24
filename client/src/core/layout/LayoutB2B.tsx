@@ -1,7 +1,7 @@
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { Package, FileText, CreditCard, LogOut, TrendingUp } from "lucide-react";
 import { atminDispatch } from "../store/reduxHook";
-import { logout } from "../store/slice/authSlice";
+import { logout } from "../../features/auth";
 
 export function LayoutB2B() {
   const navigate = useNavigate();

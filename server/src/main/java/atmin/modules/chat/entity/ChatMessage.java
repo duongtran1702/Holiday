@@ -1,6 +1,6 @@
 package atmin.modules.chat.entity;
 
-import atmin.modules.user.entity.User;
+
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -19,13 +19,11 @@ public class ChatMessage {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "conversation_id", nullable = false)
-    private Conversation conversation;
+    @Column(name = "conversation_id", nullable = false)
+    private String conversationId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_id", nullable = false)
-    private User sender;
+    @Column(name = "sender_id", nullable = false)
+    private String senderId;
 
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
@@ -37,9 +35,8 @@ public class ChatMessage {
     @Column(name = "media_url")
     private String mediaUrl;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reply_to_id")
-    private ChatMessage replyTo;
+    @Column(name = "reply_to_id")
+    private String replyToId;
 
     @Column(name = "status")
     @Builder.Default

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { fmt } from "../../../core/utils/format";
 import { StatusBadge } from "../../../core/components/common/StatusBadge";
@@ -9,13 +9,14 @@ import { toast } from "sonner";
 export function AdminPromotions() {
   const [promotions, setPromotions] = useState<Promotion[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingPromotion, setEditingPromotion] = useState<Promotion | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchPromotions = async () => {
     try {
       setLoading(true);
-      const data = await promotionService.getAllPromotions();
-      setPromotions(data);
+      const res = await promotionService.getAllPromotions();
+      setPromotions(res || []);
     } catch (error) {
       toast.error("Không thể tải danh sách voucher");
     } finally {
@@ -27,12 +28,42 @@ export function AdminPromotions() {
     fetchPromotions();
   }, []);
 
+  const handleDelete = async (id: string) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa voucher này?")) {
+      try {
+        await promotionService.deletePromotion(id);
+        toast.success("Xóa voucher thành công");
+        fetchPromotions();
+      } catch (error) {
+        toast.error("Lỗi khi xóa voucher");
+      }
+    }
+  };
+
+  const handleToggle = async (id: string) => {
+    try {
+      await promotionService.togglePromotionStatus(id);
+      toast.success("Cập nhật trạng thái thành công");
+      fetchPromotions();
+    } catch (error) {
+      toast.error("Lỗi khi cập nhật trạng thái");
+    }
+  };
+
+  const handleEdit = (v: Promotion) => {
+    setEditingPromotion(v);
+    setIsModalOpen(true);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-base font-semibold">Quản lý Khuyến mãi & Voucher</h2>
         <button 
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            setEditingPromotion(null);
+            setIsModalOpen(true);
+          }}
           className="flex items-center gap-1.5 bg-primary text-primary-foreground text-xs px-3 py-2 rounded-lg hover:bg-primary/90 transition-colors"
         >
           <Plus size={13} /> Tạo voucher
@@ -91,6 +122,16 @@ export function AdminPromotions() {
                     </span>
                   </div>
                 </div>
+                
+                <div className="flex items-center gap-2 mt-4 pt-3 border-t">
+                  <button onClick={() => handleEdit(v)} className="flex-1 text-xs border rounded py-1.5 hover:bg-muted">Sửa</button>
+                  <button onClick={() => handleToggle(v.id)} className={`flex-1 text-xs border rounded py-1.5 ${v.status === 'ACTIVE' ? 'hover:bg-amber-50 text-amber-600 border-amber-200' : 'hover:bg-emerald-50 text-emerald-600 border-emerald-200'}`}>
+                    {v.status === 'ACTIVE' ? 'Tạm dừng' : 'Kích hoạt'}
+                  </button>
+                  <button onClick={() => handleDelete(v.id)} className="px-2 py-1.5 border border-red-200 text-red-600 rounded hover:bg-red-50">
+                    <Trash2 size={14} />
+                  </button>
+                </div>
               </div>
             );
           })}
@@ -101,6 +142,7 @@ export function AdminPromotions() {
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
         onSuccess={fetchPromotions} 
+        initialData={editingPromotion}
       />
     </div>
   );

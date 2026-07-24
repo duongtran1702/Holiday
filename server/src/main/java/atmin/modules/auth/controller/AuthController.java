@@ -5,6 +5,7 @@ import atmin.modules.auth.dto.AuthResponse;
 import atmin.modules.auth.dto.LoginRequest;
 import atmin.modules.auth.dto.RefreshTokenRequest;
 import atmin.modules.auth.dto.RegisterRequest;
+import atmin.modules.auth.dto.AgentRegisterRequest;
 import atmin.modules.auth.service.IAuthenticationService;
 import atmin.modules.auth.service.IOAuth2Service;
 import atmin.modules.auth.service.ITokenManagementService;
@@ -38,6 +39,14 @@ public class AuthController {
         setRefreshTokenCookie(response, authResponse.getRefreshToken());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.created("Đăng ký tài khoản thành công", authResponse));
+    }
+
+    @PostMapping("/register/agent")
+    public ResponseEntity<ApiResponse<AuthResponse>> registerAgent(@Valid @RequestBody AgentRegisterRequest request, HttpServletResponse response) {
+        AuthResponse authResponse = authService.registerAgent(request);
+        setRefreshTokenCookie(response, authResponse.getRefreshToken());
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.created("Đăng ký hồ sơ đại lý thành công. Đang chờ xét duyệt.", authResponse));
     }
 
     @PostMapping("/login")

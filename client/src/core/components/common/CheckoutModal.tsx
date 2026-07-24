@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { X, CreditCard, Banknote, MapPin, Phone } from "lucide-react";
 import { useSelector } from "react-redux";
-import { RootState } from "../../store/store/store";
+import { RootState } from "../../store/store";
 import { orderApi } from "../../../features/orders/services/order.api";
-import { CreateOrderRequest } from "../../../features/orders/types/order.types";
+import { CreateOrderRequest } from "../../../features/orders/services/order.api";
 import { toast } from "sonner";
 
 interface CheckoutModalProps {
@@ -24,9 +24,28 @@ export function CheckoutModal({ cart, setCart, onClose, onSuccess }: CheckoutMod
   });
 
   const [loading, setLoading] = useState(false);
+  const [voucherCode, setVoucherCode] = useState("");
+  const [appliedVoucher, setAppliedVoucher] = useState<any>(null);
+  const [voucherError, setVoucherError] = useState("");
 
   // Tính tổng tiền
-  const totalAmount = cart.reduce((sum, item) => sum + item.price * (item.qty || 1), 0);
+  const itemsAmount = cart.reduce((sum, item) => sum + item.price * (item.qty || 1), 0);
+  const totalAmount = appliedVoucher ? Math.max(0, itemsAmount - (appliedVoucher.discountAmount || 0)) : itemsAmount;
+
+  const handleApplyVoucher = async () => {
+    if (!voucherCode.trim()) return;
+    try {
+      setVoucherError("");
+      const res = await import("../../../features/promotions/services/promotionService").then(m => m.promotionService.validateCode(voucherCode, itemsAmount));
+      if (res.data) {
+        setAppliedVoucher(res.data);
+        toast.success("Áp dụng mã giảm giá thành công");
+      }
+    } catch (err: any) {
+      setAppliedVoucher(null);
+      setVoucherError(err.response?.data?.message || "Mã giảm giá không hợp lệ");
+    }
+  };
 
   const validateForm = () => {
     if (!form.name.trim()) {
@@ -59,7 +78,7 @@ export function CheckoutModal({ cart, setCart, onClose, onSuccess }: CheckoutMod
   const handleCheckout = async () => {
     if (!validateForm()) return;
 
-    let toastId: string | undefined;
+    let toastId: string | number | undefined;
     try {
       setLoading(true);
       toastId = toast.loading("Đang xử lý đơn hàng...");
@@ -68,6 +87,7 @@ export function CheckoutModal({ cart, setCart, onClose, onSuccess }: CheckoutMod
         shippingAddress: form.address,
         phoneNumber: form.phone,
         paymentMethod: form.paymentMethod,
+        voucherCode: appliedVoucher ? appliedVoucher.code : undefined,
         items: cart.map((item) => ({
           productId: item.productId,
           quantity: item.qty || 1,
@@ -198,12 +218,52 @@ export function CheckoutModal({ cart, setCart, onClose, onSuccess }: CheckoutMod
             </div>
           </div>
 
+          {/* Mã giảm giá */}
+          <div>
+            <h3 className="text-sm font-semibold mb-4 flex items-center gap-2 border-b pb-2">
+              Mã giảm giá
+            </h3>
+            <div className="flex gap-2">
+              <input 
+                type="text" 
+                value={voucherCode} 
+                onChange={e => setVoucherCode(e.target.value.toUpperCase())}
+                placeholder="Nhập mã giảm giá..."
+                className="flex-1 text-sm px-4 py-2 bg-input-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent uppercase" 
+              />
+              <button 
+                onClick={handleApplyVoucher}
+                className="px-4 py-2 bg-secondary text-foreground font-medium text-sm rounded-xl hover:bg-muted transition-colors"
+              >
+                Áp dụng
+              </button>
+            </div>
+            {voucherError && <p className="text-xs text-red-500 mt-2">{voucherError}</p>}
+            {appliedVoucher && (
+              <p className="text-xs text-emerald-600 mt-2 font-medium">
+                Đã áp dụng mã {appliedVoucher.code} (Giảm {(appliedVoucher.discountAmount || 0).toLocaleString("vi-VN")} đ)
+              </p>
+            )}
+          </div>
+
           {/* Tổng tiền */}
-          <div className="bg-muted p-4 rounded-xl flex items-center justify-between border border-border/50">
-            <span className="text-sm font-medium text-muted-foreground">Tổng thanh toán:</span>
-            <span className="text-xl font-bold text-accent">
-              {totalAmount.toLocaleString("vi-VN")} đ
-            </span>
+          <div className="bg-muted p-4 rounded-xl flex flex-col gap-2 border border-border/50">
+            <div className="flex justify-between items-center text-sm text-muted-foreground">
+              <span>Tạm tính:</span>
+              <span>{itemsAmount.toLocaleString("vi-VN")} đ</span>
+            </div>
+            {appliedVoucher && (
+              <div className="flex justify-between items-center text-sm text-emerald-600">
+                <span>Giảm giá:</span>
+                <span>- {(appliedVoucher.discountAmount || 0).toLocaleString("vi-VN")} đ</span>
+              </div>
+            )}
+            <div className="flex justify-between items-center border-t border-border pt-2 mt-1">
+              <span className="text-sm font-medium text-muted-foreground">Tổng thanh toán:</span>
+              <span className="text-xl font-bold text-accent">
+                {totalAmount.toLocaleString("vi-VN")} đ
+              </span>
+            </div>
           </div>
         </div>
 

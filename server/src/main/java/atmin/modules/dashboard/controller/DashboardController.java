@@ -18,7 +18,7 @@ public class DashboardController {
     private final DashboardService dashboardService;
 
     @GetMapping("/metrics")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('VIEW_REPORTS') or hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<DashboardResponse>> getMetrics() {
         DashboardResponse response = dashboardService.getDashboardMetrics();
         return ResponseEntity.ok(ApiResponse.success("Lấy thông tin dashboard thành công", response));

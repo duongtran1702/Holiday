@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { api } from '../../../core/utils/callApi';
-import { setCredentials } from '../../../core/store/slice/authSlice';
+import { setCredentials } from '../store/authSlice';
 
 import { Loader2 } from 'lucide-react';
 

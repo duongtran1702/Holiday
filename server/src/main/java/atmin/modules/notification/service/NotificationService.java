@@ -5,6 +5,7 @@ import atmin.modules.notification.dto.NotificationListResponse;
 import java.util.List;
 
 public interface NotificationService {
-    NotificationListResponse getNotifications();
+    NotificationListResponse getNotifications(); // For admin
+    NotificationListResponse getMyNotifications(String userId); // For customer
     void markAsRead(List<String> notificationIds);
 }

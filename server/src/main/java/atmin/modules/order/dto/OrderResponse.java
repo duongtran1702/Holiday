@@ -24,7 +24,11 @@ public class OrderResponse {
     private java.time.LocalDate estimatedDeliveryDate;
     private List<OrderItemResponse> items;
 
-    public static OrderResponse fromEntity(Order order, String paymentUrl) {
+    private String customerName;
+    private String customerEmail;
+    private String customerPhone;
+
+    public static OrderResponse fromEntity(Order order, String paymentUrl, String customerName, String customerEmail, String customerPhone) {
         List<OrderItemResponse> itemResponses = null;
         if (order.getOrderItems() != null) {
             itemResponses = order.getOrderItems().stream()
@@ -43,6 +47,9 @@ public class OrderResponse {
                 .estimatedDeliveryDate(order.getEstimatedDeliveryDate())
                 .createdAt(order.getCreatedAt())
                 .items(itemResponses)
+                .customerName(customerName)
+                .customerEmail(customerEmail)
+                .customerPhone(customerPhone)
                 .build();
     }
 }

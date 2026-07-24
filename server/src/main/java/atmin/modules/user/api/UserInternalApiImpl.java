@@ -6,6 +6,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Collections;
+import java.util.stream.Collectors;
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class UserInternalApiImpl implements UserInternalApi {
@@ -26,6 +31,17 @@ public class UserInternalApiImpl implements UserInternalApi {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found: " + id));
         return mapToDto(user);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserDto> getUsersByIds(List<String> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return userRepository.findByIdInAndDeletedAtIsNull(ids).stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -50,7 +66,7 @@ public class UserInternalApiImpl implements UserInternalApi {
 
     @Override
     @Transactional
-    public void updateUserPresence(String userId, boolean isOnline, java.time.LocalDateTime lastSeenAt) {
+    public void updateUserPresence(String userId, boolean isOnline, LocalDateTime lastSeenAt) {
         userRepository.findById(userId).ifPresent(user -> {
             user.setIsOnline(isOnline);
             user.setLastSeenAt(lastSeenAt);
@@ -65,6 +81,7 @@ public class UserInternalApiImpl implements UserInternalApi {
                 .fullName(user.getFullName())
                 .phoneNumber(user.getPhoneNumber())
                 .address(user.getAddress())
+                .avatarUrl(user.getAvatarUrl())
                 .status(user.getStatus())
                 .build();
     }

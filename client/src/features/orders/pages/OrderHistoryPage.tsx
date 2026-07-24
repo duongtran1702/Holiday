@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Package, Clock, XCircle, Receipt, AlertTriangle, Truck } from 'lucide-react';
+import { ArrowLeft, Package, Clock, Receipt, AlertTriangle, Truck } from 'lucide-react';
 import { useOrderHistory } from '../hooks/useOrderHistory';
 import { Button } from '../../../core/components/ui/forms/Button';
 import {
@@ -10,7 +10,6 @@ import {
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
-  AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '../../../core/components/ui/overlay/AlertDialog';

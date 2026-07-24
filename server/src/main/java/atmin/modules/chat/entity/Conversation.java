@@ -1,6 +1,6 @@
 package atmin.modules.chat.entity;
 
-import atmin.modules.user.entity.User;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -33,9 +33,8 @@ public class Conversation {
     @Column(name = "avatar_url")
     private String avatarUrl;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id", nullable = false)
-    private User customer;
+    @Column(name = "customer_id", nullable = false)
+    private String customerId;
 
     @Column(name = "status")
     @Builder.Default
@@ -49,7 +48,7 @@ public class Conversation {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "conversation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Transient
     @JsonIgnore
     @Builder.Default
     private List<ChatMessage> messages = new ArrayList<>();

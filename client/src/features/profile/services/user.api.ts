@@ -1,5 +1,5 @@
-import { callApi } from '../utils/callApi';
-import { AuthResponse, ApiResponse } from '../types';
+import { callApi } from '../../../core/utils/callApi';
+import { AuthResponse, ApiResponse } from '../../../core/types';
 
 export const userApi = {
     uploadAvatar: (file: File) => {

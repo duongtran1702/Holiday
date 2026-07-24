@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig, Method } from 'axios';
-import { store } from '../store/store/store';
-import { logout, setCredentials } from '../store/slice/authSlice';
+import { store } from '../store/store';
+import { logout, setCredentials } from '../../features/auth';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1';
 

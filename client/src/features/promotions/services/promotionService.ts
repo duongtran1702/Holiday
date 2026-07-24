@@ -36,11 +36,23 @@ export interface UserVoucher {
 export const promotionService = {
   // Admin
   getAllPromotions: () => {
-    return callApi<Promotion[]>('/admin/promotions', 'GET');
+    return callApi<Promotion[]>('/staff/promotions', 'GET');
   },
 
   createPromotion: (data: PromotionCreateReq) => {
-    return callApi<Promotion>('/admin/promotions', 'POST', data);
+    return callApi<Promotion>('/staff/promotions', 'POST', data);
+  },
+
+  updatePromotion: (id: string, data: PromotionCreateReq) => {
+    return callApi<Promotion>(`/staff/promotions/${id}`, 'PUT', data);
+  },
+
+  deletePromotion: (id: string) => {
+    return callApi<void>(`/staff/promotions/${id}`, 'DELETE');
+  },
+
+  togglePromotionStatus: (id: string) => {
+    return callApi<void>(`/staff/promotions/${id}/status`, 'PATCH');
   },
 
   // User
@@ -50,5 +62,12 @@ export const promotionService = {
 
   deleteMyVoucher: (id: string) => {
     return callApi<void>(`/promotions/my-vouchers/${id}`, 'DELETE');
+  },
+
+  validateCode: (code: string, totalAmount: number) => {
+    const params = new URLSearchParams();
+    params.append('code', code);
+    params.append('totalAmount', totalAmount.toString());
+    return callApi<{ data: Promotion, message: string }>(`/promotions/validate?${params.toString()}`, 'POST');
   },
 };

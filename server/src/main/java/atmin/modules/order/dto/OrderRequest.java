@@ -23,6 +23,8 @@ public class OrderRequest {
     @NotEmpty(message = "Order items cannot be empty")
     private List<OrderItemDto> items;
 
+    private String voucherCode;
+
     @Data
     public static class OrderItemDto {
         @NotBlank(message = "Product ID is required")

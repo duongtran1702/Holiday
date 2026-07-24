@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Package, Clock, ChevronRight } from 'lucide-react';
 import { orderApi } from "../../../features/orders/services/order.api";
-import { OrderResponse } from '../../../features/orders/types/order.types';
+import { OrderResponse } from "../../../features/orders/services/order.api";
 
 interface OrderHistoryPopupProps {
     isOpen: boolean;

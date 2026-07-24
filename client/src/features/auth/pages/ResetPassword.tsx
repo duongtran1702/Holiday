@@ -1,4 +1,4 @@
-import { Lock, ArrowRight, RefreshCw, AlertCircle, CheckCircle, Smartphone } from "lucide-react";
+import { Lock, ArrowRight, RefreshCw, AlertCircle, CheckCircle } from "lucide-react";
 import { InputField } from "../../../core/components/common/InputField";
 import { AuthLayout } from "../../../core/layout/AuthLayout";
 import { useNavigate, useLocation } from "react-router-dom";

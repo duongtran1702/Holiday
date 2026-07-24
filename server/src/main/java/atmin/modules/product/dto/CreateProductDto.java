@@ -22,6 +22,7 @@ public class CreateProductDto {
     private Integer reviews;
     private String image;
     private String badge;
+    private String status;
     private Set<String> colors;
     private Set<String> sizes;
     private Map<String, Integer> stock;

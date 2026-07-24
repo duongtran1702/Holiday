@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { X, MessageCircle, Send, Paperclip, Headphones } from "lucide-react";
 import { useSelector } from "react-redux";
-import { useChatWebSocket } from "../../store/useChatWebSocket";
-import { chatApi } from "../../api/chat.api";
+import { chatApi, useChatWebSocket } from "../../../features/inbox";
 import { MessageDTO } from "../../types";
 
 const FAQ_BUTTONS = [
@@ -37,9 +36,6 @@ export function ChatWidget({ loggedInAs }: Readonly<{ loggedInAs?: { name: strin
     }
   };
 
-
-
-  // Use any to bypass RootState import for now, or you can import RootState
   const token = useSelector((state: any) => state.auth.accessToken);
   const user = useSelector((state: any) => state.auth.user);
   
@@ -47,14 +43,14 @@ export function ChatWidget({ loggedInAs }: Readonly<{ loggedInAs?: { name: strin
   
   const userName = loggedInAs?.name ?? guestForm.name ?? user?.fullName;
 
-  const { messages, sendMessage, isConnected, setMessages, hasMore, isLoadingMore, loadMore, typingUsers, sendTyping } = useChatWebSocket({ 
+  const { messages, sendMessage, isConnected, hasMore, isLoadingMore, loadMore, typingUsers, sendTyping } = useChatWebSocket({ 
     token, 
     conversationId, 
     isViewing: open,
     userId: user?.id,
     userName: userName,
     userAvatar: user?.avatarUrl,
-    onNewMessage: (msg) => {
+    onNewMessage: (msg: MessageDTO) => {
       if (!open && msg.senderId !== "user" && msg.senderId !== user?.id) {
         setUnread(prev => prev + 1);
       }
@@ -83,7 +79,7 @@ export function ChatWidget({ loggedInAs }: Readonly<{ loggedInAs?: { name: strin
   // Initialize conversation when component mounts to get real unread count
   useEffect(() => {
     if (isReady && token && !conversationId) {
-      chatApi.getMyConversations().then(res => {
+      chatApi.getMyConversations().then((res: any) => {
         if (res?.data && res.data.length > 0) {
           const conv = res.data[0];
           setConversationId(conv.id);
@@ -92,13 +88,13 @@ export function ChatWidget({ loggedInAs }: Readonly<{ loggedInAs?: { name: strin
           }
         } else if (open) {
           // If no conversation exists, and user opens chat, start one
-          chatApi.startConversation().then(startRes => {
+          chatApi.startConversation().then((startRes: any) => {
             if (startRes && startRes.data) {
               setConversationId(startRes.data.id);
             }
-          }).catch(err => console.error("Could not start chat:", err));
+          }).catch((err: any) => console.error("Could not start chat:", err));
         }
-      }).catch(err => console.error("Could not fetch conversation:", err));
+      }).catch((err: any) => console.error("Could not fetch conversation:", err));
     }
   }, [open, isReady, token, conversationId]);
 
@@ -128,7 +124,7 @@ export function ChatWidget({ loggedInAs }: Readonly<{ loggedInAs?: { name: strin
     // Gửi yêu cầu lưu tin nhắn trả lời tự động của bot lên server
     if (conversationId) {
       setTimeout(() => {
-        chatApi.sendBotReply(conversationId, faq.answer).catch(err => console.error("Failed to send bot reply:", err));
+        chatApi.sendBotReply(conversationId, faq.answer).catch((err: any) => console.error("Failed to send bot reply:", err));
       }, 500);
     }
   };

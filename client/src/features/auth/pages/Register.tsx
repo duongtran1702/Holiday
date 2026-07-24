@@ -134,9 +134,9 @@ export function RegisterPage() {
               <InputField label="Địa chỉ kinh doanh" placeholder="Số nhà, đường, quận..." value={b2b.address} onChange={v => setB2b(p => ({ ...p, address: v }))} required />
             </div>
             {b2bError && <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700"><AlertCircle size={14} />{b2bError}</div>}
-            <button onClick={handleB2BSubmit}
-              className="w-full bg-primary text-primary-foreground py-3 rounded-xl font-semibold text-sm hover:bg-primary/90 transition-all flex items-center justify-center gap-2">
-              Gửi hồ sơ đăng ký <ArrowRight size={14} />
+            <button onClick={handleB2BSubmit} disabled={isRegistering}
+              className="w-full bg-primary text-primary-foreground py-3 rounded-xl font-semibold text-sm hover:bg-primary/90 transition-all flex items-center justify-center gap-2 disabled:opacity-70">
+              {isRegistering ? "Đang gửi hồ sơ..." : "Gửi hồ sơ đăng ký"} <ArrowRight size={14} />
             </button>
           </div>
         )}

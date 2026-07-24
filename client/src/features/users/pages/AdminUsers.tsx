@@ -1,4 +1,4 @@
-import { User, Users, CheckCircle, ChevronRight, Lock, Settings, Phone, Mail, ShieldCheck, UserPlus, Info } from "lucide-react";
+import { User, Users, CheckCircle, Lock, Settings, Phone, Mail, ShieldCheck, UserPlus, Info } from "lucide-react";
 import { PERMISSION_MODULES } from "../../../core/utils/mockData";
 import { StatusBadge } from "../../../core/components/common/StatusBadge";
 import { countPerms } from "../../../core/utils/helpers";
@@ -14,6 +14,7 @@ export function AdminUsers() {
     newStaff, setNewStaff,
     statusFilter, setStatusFilter,
     isSubmitting,
+    isStaffLoading,
     handleSavePerms,
     handleToggleStatus,
     handleAddStaff,
@@ -56,9 +57,9 @@ export function AdminUsers() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
           { label: "Tổng nhân viên", value: staff.length, icon: Users, color: "text-blue-600", bg: "bg-blue-50" },
-          { label: "Đang hoạt động", value: staff.filter(s => s.status === "Hoạt động").length, icon: CheckCircle, color: "text-emerald-600", bg: "bg-emerald-50" },
-          { label: "Tạm khóa", value: staff.filter(s => s.status === "Tạm khóa").length, icon: Lock, color: "text-red-600", bg: "bg-red-50" },
-          { label: "TB quyền/NV", value: Math.round(staff.reduce((s, m) => s + countPerms(m.permissions), 0) / Math.max(1, staff.length)), icon: ShieldCheck, color: "text-purple-600", bg: "bg-purple-50" },
+          { label: "Đang hoạt động", value: staff.filter((s: any) => s.status === "Hoạt động").length, icon: CheckCircle, color: "text-emerald-600", bg: "bg-emerald-50" },
+          { label: "Tạm khóa", value: staff.filter((s: any) => s.status === "Tạm khóa").length, icon: Lock, color: "text-red-600", bg: "bg-red-50" },
+          { label: "TB quyền/NV", value: Math.round(staff.reduce((s: number, m: any) => s + countPerms(m.permissions), 0) / Math.max(1, staff.length)), icon: ShieldCheck, color: "text-purple-600", bg: "bg-purple-50" },
         ].map((c, i) => (
           <div key={i} className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
             <div className={`w-9 h-9 ${c.bg} rounded-lg flex items-center justify-center shrink-0`}><c.icon size={16} className={c.color} /></div>
@@ -87,11 +88,15 @@ export function AdminUsers() {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {filteredStaff.length === 0 ? (
+            {isStaffLoading ? (
+              <tr>
+                <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground text-sm">Đang tải dữ liệu nhân viên...</td>
+              </tr>
+            ) : filteredStaff.length === 0 ? (
               <tr>
                 <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground text-sm">Không có nhân viên nào trong danh sách này.</td>
               </tr>
-            ) : filteredStaff.map(s => {
+            ) : filteredStaff.map((s: any) => {
               const total = countPerms(s.permissions);
               const modules = PERMISSION_MODULES.filter(m => Object.values(s.permissions[m.key] ?? {}).some(Boolean));
               return (

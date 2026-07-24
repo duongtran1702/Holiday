@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { atminDispatch } from '../../../core/store/reduxHook';
-import { setCredentials } from '../../../core/store/slice/authSlice';
+import { setCredentials } from '../store/authSlice';
 import { authApi } from '../services/auth.api';
 
 export const useRegister = () => {
@@ -63,10 +63,27 @@ export const useRegister = () => {
         }
     };
 
-    const handleB2BSubmit = () => {
+    const handleB2BSubmit = async () => {
         const e = validateB2B(); 
         if (e) { setB2bError(e); return; } 
-        setB2bStep("pending");
+
+        setIsRegistering(true);
+        try {
+            await authApi.registerAgent({
+                email: b2b.email,
+                password: b2b.pw,
+                name: b2b.name,
+                phone: b2b.phone,
+                business: b2b.business,
+                tax: b2b.tax,
+                address: b2b.address
+            });
+            setB2bStep("pending");
+        } catch (err: any) {
+            setB2bError(err.response?.data?.message || "Đăng ký thất bại");
+        } finally {
+            setIsRegistering(false);
+        }
     };
 
     return {

@@ -8,6 +8,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import atmin.common.response.ApiResponse;
+import atmin.modules.promotion.dto.PromotionDTO;
+import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/api/v1/promotions")
@@ -27,5 +30,16 @@ public class UserPromotionController {
             @AuthenticationPrincipal atmin.modules.user.entity.User user) {
         promotionService.deleteMyVoucher(user.getId(), id);
         return ResponseEntity.noContent().build();
+    }
+    
+    @PostMapping("/validate")
+    public ResponseEntity<ApiResponse<PromotionDTO>> validateCode(
+            @RequestParam String code, 
+            @RequestParam BigDecimal totalAmount,
+            @AuthenticationPrincipal atmin.modules.user.entity.User user) {
+        return ResponseEntity.ok(ApiResponse.success(
+                "Mã giảm giá hợp lệ", 
+                promotionService.validateVoucher(code, totalAmount, user.getId())
+        ));
     }
 }

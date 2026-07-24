@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/admin/promotions")
+@RequestMapping("/api/v1/staff/promotions")
 @RequiredArgsConstructor
 public class AdminPromotionController {
 
@@ -27,5 +27,25 @@ public class AdminPromotionController {
     @PreAuthorize("hasAuthority('CREATE_PROMOTIONS')")
     public ResponseEntity<PromotionDTO> createPromotion(@RequestBody PromotionCreateReq req) {
         return ResponseEntity.ok(promotionService.createPromotion(req));
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('UPDATE_PROMOTIONS')")
+    public ResponseEntity<PromotionDTO> updatePromotion(@PathVariable String id, @RequestBody PromotionCreateReq req) {
+        return ResponseEntity.ok(promotionService.updatePromotion(id, req));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('DELETE_PROMOTIONS')")
+    public ResponseEntity<Void> deletePromotion(@PathVariable String id) {
+        promotionService.deletePromotion(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/status")
+    @PreAuthorize("hasAuthority('UPDATE_PROMOTIONS')")
+    public ResponseEntity<Void> togglePromotionStatus(@PathVariable String id) {
+        promotionService.togglePromotionStatus(id);
+        return ResponseEntity.ok().build();
     }
 }
