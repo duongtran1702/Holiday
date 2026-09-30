@@ -1,0 +1,47 @@
+# =========================================================================
+# MICROSERVICES MULTI-PROJECT .GITIGNORE
+# =========================================================================
+
+# Secrets & Environment variables
+.env
+.env.*
+*.env
+!*.env.example
+!*.env.sample
+*.pem
+*.key
+*.p12
+*.jks
+
+# Gradle & Build Artifacts
+.gradle/
+build/
+**/build/
+out/
+**/out/
+bin/
+**/bin/
+*.class
+*.war
+*.ear
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+
+# Crash logs
+hs_err_pid*
+replay_pid*
+
+# IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.classpath
+.project
+
+# Docker data & logs
+logs/
+*.log
+data/

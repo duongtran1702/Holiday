@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="780" viewBox="0 0 1500 780">
+<defs><style>.t{font:700 30px Arial;fill:#17324d}.h{font:700 18px Arial;fill:#17324d}.s{font:15px Arial;fill:#394b57}.b{stroke:#17324d;stroke-width:2.4;rx:15}.a{stroke:#71808a;stroke-width:3;fill:none;marker-end:url(#m)}</style><marker id="m" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0 0L10 3 0 6Z" fill="#71808a"/></marker></defs>
+<rect width="1500" height="780" fill="white"/><text x="750" y="50" text-anchor="middle" class="t">PHÂN LOẠI XỬ LÝ PAYOS WEBHOOK</text>
+<rect x="60" y="250" width="220" height="105" fill="#fcebd0" class="b"/><text x="170" y="292" text-anchor="middle" class="h">Nhận webhook</text><text x="170" y="323" text-anchor="middle" class="s">Payload + chữ ký</text>
+<rect x="355" y="250" width="240" height="105" fill="#e7f1fa" class="b"/><text x="475" y="292" text-anchor="middle" class="h">Kiểm tra request</text><text x="475" y="323" text-anchor="middle" class="s">JSON, chữ ký, mã đơn</text>
+<rect x="690" y="105" width="250" height="105" fill="#f0e4f5" class="b"/><text x="815" y="147" text-anchor="middle" class="h">Request không hợp lệ</text><text x="815" y="178" text-anchor="middle" class="s">HTTP 400 • Không retry</text>
+<rect x="690" y="305" width="250" height="105" fill="#dceedd" class="b"/><text x="815" y="347" text-anchor="middle" class="h">Xử lý nghiệp vụ</text><text x="815" y="378" text-anchor="middle" class="s">Payment • Order • Event</text>
+<rect x="1040" y="245" width="250" height="105" fill="#dceedd" class="b"/><text x="1165" y="287" text-anchor="middle" class="h">Thành công</text><text x="1165" y="318" text-anchor="middle" class="s">HTTP 200</text>
+<rect x="1040" y="445" width="250" height="105" fill="#f0e4f5" class="b"/><text x="1165" y="487" text-anchor="middle" class="h">Lỗi nội bộ</text><text x="1165" y="518" text-anchor="middle" class="s">HTTP 500 • PayOS retry</text>
+<path d="M280 302H355M595 280L690 158M595 320L690 357M940 337L1040 297M940 377L1040 497" class="a"/>
+<rect x="300" y="640" width="900" height="75" fill="#f7f9fb" stroke="#c3ccd3" stroke-width="2" rx="14"/><text x="750" y="685" text-anchor="middle" class="h">Xử lý idempotent: webhook gửi lại không ghi nhận thanh toán hai lần</text>
+</svg>

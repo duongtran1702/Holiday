@@ -1,0 +1,117 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  config:
+    import: "optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888/}"
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: false # Cấu hình tĩnh: không dùng locator tự động
+      routes:
+        # 1. Identity & Auth Service Routes
+        - id: identity-auth-route
+          uri: lb://identity-service
+          predicates:
+            - Path=/api/v1/auth/**
+        - id: identity-user-route
+          uri: lb://identity-service
+          predicates:
+            - Path=/api/v1/users/**, /api/v1/admin/users/**, /api/v1/admin/roles/**, /api/v1/admin/agents/**
+
+        # 2. Product Service Routes
+        - id: product-service-route
+          uri: lb://product-service
+          predicates:
+            - Path=/api/v1/products/**, /api/v1/admin/products/**, /api/v1/categories/**, /api/v1/brands/**
+
+        # 3. Order & Dashboard Service Routes
+        - id: order-service-route
+          uri: lb://order-service
+          predicates:
+            - Path=/api/v1/orders/**, /api/v1/admin/orders/**, /api/v1/dashboard/**
+
+        # 4. Payment Service Routes
+        - id: payment-service-route
+          uri: lb://payment-service
+          predicates:
+            - Path=/api/v1/payments/**
+
+        # 5. Promotion Service Routes
+        - id: promotion-service-route
+          uri: lb://promotion-service
+          predicates:
+            - Path=/api/v1/promotions/**, /api/v1/admin/promotions/**, /api/v1/user/promotions/**
+
+        # 6. Notification Service Routes
+        - id: notification-service-route
+          uri: lb://notification-service
+          predicates:
+            - Path=/api/v1/notifications/**
+
+        # 7. Media Service Routes
+        - id: media-service-route
+          uri: lb://media-service
+          predicates:
+            - Path=/api/v1/media/**
+
+        # 8. Chat REST Routes
+        - id: chat-rest-route
+          uri: lb://chat-service
+          predicates:
+            - Path=/api/v1/chat/**
+
+        # 9. WebSocket Chat Route
+        - id: chat-websocket-route
+          uri: lb:ws://chat-service
+          predicates:
+            - Path=/ws-chat/**
+
+      # Cấu hình tĩnh CORS cho phép Frontend truy cập
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:5173"
+              - "http://127.0.0.1:5173"
+              - "${FRONTEND_URL:http://localhost:5173}"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+
+# Cấu hình Atmin Library cho API Gateway theo USAGE.md
+atmin:
+  exceptions:
+    enabled: true
+    gateway-enabled: true
+    gateway-order: -2
+    microservice-enabled: true
+    downstream-preserve-client-errors: true
+    downstream-expose-service-name: false
+    trace-id-header: X-Trace-Id
+    echo-trace-id-header: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway

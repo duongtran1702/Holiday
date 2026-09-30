@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="700" viewBox="0 0 1500 700">
+<defs><style>.t{font:700 30px Arial;fill:#17324d}.h{font:700 19px Arial;fill:#17324d}.s{font:15px Arial;fill:#394b57}.b{stroke:#17324d;stroke-width:2.4;rx:16}.a{stroke:#71808a;stroke-width:3;fill:none;marker-end:url(#m)}</style><marker id="m" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0 0L10 3 0 6Z" fill="#71808a"/></marker></defs>
+<rect width="1500" height="700" fill="white"/><text x="750" y="48" text-anchor="middle" class="t">CHUỖI TRUY VẾT YÊU CẦU</text>
+<rect x="50" y="210" width="220" height="120" fill="#fcebd0" class="b"/><text x="160" y="258" text-anchor="middle" class="h">Yêu cầu</text><text x="160" y="292" text-anchor="middle" class="s">FR / NFR / BR</text>
+<rect x="345" y="210" width="220" height="120" fill="#e7f1fa" class="b"/><text x="455" y="258" text-anchor="middle" class="h">Use case</text><text x="455" y="292" text-anchor="middle" class="s">Luồng và ngoại lệ</text>
+<rect x="640" y="210" width="220" height="120" fill="#dceedd" class="b"/><text x="750" y="258" text-anchor="middle" class="h">API / Service</text><text x="750" y="292" text-anchor="middle" class="s">Xử lý nghiệp vụ</text>
+<rect x="935" y="210" width="220" height="120" fill="#f0e4f5" class="b"/><text x="1045" y="258" text-anchor="middle" class="h">Dữ liệu</text><text x="1045" y="292" text-anchor="middle" class="s">Bảng và ràng buộc</text>
+<rect x="1230" y="210" width="220" height="120" fill="#fcebd0" class="b"/><text x="1340" y="258" text-anchor="middle" class="h">Test case</text><text x="1340" y="292" text-anchor="middle" class="s">Bằng chứng nghiệm thu</text>
+<path d="M270 270H345M565 270H640M860 270H935M1155 270H1230" class="a"/>
+<rect x="220" y="470" width="1060" height="95" fill="#f7f9fb" stroke="#c3ccd3" stroke-width="2" rx="14"/><text x="750" y="510" text-anchor="middle" class="h">Khi một yêu cầu thay đổi, các đối tượng liên quan phải được rà soát theo cả hai chiều</text><text x="750" y="542" text-anchor="middle" class="s">Ví dụ: trạng thái CANCELLED → frontend, service, database, API response và test case phải đồng nhất</text>
+</svg>

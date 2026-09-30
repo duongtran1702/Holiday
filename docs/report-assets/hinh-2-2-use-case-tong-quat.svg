@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="950" viewBox="0 0 1500 950">
+<defs><style>.t{font:700 30px Arial;fill:#17324d}.h{font:700 18px Arial;fill:#17324d}.s{font:15px Arial;fill:#394b57}.actor{stroke:#17324d;stroke-width:3}.uc{fill:#eef5f9;stroke:#17324d;stroke-width:2.2}.line{stroke:#7a8891;stroke-width:2.2}</style></defs>
+<rect width="1500" height="950" fill="white"/><text x="750" y="48" text-anchor="middle" class="t">BIỂU ĐỒ CA SỬ DỤNG TỔNG QUÁT</text>
+<rect x="330" y="90" width="840" height="790" fill="#fbfcfd" stroke="#17324d" stroke-width="3" rx="22"/><text x="750" y="125" text-anchor="middle" class="h">Holiday Fashion</text>
+<g class="actor"><circle cx="130" cy="235" r="28" fill="white"/><path d="M130 263V345M75 295H185M130 345L85 410M130 345L175 410"/></g><text x="130" y="450" text-anchor="middle" class="h">Khách B2C</text>
+<g class="actor"><circle cx="130" cy="565" r="28" fill="white"/><path d="M130 593V675M75 625H185M130 675L85 740M130 675L175 740"/></g><text x="130" y="780" text-anchor="middle" class="h">Đại lý B2B</text>
+<g class="actor"><circle cx="1360" cy="430" r="28" fill="white"/><path d="M1360 458V540M1305 490H1415M1360 540L1315 605M1360 540L1405 605"/></g><text x="1360" y="645" text-anchor="middle" class="h">Admin/Staff</text>
+<ellipse cx="530" cy="205" rx="145" ry="42" class="uc"/><text x="530" y="211" text-anchor="middle" class="h">Tài khoản &amp; hồ sơ</text>
+<ellipse cx="800" cy="205" rx="145" ry="42" class="uc"/><text x="800" y="211" text-anchor="middle" class="h">Xem sản phẩm</text>
+<ellipse cx="530" cy="340" rx="145" ry="42" class="uc"/><text x="530" y="346" text-anchor="middle" class="h">Giỏ hàng B2C</text>
+<ellipse cx="800" cy="340" rx="145" ry="42" class="uc"/><text x="800" y="346" text-anchor="middle" class="h">Tạo đơn hàng</text>
+<ellipse cx="530" cy="475" rx="145" ry="42" class="uc"/><text x="530" y="481" text-anchor="middle" class="h">Thanh toán</text>
+<ellipse cx="800" cy="475" rx="145" ry="42" class="uc"/><text x="800" y="481" text-anchor="middle" class="h">Lịch sử đơn</text>
+<ellipse cx="530" cy="610" rx="145" ry="42" class="uc"/><text x="530" y="616" text-anchor="middle" class="h">Đăng ký đại lý</text>
+<ellipse cx="800" cy="610" rx="145" ry="42" class="uc"/><text x="800" y="616" text-anchor="middle" class="h">Đặt hàng B2B</text>
+<ellipse cx="530" cy="745" rx="145" ry="42" class="uc"/><text x="530" y="751" text-anchor="middle" class="h">Chat &amp; thông báo</text>
+<ellipse cx="955" cy="745" rx="145" ry="42" class="uc"/><text x="955" y="751" text-anchor="middle" class="h">Quản trị &amp; báo cáo</text>
+<path d="M185 300L385 205M185 300L385 340M185 300L385 475M185 300L655 475" class="line"/>
+<path d="M185 630L385 610M185 630L655 610M185 630L385 745" class="line"/>
+<path d="M1305 500L1100 745M1305 500L945 610M1305 500L945 340M1305 500L675 745" class="line"/>
+</svg>

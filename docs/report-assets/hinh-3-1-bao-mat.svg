@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="760" viewBox="0 0 1500 760">
+<defs><style>.t{font:700 30px Arial;fill:#17324d}.h{font:700 18px Arial;fill:#17324d}.s{font:15px Arial;fill:#394b57}.b{stroke:#17324d;stroke-width:2.4;rx:15}.a{stroke:#71808a;stroke-width:3;fill:none;marker-end:url(#m)}</style><marker id="m" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0 0L10 3 0 6Z" fill="#71808a"/></marker></defs>
+<rect width="1500" height="760" fill="white"/><text x="750" y="50" text-anchor="middle" class="t">LUỒNG XÁC THỰC VÀ PHÂN QUYỀN</text>
+<rect x="55" y="220" width="220" height="110" fill="#fcebd0" class="b"/><text x="165" y="262" text-anchor="middle" class="h">Đăng nhập</text><text x="165" y="294" text-anchor="middle" class="s">Email + mật khẩu</text>
+<rect x="340" y="220" width="220" height="110" fill="#e7f1fa" class="b"/><text x="450" y="262" text-anchor="middle" class="h">Xác thực</text><text x="450" y="294" text-anchor="middle" class="s">BCrypt / UserDetails</text>
+<rect x="625" y="220" width="220" height="110" fill="#dceedd" class="b"/><text x="735" y="262" text-anchor="middle" class="h">Cấp JWT</text><text x="735" y="294" text-anchor="middle" class="s">Chữ ký + thời hạn</text>
+<rect x="910" y="220" width="220" height="110" fill="#dceedd" class="b"/><text x="1020" y="262" text-anchor="middle" class="h">JWT Filter</text><text x="1020" y="294" text-anchor="middle" class="s">Kiểm tra mỗi request</text>
+<rect x="1195" y="130" width="230" height="105" fill="#fcebd0" class="b"/><text x="1310" y="172" text-anchor="middle" class="h">Role/Permission</text><text x="1310" y="203" text-anchor="middle" class="s">Cho phép</text>
+<rect x="1195" y="340" width="230" height="105" fill="#f0e4f5" class="b"/><text x="1310" y="382" text-anchor="middle" class="h">Từ chối</text><text x="1310" y="413" text-anchor="middle" class="s">401 hoặc 403</text>
+<path d="M275 275H340M560 275H625M845 275H910M1130 255L1195 182M1130 295L1195 392" class="a"/>
+<rect x="265" y="535" width="970" height="105" fill="#f7f9fb" stroke="#c3ccd3" stroke-width="2" rx="15"/>
+<text x="750" y="575" text-anchor="middle" class="h">Các lớp bảo vệ bổ sung</text><text x="750" y="609" text-anchor="middle" class="s">Validation • CORS • Không trả dữ liệu bí mật • Biến môi trường • Log và xử lý exception</text>
+</svg>

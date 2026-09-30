@@ -1,0 +1,38 @@
+package atmin.modules.notification.repository;
+
+import atmin.modules.notification.entity.Notification;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+@Repository
+public interface NotificationRepository extends JpaRepository<Notification, UUID> {
+
+    long countByIsResolvedFalse();
+    long countByIsReadFalse();
+
+    List<Notification> findAllByOrderByCreatedAtDesc(Pageable pageable);
+
+    List<Notification> findAllByTargetRoleOrderByCreatedAtDesc(String targetRole, Pageable pageable);
+    
+    List<Notification> findByTargetUserIdOrderByCreatedAtDesc(String userId, Pageable pageable);
+    long countByTargetUserIdAndIsReadFalse(String userId);
+    long countByTargetRoleAndIsReadFalse(String targetRole);
+
+    Optional<Notification> findFirstByTypeAndEntityIdAndIsResolvedFalse(String type, String entityId);
+
+    @Modifying
+    @Query("UPDATE Notification n SET n.isRead = true WHERE n.id IN :ids AND n.targetUserId = :userId")
+    void markAsReadForUser(@Param("ids") List<UUID> ids, @Param("userId") String userId);
+
+    @Modifying
+    @Query("UPDATE Notification n SET n.isRead = true WHERE n.id IN :ids AND n.targetRole = :targetRole")
+    void markAsReadForRole(@Param("ids") List<UUID> ids, @Param("targetRole") String targetRole);
+}

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="980" viewBox="0 0 1600 980">
+<defs><style>.t{font:700 30px Arial;fill:#17324d}.h{font:700 18px Arial;fill:#17324d}.s{font:15px Arial;fill:#394b57}.b{stroke:#17324d;stroke-width:2.4;rx:16}.a{stroke:#71808a;stroke-width:3;fill:none;marker-end:url(#m)}.x{stroke:#b23b3b;stroke-width:3;fill:none;stroke-dasharray:8 6;marker-end:url(#r)}</style><marker id="m" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0 0L10 3 0 6Z" fill="#71808a"/></marker><marker id="r" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0 0L10 3 0 6Z" fill="#b23b3b"/></marker></defs>
+<rect width="1600" height="980" fill="white"/><text x="800" y="48" text-anchor="middle" class="t">MÔ HÌNH TRẠNG THÁI NGHIỆP VỤ CỐT LÕI</text>
+<text x="90" y="110" class="h">Đơn hàng</text>
+<rect x="90" y="150" width="210" height="80" fill="#e7f1fa" class="b"/><text x="195" y="198" text-anchor="middle" class="h">PENDING</text>
+<rect x="390" y="150" width="210" height="80" fill="#fcebd0" class="b"/><text x="495" y="198" text-anchor="middle" class="h">CONFIRMED</text>
+<rect x="690" y="150" width="210" height="80" fill="#dceedd" class="b"/><text x="795" y="198" text-anchor="middle" class="h">PROCESSING</text>
+<rect x="990" y="150" width="210" height="80" fill="#dceedd" class="b"/><text x="1095" y="198" text-anchor="middle" class="h">COMPLETED</text>
+<rect x="690" y="290" width="210" height="80" fill="#f0e4f5" class="b"/><text x="795" y="338" text-anchor="middle" class="h">CANCELLED</text>
+<path d="M300 190H390M600 190H690M900 190H990M195 230L690 315M495 230L690 315" class="a"/>
+<text x="90" y="460" class="h">Thanh toán</text>
+<rect x="90" y="500" width="210" height="80" fill="#e7f1fa" class="b"/><text x="195" y="548" text-anchor="middle" class="h">PENDING</text>
+<rect x="420" y="500" width="210" height="80" fill="#dceedd" class="b"/><text x="525" y="548" text-anchor="middle" class="h">PAID</text>
+<rect x="420" y="650" width="210" height="80" fill="#f0e4f5" class="b"/><text x="525" y="698" text-anchor="middle" class="h">CANCELLED</text>
+<rect x="750" y="650" width="210" height="80" fill="#f0e4f5" class="b"/><text x="855" y="698" text-anchor="middle" class="h">FAILED</text>
+<path d="M300 540H420M195 580L420 675M300 565L750 675" class="a"/>
+<path d="M630 690L420 545" class="x"/><text x="650" y="610" class="s">Không tự chuyển ngược</text>
+<text x="1060" y="460" class="h">Hồ sơ đại lý</text>
+<rect x="1050" y="500" width="210" height="80" fill="#e7f1fa" class="b"/><text x="1155" y="548" text-anchor="middle" class="h">PENDING</text>
+<rect x="1320" y="420" width="210" height="80" fill="#dceedd" class="b"/><text x="1425" y="468" text-anchor="middle" class="h">APPROVED</text>
+<rect x="1320" y="600" width="210" height="80" fill="#f0e4f5" class="b"/><text x="1425" y="648" text-anchor="middle" class="h">REJECTED</text>
+<path d="M1260 525L1320 475M1260 555L1320 625" class="a"/>
+<rect x="140" y="835" width="1320" height="75" fill="#f7f9fb" stroke="#c3ccd3" stroke-width="2" rx="14"/><text x="800" y="880" text-anchor="middle" class="h">Mọi bước chuyển phải kiểm tra permission, trạng thái hiện tại và quy tắc nghiệp vụ liên quan</text>
+</svg>

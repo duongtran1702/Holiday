@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="760" viewBox="0 0 1400 760">
+  <defs>
+    <style>
+      .title{font:700 30px Arial;fill:#17324d}.label{font:700 19px Arial;fill:#17324d}
+      .small{font:16px Arial;fill:#384955}.box{stroke:#17324d;stroke-width:2.5;rx:18}
+      .arrow{stroke:#687985;stroke-width:3;fill:none;marker-end:url(#m)}
+    </style>
+    <marker id="m" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#687985"/>
+    </marker>
+  </defs>
+  <rect width="1400" height="760" fill="#fff"/>
+  <text x="700" y="55" text-anchor="middle" class="title">QUY TRÌNH KINH DOANH TỔNG QUÁT HOLIDAY FASHION</text>
+  <rect x="70" y="135" width="220" height="110" fill="#fcebd0" class="box"/>
+  <text x="180" y="180" text-anchor="middle" class="label">1. Tiếp cận</text>
+  <text x="180" y="210" text-anchor="middle" class="small">B2C / Đại lý B2B</text>
+  <rect x="360" y="135" width="220" height="110" fill="#e7f1fa" class="box"/>
+  <text x="470" y="180" text-anchor="middle" class="label">2. Chọn hàng</text>
+  <text x="470" y="210" text-anchor="middle" class="small">Sản phẩm, số lượng</text>
+  <rect x="650" y="135" width="220" height="110" fill="#e7f1fa" class="box"/>
+  <text x="760" y="180" text-anchor="middle" class="label">3. Tạo đơn</text>
+  <text x="760" y="210" text-anchor="middle" class="small">B2C hoặc B2B</text>
+  <rect x="940" y="135" width="220" height="110" fill="#dceedd" class="box"/>
+  <text x="1050" y="180" text-anchor="middle" class="label">4. Thanh toán</text>
+  <text x="1050" y="210" text-anchor="middle" class="small">COD / PayOS</text>
+  <path d="M290 190 H360" class="arrow"/><path d="M580 190 H650" class="arrow"/><path d="M870 190 H940" class="arrow"/>
+  <rect x="940" y="365" width="220" height="110" fill="#f0e4f5" class="box"/>
+  <text x="1050" y="410" text-anchor="middle" class="label">5. Xử lý đơn</text>
+  <text x="1050" y="440" text-anchor="middle" class="small">Xác nhận, giao hàng</text>
+  <rect x="650" y="365" width="220" height="110" fill="#dceedd" class="box"/>
+  <text x="760" y="410" text-anchor="middle" class="label">6. Thông báo</text>
+  <text x="760" y="440" text-anchor="middle" class="small">Email, hệ thống, chat</text>
+  <rect x="360" y="365" width="220" height="110" fill="#e7f1fa" class="box"/>
+  <text x="470" y="410" text-anchor="middle" class="label">7. Theo dõi</text>
+  <text x="470" y="440" text-anchor="middle" class="small">Lịch sử và trạng thái</text>
+  <rect x="70" y="365" width="220" height="110" fill="#fcebd0" class="box"/>
+  <text x="180" y="410" text-anchor="middle" class="label">8. Báo cáo</text>
+  <text x="180" y="440" text-anchor="middle" class="small">Doanh thu B2C/B2B</text>
+  <path d="M1050 245 V365" class="arrow"/><path d="M940 420 H870" class="arrow"/>
+  <path d="M650 420 H580" class="arrow"/><path d="M360 420 H290" class="arrow"/>
+  <rect x="240" y="590" width="920" height="90" fill="#f7f9fb" stroke="#c3ccd3" stroke-width="2" rx="15"/>
+  <text x="700" y="625" text-anchor="middle" class="label">Dữ liệu được quản lý tập trung</text>
+  <text x="700" y="655" text-anchor="middle" class="small">Người dùng • Sản phẩm • Đơn hàng • Thanh toán • Khuyến mãi • Thông báo</text>
+</svg>

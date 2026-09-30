@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="920" viewBox="0 0 1500 920">
+<defs><style>.t{font:700 30px Arial;fill:#17324d}.h{font:700 18px Arial;fill:#17324d}.s{font:15px Arial;fill:#394b57}.life{stroke:#8a979f;stroke-width:2;stroke-dasharray:8 7}.msg{stroke:#17324d;stroke-width:2.5;marker-end:url(#m)}.ret{stroke:#687985;stroke-width:2;stroke-dasharray:7 6;marker-end:url(#m2)}</style><marker id="m" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0 0L10 3 0 6Z" fill="#17324d"/></marker><marker id="m2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0 0L10 3 0 6Z" fill="#687985"/></marker></defs>
+<rect width="1500" height="920" fill="white"/><text x="750" y="48" text-anchor="middle" class="t">BIỂU ĐỒ TUẦN TỰ THANH TOÁN PAYOS</text>
+<g fill="#e7f1fa" stroke="#17324d" stroke-width="2"><rect x="70" y="90" width="220" height="70" rx="12"/><rect x="410" y="90" width="220" height="70" rx="12"/><rect x="750" y="90" width="220" height="70" rx="12"/><rect x="1090" y="90" width="220" height="70" rx="12"/></g>
+<text x="180" y="132" text-anchor="middle" class="h">Người dùng</text><text x="520" y="132" text-anchor="middle" class="h">Frontend</text><text x="860" y="132" text-anchor="middle" class="h">Backend</text><text x="1200" y="132" text-anchor="middle" class="h">PayOS</text>
+<path d="M180 160V860M520 160V860M860 160V860M1200 160V860" class="life"/>
+<path d="M180 225H520" class="msg"/><text x="350" y="215" text-anchor="middle" class="s">Chọn thanh toán PayOS</text>
+<path d="M520 300H860" class="msg"/><text x="690" y="290" text-anchor="middle" class="s">Yêu cầu tạo liên kết</text>
+<path d="M860 375H1200" class="msg"/><text x="1030" y="365" text-anchor="middle" class="s">Tạo payment link</text>
+<path d="M1200 450H860" class="ret"/><text x="1030" y="440" text-anchor="middle" class="s">URL thanh toán</text>
+<path d="M860 525H520" class="ret"/><text x="690" y="515" text-anchor="middle" class="s">Trả URL</text>
+<path d="M520 600H180" class="msg"/><text x="350" y="590" text-anchor="middle" class="s">Chuyển hướng</text>
+<path d="M1200 675H860" class="msg"/><text x="1030" y="665" text-anchor="middle" class="s">Webhook đã ký</text>
+<path d="M860 750H1200" class="ret"/><text x="1030" y="740" text-anchor="middle" class="s">HTTP 200 / 400 / 500</text>
+<path d="M860 825H520" class="ret"/><text x="690" y="815" text-anchor="middle" class="s">Trạng thái đơn/thanh toán</text>
+</svg>
